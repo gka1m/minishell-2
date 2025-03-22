@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zchan <zchan@student.42singapore.sg>       +#+  +:+       +#+        */
+/*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/22 16:23:16 by zchan            ###   ########.fr       */
+/*   Updated: 2025/03/22 17:50:08 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,7 @@ void					free_split(char **split);
 // parsing functions
 t_ast	*create_ast_node(t_ast_type type, t_minishell *shell);
 char    *append_char(char c, char *str);
-
+t_ast   *parse_pipeline(t_token **tokens, t_minishell *shell);
 
 // signals
 void    sigint_handler(int signo);
