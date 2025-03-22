@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zchan <zchan@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/20 16:00:34 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/22 16:23:16 by zchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,12 +100,20 @@ typedef struct s_heredoc
 // Struct for pipe child process configuration
 typedef struct  s_pipechild
 {
-    t_ast *ast;
-    t_minishell *minishell;
-    int read_fd;
-    int write_fd;
-    int std_fd;
-} t_pipechild;
+    t_ast		*ast;
+    t_minishell	*minishell;
+    int			read_fd;
+    int			write_fd;
+    int			std_fd;
+}				t_pipechild;
+
+// Structure for storing key-value pairs of environment variables
+typedef struct s_env
+{
+    char			*key;
+    char			*value;
+    struct s_env	*next;
+}					t_env;
 
 /* function prototypes */
 

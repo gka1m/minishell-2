@@ -6,7 +6,7 @@
 /*   By: zchan <zchan@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/19 11:13:34 by zchan             #+#    #+#             */
-/*   Updated: 2025/03/22 14:44:12 by zchan            ###   ########.fr       */
+/*   Updated: 2025/03/22 16:06:53 by zchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int	execute_builtin(const char *cmd, char **args, t_minishell *minishell)
 		return (builtin_echo(args));
 	else if (ft_strncmp(cmd, "cd", 2) == 0)
 		return (builtin_cd(args, minishell));
-	else if (ft_strncmp(cmd, "pwd", 3) == 0)
+	else if (ft_strncmp(cmd, "pwd", 3) == 0)    
 		return (builtin_pwd());
 	else if (ft_strncmp(cmd, "export", 6) == 0)
 		return (builtin_export(args, minishell));
@@ -64,22 +64,26 @@ int	builtin_echo(char **args)
 
 // cd
 // Changes the current directory to the path specified in args[1]
-// Only supports relative or absolute paths
-// Update current working directory "getcwd(minishell->cwd, PATH_MAX);"
-int	builtin_cd(char **args, t_minishell *minishell)
+// Save the current working directory before changing it
+// Update `$OLDPWD` and `$PWD`
+int builtin_cd(char **args, t_minishell *minishell)
 {
-	if (!args[1])
-	{
-		printf("cd: missing argument\n");
-		return (-1);
-	}
-	if (chdir(args[1]) == -1)
-	{
-		perror("cd");
-		return (-1);
-	}
-	getcwd(minishell->cwd, PATH_MAX);
-	return (0);
+    char oldpwd[PATH_MAX];
+
+    if (!getcwd(oldpwd, sizeof(oldpwd)))
+    {
+        perror("getcwd");
+        return (-1);
+    }
+    if (!args[1] || strcmp(args[1], "--") == 0)
+        return change_to_home(args);
+    else if (ft_strcmp(args[1], "-") == 0)
+        return change_to_oldpwd(args);
+    else if (args[1][0] == '~')
+        return change_to_expanded_home(args);
+    else
+        return change_to_directory(args); // return chdir(args[1]);
+    return update_oldpwd_and_pwd(minishell, oldpwd);
 }
 
 // pwd
@@ -101,6 +105,8 @@ int	builtin_pwd(void)
 // Adds or updates environment variables
 // Expects arguments in the format VAR=value
 // if !args[i], print all environment variables
+// (first letter of key needs to be _ or alpha, nothing else)
+// (key exists (eg "a"), you export with no value, it don't change)
 int	builtin_export(char **args, t_minishell *minishell)
 {
 	int	i;
@@ -123,3 +129,90 @@ int	builtin_export(char **args, t_minishell *minishell)
 	}
 	return (0);
 }
+
+
+/* OLD SIMPLE VERSION
+// cd
+// Changes the current directory to the path specified in args[1]
+// Update current working directory "getcwd(minishell->cwd, PATH_MAX);"
+int	builtin_cd(char **args, t_minishell *minishell)
+{
+	if (!args[1])
+	{
+		printf("cd: missing argument\n");
+		return (-1);
+	}
+	if (chdir(args[1]) == -1)
+	{
+		perror("cd");
+		return (-1);
+	}
+	getcwd(minishell->cwd, PATH_MAX);
+	return (0);
+}
+
+NEW LONG VERSION
+// cd ..    up one dir "chdir(args[1])"
+// cd .     stays in current dir "chdir(args[1])"
+// cd       $HOME
+// cd ~/Desktop $HOME
+// cd -     $OLDPWD (previous directory)
+// cd --    behave like cd ie $HOME
+int builtin_cd(char **args, t_minishell *minishell)
+{
+    char *dest;
+    char oldpwd[PATH_MAX];
+
+    // Save the current working directory before changing it
+    if (!getcwd(oldpwd, sizeof(oldpwd))) {
+        perror("getcwd");
+        return (-1);
+    }
+
+    // Case: `cd` or `cd --` → Go to `$HOME`
+    if (!args[1] || strcmp(args[1], "--") == 0) {
+        dest = getenv("HOME");
+        if (!dest) {
+            printf("cd: HOME not set\n");
+            return (-1);
+        }
+    }
+    // Case: `cd -` → Switch to `$OLDPWD`
+    else if (strcmp(args[1], "-") == 0) {
+        dest = getenv("OLDPWD");
+        if (!dest) {
+            printf("cd: OLDPWD not set\n");
+            return (-1);
+        }
+        printf("%s\n", dest);  // Print the directory being switched to (Bash behavior)
+    }
+    // Case: `cd ~/Desktop` → Expand `~` to `$HOME`
+    else if (args[1][0] == '~') {
+        char *home = getenv("HOME");
+        if (!home) {
+            printf("cd: HOME not set\n");
+            return (-1);
+        }
+        // Construct full path: `$HOME/Desktop`
+        char full_path[PATH_MAX];
+        snprintf(full_path, sizeof(full_path), "%s%s", home, args[1] + 1);
+        dest = full_path;
+    }
+    else {
+        dest = args[1];  // Standard directory change
+    }
+
+    // Attempt to change directory
+    if (chdir(dest) == -1) {
+        perror("cd");
+        return (-1);
+    }
+
+    // Update `$OLDPWD` and `$PWD`
+    setenv("OLDPWD", oldpwd, 1);
+    getcwd(minishell->cwd, PATH_MAX);
+    setenv("PWD", minishell->cwd, 1);
+
+    return (0);
+}
+*/
