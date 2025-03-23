@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 14:44:21 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/22 17:20:32 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/23 16:48:09 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,137 +96,137 @@ t_ast	*parse_hd(t_token **tokens, t_minishell *shell)
 	return (hd_node);
 }
 
-void parse_arguments(t_token **tokens, t_ast *cmd_node)
+void	parse_arguments(t_token **tokens, t_ast *cmd_node)
 {
-    while (*tokens && (*tokens)->type == T_STRING)
-    {
-        add_argument(&cmd_node->args, (*tokens)->value);
-        *tokens = (*tokens)->next;
-    }
-}
-
-t_ast *parse_command(t_token **tokens, t_minishell *shell)
-{
-    t_ast *cmd_node;
-    t_ast *redir_node;
-    t_ast *last_redir;
-
-    cmd_node = create_ast_node(AST_CMD, shell);
-    if (!cmd_node)
-        return (NULL);
-    parse_arguments(tokens, cmd_node);
-    last_redir = NULL;
-    while (*tokens && (*tokens)->type != T_PIPE && (*tokens)->type != T_EOF)
-    {
-        if ((*tokens)->type == T_REDIR_IN || (*tokens)->type == T_REDIR_OUT
-            || (*tokens)->type == T_APPEND)
-            redir_node = parse_redir(tokens, shell);
-        else if ((*tokens)->type == T_HEREDOC)
-            redir_node = parse_hd(tokens, shell);
-        if (!redir_node)
-            return (NULL);
-        if (!last_redir)
-            cmd_node->left = redir_node;
-        else
-            last_redir->left = redir_node;
-        last_redir = redir_node;
-    }
-    return (cmd_node);
-}
-
-void	print_ast(t_ast *node, int level)
-{
-	if (!node)
-		return ;
-	// Print indentation based on the level
-	for (int i = 0; i < level; i++)
-		printf(" ");
-	// Print the node type
-	switch (node->type)
+	while (*tokens && (*tokens)->type == T_STRING)
 	{
-	case AST_CMD:
-		printf("CMD: ");
-		for (int i = 0; node->args && node->args[i]; i++)
-			printf("%s ", node->args[i]);
-		printf("\n");
-		break ;
-	case AST_PIPE:
-		printf("PIPE:\n");
-		break ;
-	case AST_REDIR_IN:
-		printf("REDIR_IN: %s\n", node->file);
-		break ;
-	case AST_REDIR_OUT:
-		printf("REDIR_OUT: %s\n", node->file);
-		break ;
-	case AST_APPEND:
-		printf("APPEND: %s\n", node->file);
-		break ;
-	case AST_HEREDOC:
-		printf("HEREDOC: %s\n", node->file);
-		break ;
-	default:
-		printf("UNKNOWN NODE TYPE\n");
+		add_argument(&cmd_node->args, (*tokens)->value);
+		*tokens = (*tokens)->next;
 	}
-	// Recursively print left and right children
-	print_ast(node->left, level + 1);
-	print_ast(node->right, level + 1);
 }
 
-int	main(void)
+t_ast	*parse_command(t_token **tokens, t_minishell *shell)
 {
-	t_token		*tokens;
-	t_ast		*ast;
-	t_minishell	shell;
-	char		*input;
-	char		**split;
+	t_ast	*cmd_node;
+	t_ast	*redir_node;
+	t_ast	*last_redir;
 
-	// Initialize the shell structure (dummy values for testing)
-	shell.env = NULL;
-	shell.last_exit_code = 0;
-	// Main loop
-	while (1)
+	cmd_node = create_ast_node(AST_CMD, shell);
+	if (!cmd_node)
+		return (NULL);
+	parse_arguments(tokens, cmd_node);
+	last_redir = NULL;
+	while (*tokens && (*tokens)->type != T_PIPE && (*tokens)->type != T_EOF)
 	{
-		// Read input using readline
-		input = readline("minishell> ");
-		if (!input)
-			break ; // Exit on EOF (Ctrl+D)
-		// Tokenize the input
-		split = ft_split(input, ' ');
-			// Split input into words (you need to implement ft_split)
-		tokens = tokenize_input(split);
-		free_split(split); // Free the split array
-		if (!tokens)
-		{
-			printf("Error: Tokenization failed\n");
-			free(input);
-			continue ;
-		}
-		// Check grammar
-		if (!check_grammar(tokens))
-		{
-			printf("Error: Invalid grammar\n");
-			free_tokens(&tokens);
-			free(input);
-			continue ;
-		}
-		// Parse tokens into AST
-		ast = parse_pipeline(&tokens, &shell);
-		if (!ast)
-		{
-			printf("Error: Parsing failed\n");
-			free_tokens(&tokens);
-			free(input);
-			continue ;
-		}
-		// Print the AST (for debugging)
-		printf("AST:\n");
-		print_ast(ast, 0);
-		// Free the AST and tokens
-		free_ast(ast);
-		free_tokens(&tokens);
-		// Free the input
-		free(input);
+		if ((*tokens)->type == T_REDIR_IN || (*tokens)->type == T_REDIR_OUT
+			|| (*tokens)->type == T_APPEND)
+			redir_node = parse_redir(tokens, shell);
+		else if ((*tokens)->type == T_HEREDOC)
+			redir_node = parse_hd(tokens, shell);
+		if (!redir_node)
+			return (NULL);
+		if (!last_redir)
+			cmd_node->left = redir_node;
+		else
+			last_redir->left = redir_node;
+		last_redir = redir_node;
 	}
-	return (0);
+	return (cmd_node);
 }
+
+// void	print_ast(t_ast *node, int level)
+// {
+// 	if (!node)
+// 		return ;
+// 	// Print indentation based on the level
+// 	for (int i = 0; i < level; i++)
+// 		printf(" ");
+// 	// Print the node type
+// 	switch (node->type)
+// 	{
+// 	case AST_CMD:
+// 		printf("CMD: ");
+// 		for (int i = 0; node->args && node->args[i]; i++)
+// 			printf("%s ", node->args[i]);
+// 		printf("\n");
+// 		break ;
+// 	case AST_PIPE:
+// 		printf("PIPE:\n");
+// 		break ;
+// 	case AST_REDIR_IN:
+// 		printf("REDIR_IN: %s\n", node->file);
+// 		break ;
+// 	case AST_REDIR_OUT:
+// 		printf("REDIR_OUT: %s\n", node->file);
+// 		break ;
+// 	case AST_APPEND:
+// 		printf("APPEND: %s\n", node->file);
+// 		break ;
+// 	case AST_HEREDOC:
+// 		printf("HEREDOC: %s\n", node->file);
+// 		break ;
+// 	default:
+// 		printf("UNKNOWN NODE TYPE\n");
+// 	}
+// 	// Recursively print left and right children
+// 	print_ast(node->left, level + 1);
+// 	print_ast(node->right, level + 1);
+// }
+
+// int	main(void)
+// {
+// 	t_token		*tokens;
+// 	t_ast		*ast;
+// 	t_minishell	shell;
+// 	char		*input;
+// 	char		**split;
+
+// 	// Initialize the shell structure (dummy values for testing)
+// 	shell.env = NULL;
+// 	shell.last_exit_code = 0;
+// 	// Main loop
+// 	while (1)
+// 	{
+// 		// Read input using readline
+// 		input = readline("minishell> ");
+// 		if (!input)
+// 			break ; // Exit on EOF (Ctrl+D)
+// 		// Tokenize the input
+// 		split = ft_split(input, ' ');
+// 			// Split input into words (you need to implement ft_split)
+// 		tokens = tokenize_input(split);
+// 		free_split(split); // Free the split array
+// 		if (!tokens)
+// 		{
+// 			printf("Error: Tokenization failed\n");
+// 			free(input);
+// 			continue ;
+// 		}
+// 		// Check grammar
+// 		if (!check_grammar(tokens))
+// 		{
+// 			printf("Error: Invalid grammar\n");
+// 			free_tokens(&tokens);
+// 			free(input);
+// 			continue ;
+// 		}
+// 		// Parse tokens into AST
+// 		ast = parse_pipeline(&tokens, &shell);
+// 		if (!ast)
+// 		{
+// 			printf("Error: Parsing failed\n");
+// 			free_tokens(&tokens);
+// 			free(input);
+// 			continue ;
+// 		}
+// 		// Print the AST (for debugging)
+// 		printf("AST:\n");
+// 		print_ast(ast, 0);
+// 		// Free the AST and tokens
+// 		free_ast(ast);
+// 		free_tokens(&tokens);
+// 		// Free the input
+// 		free(input);
+// 	}
+// 	return (0);
+// }

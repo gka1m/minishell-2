@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 14:18:03 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/22 18:01:37 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/23 16:48:34 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	free_ast(t_ast *node)
 
 	i = 0;
 	if (!node)
-		return;
+		return ;
 	free_ast(node->left);
 	free_ast(node->right);
 	if (node->args)
@@ -53,15 +53,15 @@ void	free_ast(t_ast *node)
 
 void	add_argument(char ***args, char *value)
 {
-	int i;
-	char **new_args;
+	int		i;
+	char	**new_args;
 
 	i = 0;
 	while (*args && (*args)[i])
 		i++;
 	new_args = malloc(sizeof(char *) * (i + 2));
 	if (!new_args)
-		return ; // Handle allocation failure (you may want to exit or handle this differently)
+		return ;
 	i = 0;
 	while (*args && (*args)[i])
 	{
