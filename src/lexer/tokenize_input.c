@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:15:04 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/19 14:13:50 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/25 12:44:01 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,20 +97,20 @@ t_token	*tokenize_input(char **split)
 	return (head);
 }
 
-const char	*get_token_type_str(t_token_type type)
-{
-	if (type == T_HEREDOC)
-		return ("T_HEREDOC");
-	if (type == T_PIPE)
-		return ("T_PIPE");
-	if (type == T_REDIR_OUT)
-		return ("T_REDIR_OUT");
-	if (type == T_REDIR_IN)
-		return ("T_REDIR_IN");
-	if (type == T_APPEND)
-		return ("T_APPEND");
-	return ("T_STRING"); // Default case
-}
+// const char	*get_token_type_str(t_token_type type)
+// {
+// 	if (type == T_HEREDOC)
+// 		return ("T_HEREDOC");
+// 	if (type == T_PIPE)
+// 		return ("T_PIPE");
+// 	if (type == T_REDIR_OUT)
+// 		return ("T_REDIR_OUT");
+// 	if (type == T_REDIR_IN)
+// 		return ("T_REDIR_IN");
+// 	if (type == T_APPEND)
+// 		return ("T_APPEND");
+// 	return ("T_STRING"); // Default case
+// }
 
 // int	main(void)
 // {

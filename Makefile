@@ -10,18 +10,17 @@ EXT_FLAGS = -lreadline
 SRC_DIR = src/
 LIBFT_DIR = libft/
 TOKEN = src/lexer/
-PARSE = src/parser/
-SIGNAL = src/signals
+PARSE = src/parsing/
+EXPAND = src/expansion/
+SIGNAL = src/signals/
 
 # Subdirectories inside src/
 SRC_SUBDIRS = lexer parser
 
 # Source files (manually listed)
-SRC		= $(TOKEN)free.c $(TOKEN)grammar.c $(TOKEN)tokenize_input.c \
-		  $(PARSE)expand_redir.c $(PARSE)expansion_helpers.c $(PARSE)hd_utils.c \
-		  $(PARSE)heredoc_expansion.c $(PARSE)parsing_utils.c $(PARSE)parsing.c \
-		  $(PARSE)quote_variable_expansion.c \
-		  $(SIGNAL)signals.c \
+SRC		= $(TOKEN)free.c $(TOKEN)grammar.c $(TOKEN)tokenize_input.c $(TOKEN)quotes.c \
+		  $(PARSE)parsing.c $(PARSE)ast_utils.c \
+		  $(SRC_DIR)env/env.c \
 		  $(SRC_DIR)main.c
 
 # Object files

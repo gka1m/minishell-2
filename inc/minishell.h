@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/22 17:50:08 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/25 14:00:15 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,26 +124,47 @@ int	check_append(t_token *head);
 int	check_heredoc(t_token *head);
 int	check_grammar(t_token *head);
 int	check_eof(t_token *head);
+int	check_quotes(t_token *head);
+void	toggle_quote_state(char c, int *in_dquote, int *in_squote);
 t_token					*create_token(char *value, t_token_type type);
 void					add_token(t_token **head, t_token *new);
 t_token_type			classify_token(char *input);
 void					free_tokens(t_token **head);
 t_token					*tokenize_input(char **split);
 void					free_split(char **split);
+int	is_quote(char c);
+int	get_quoted_len(const char *s);
+int	count_words(const char *s, char c);
+char	*get_next_word(const char *s, char c, int *i);
+char	**split_preserve_quotes(const char *s, char c);
 
 // parsing functions
 t_ast	*create_ast_node(t_ast_type type, t_minishell *shell);
-char    *append_char(char c, char *str);
 t_ast   *parse_pipeline(t_token **tokens, t_minishell *shell);
+t_ast	*parse_redir(t_token **tokens, t_minishell *shell);
+t_ast	*parse_hd(t_token **tokens, t_minishell *shell);
+void	parse_arguments(t_token **tokens, t_ast *cmd_node);
+t_ast	*parse_command(t_token **tokens, t_minishell *shell);
+void	print_ast(t_ast *node, int level);
+void	free_ast(t_ast *node);
+void	add_argument(char ***args, char *value);
+
 
 // signals
-void    sigint_handler(int signo);
-void    sigint_heredoc(int signo);
-int rl_event_hd(void);
-void	setup_sig_interactive(void);
-void	setup_sig_exec(void);
-void	setup_sig_heredoc(void);
-int process_input(char **input);
+// void    sigint_handler(int signo);
+// void    sigint_heredoc(int signo);
+// int rl_event_hd(void);
+// void	setup_sig_interactive(void);
+// void	setup_sig_exec(void);
+// void	setup_sig_heredoc(void);
+// int process_input(char **input);
+
+// env functions
+t_minishell	*init_minishell(char **envp);
+void	init_fields(t_minishell *minishell, char **envp);
+void	free_minishell(t_minishell *minishell);
+
+void	print_env_vars(char **env);
 
 #endif
 
