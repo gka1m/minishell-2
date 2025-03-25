@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 14:18:03 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/23 16:48:34 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/25 17:24:30 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,29 +53,25 @@ void	free_ast(t_ast *node)
 
 void	add_argument(char ***args, char *value)
 {
-	int		i;
 	char	**new_args;
+	int		count;
+	int		i;
 
-	i = 0;
-	while (*args && (*args)[i])
-		i++;
-	new_args = malloc(sizeof(char *) * (i + 2));
+	count = 0;
+	if (*args)
+		while ((*args)[count])
+			count++;
+	new_args = malloc(sizeof(char *) * (count + 2));
 	if (!new_args)
 		return ;
 	i = 0;
-	while (*args && (*args)[i])
+	while (i < count)
 	{
 		new_args[i] = (*args)[i];
 		i++;
 	}
-	new_args[i] = ft_strdup(value); // Duplicate the value to ensure ownership
-	if (!new_args[i])
-	{
-		free(new_args); // Handle allocation failure
-		return ;
-	}
+	new_args[i] = value;
 	new_args[i + 1] = NULL;
-	if (*args)
-		free(*args);
+	free(*args);
 	*args = new_args;
 }

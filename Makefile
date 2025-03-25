@@ -18,8 +18,10 @@ SIGNAL = src/signals/
 SRC_SUBDIRS = lexer parser
 
 # Source files (manually listed)
-SRC		= $(TOKEN)free.c $(TOKEN)grammar.c $(TOKEN)tokenize_input.c $(TOKEN)quotes.c \
-		  $(PARSE)parsing.c $(PARSE)ast_utils.c \
+SRC		= $(TOKEN)free.c $(TOKEN)grammar.c $(TOKEN)tokenize_input.c \
+		  $(TOKEN)quotes.c $(TOKEN)quotes2.c \
+		  $(PARSE)parsing.c $(PARSE)ast_utils.c $(PARSE)expand_utils.c \
+		  $(PARSE)str_expand.c $(PARSE)expand_utils2.c \
 		  $(SRC_DIR)env/env.c \
 		  $(SRC_DIR)main.c
 

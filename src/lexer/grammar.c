@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 12:06:24 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/24 15:51:18 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/25 18:13:38 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,13 @@ int	check_pipe(t_token *head)
 		{
 			if (!temp->previous || !temp->next)
 			{
-				printf("Syntax error: Pipe cannot be first or last token\n");
+				printf("Pipe cannot be first or last token\n");
 				return (0);
 			}
 			if (temp->previous->type != T_STRING
 				|| temp->next->type != T_STRING)
 			{
-				printf("Syntax error: Pipe must have commands on both sides.\n");
+				printf("Pipe must have commands on both sides.\n");
 				return (0);
 			}
 		}
@@ -50,13 +50,13 @@ int	check_redirects(t_token *head)
 			// Redirect must be followed by a filename
 			if (!temp->next || temp->next->type != T_STRING)
 			{
-				printf("Syntax error: Redirect must be followed by a filename.\n");
+				printf("Redirect must be followed by a filename.\n");
 				return (0);
 			}
 			// Redirect cannot be the last token
 			if (!temp->next)
 			{
-				printf("Syntax error: Redirect cannot be the last token.\n");
+				printf("Redirect cannot be the last token.\n");
 				return (0);
 			}
 		}
@@ -77,13 +77,13 @@ int	check_append(t_token *head)
 			// Append must be followed by a filename
 			if (!temp->next || temp->next->type != T_STRING)
 			{
-				printf("Syntax error: Append must be followed by a filename.\n");
+				printf("Append must be followed by a filename.\n");
 				return (0);
 			}
 			// Append cannot be the last token
 			if (!temp->next)
 			{
-				printf("Syntax error: Append cannot be the last token.\n");
+				printf("Append cannot be the last token.\n");
 				return (0);
 			}
 		}
@@ -104,13 +104,13 @@ int	check_heredoc(t_token *head)
 			// Heredoc must be followed by a delimiter
 			if (!temp->next || temp->next->type != T_STRING)
 			{
-				printf("Syntax error: Heredoc must be followed by a delimiter.\n");
+				printf("Heredoc must be followed by a delimiter.\n");
 				return (0);
 			}
 			// Heredoc cannot be the last token
 			if (!temp->next)
 			{
-				printf("Syntax error: Heredoc cannot be the last token.\n");
+				printf("Heredoc cannot be the last token.\n");
 				return (0);
 			}
 		}

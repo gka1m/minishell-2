@@ -6,11 +6,50 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/25 14:48:46 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/25 18:20:16 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
+
+void	print_ast(t_ast *node, int level)
+{
+	if (!node)
+		return ;
+	// Print indentation based on the level
+	for (int i = 0; i < level; i++)
+		printf(" ");
+	// Print the node type
+	switch (node->type)
+	{
+	case AST_CMD:
+		printf("CMD: ");
+		for (int i = 0; node->args && node->args[i]; i++)
+			printf("%s ", node->args[i]);
+		printf("\n");
+		break ;
+	case AST_PIPE:
+		printf("PIPE:\n");
+		break ;
+	case AST_REDIR_IN:
+		printf("REDIR_IN: %s\n", node->file);
+		break ;
+	case AST_REDIR_OUT:
+		printf("REDIR_OUT: %s\n", node->file);
+		break ;
+	case AST_APPEND:
+		printf("APPEND: %s\n", node->file);
+		break ;
+	case AST_HEREDOC:
+		printf("HEREDOC: %s\n", node->file);
+		break ;
+	default:
+		printf("UNKNOWN NODE TYPE\n");
+	}
+	// Recursively print left and right children
+	print_ast(node->left, level + 1);
+	print_ast(node->right, level + 1);
+}
 
 void	print_tokens(t_token *tokens)
 {
@@ -48,7 +87,7 @@ int	main(int argc, char **argv, char **envp)
 
 	// Initialize the shell
 	shell = init_minishell(envp);
-	print_env_vars(envp);
+	// print_env_vars(envp);
 	
 	// Main loop
 	while (1)

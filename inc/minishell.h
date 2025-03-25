@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/25 14:00:15 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/25 18:09:53 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,9 @@ int	count_words(const char *s, char c);
 char	*get_next_word(const char *s, char c, int *i);
 char	**split_preserve_quotes(const char *s, char c);
 
+void concatenate_quoted_strings(t_token *last, t_token *new);
+int should_concatenate(t_token *last, char *current_str);
+
 // parsing functions
 t_ast	*create_ast_node(t_ast_type type, t_minishell *shell);
 t_ast   *parse_pipeline(t_token **tokens, t_minishell *shell);
@@ -149,6 +152,22 @@ void	print_ast(t_ast *node, int level);
 void	free_ast(t_ast *node);
 void	add_argument(char ***args, char *value);
 
+int	is_valid_var_char(char c, int first_char);
+char	*extract_var_name(char *input, int *i);
+char	*handle_question_var(t_minishell *shell);
+char	*get_var_value(char *var_name, t_minishell *shell);
+char	*ft_strjoin_free(char *s1, char *s2);
+char	*ft_strjoin_char(char *s1, char c);
+int	handle_squote(char *input, int *i, char **result);
+int	handle_dquote(char *input, int *i, t_minishell *shell, char **result);
+int	expand_var(char *input, int *i, t_minishell *shell, char **result);
+char	*expand_input(char *input, t_minishell *shell);
+
+// env functions
+t_minishell	*init_minishell(char **envp);
+void	init_fields(t_minishell *minishell, char **envp);
+void	free_minishell(t_minishell *minishell);
+
 
 // signals
 // void    sigint_handler(int signo);
@@ -158,13 +177,6 @@ void	add_argument(char ***args, char *value);
 // void	setup_sig_exec(void);
 // void	setup_sig_heredoc(void);
 // int process_input(char **input);
-
-// env functions
-t_minishell	*init_minishell(char **envp);
-void	init_fields(t_minishell *minishell, char **envp);
-void	free_minishell(t_minishell *minishell);
-
-void	print_env_vars(char **env);
 
 #endif
 

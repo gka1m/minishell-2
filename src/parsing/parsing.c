@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 14:44:21 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/25 10:49:27 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/25 18:20:08 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,9 +98,17 @@ t_ast	*parse_hd(t_token **tokens, t_minishell *shell)
 
 void	parse_arguments(t_token **tokens, t_ast *cmd_node)
 {
+	char	*expanded;
+
 	while (*tokens && (*tokens)->type == T_STRING)
 	{
-		add_argument(&cmd_node->args, (*tokens)->value);
+		expanded = expand_input((*tokens)->value, cmd_node->shell);
+		if (!expanded)
+		{
+			perror("minishell: expansion error");
+			return ;
+		}
+		add_argument(&cmd_node->args, expanded);
 		*tokens = (*tokens)->next;
 	}
 }
@@ -132,45 +140,6 @@ t_ast	*parse_command(t_token **tokens, t_minishell *shell)
 		last_redir = redir_node;
 	}
 	return (cmd_node);
-}
-
-void	print_ast(t_ast *node, int level)
-{
-	if (!node)
-		return ;
-	// Print indentation based on the level
-	for (int i = 0; i < level; i++)
-		printf(" ");
-	// Print the node type
-	switch (node->type)
-	{
-	case AST_CMD:
-		printf("CMD: ");
-		for (int i = 0; node->args && node->args[i]; i++)
-			printf("%s ", node->args[i]);
-		printf("\n");
-		break ;
-	case AST_PIPE:
-		printf("PIPE:\n");
-		break ;
-	case AST_REDIR_IN:
-		printf("REDIR_IN: %s\n", node->file);
-		break ;
-	case AST_REDIR_OUT:
-		printf("REDIR_OUT: %s\n", node->file);
-		break ;
-	case AST_APPEND:
-		printf("APPEND: %s\n", node->file);
-		break ;
-	case AST_HEREDOC:
-		printf("HEREDOC: %s\n", node->file);
-		break ;
-	default:
-		printf("UNKNOWN NODE TYPE\n");
-	}
-	// Recursively print left and right children
-	print_ast(node->left, level + 1);
-	print_ast(node->right, level + 1);
 }
 
 // int	main(int argc, char **argv, char **envp)

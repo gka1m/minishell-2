@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:15:04 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/25 12:44:01 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/25 18:14:35 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,32 +70,61 @@ t_token_type	classify_token(char *input)
 	return (T_STRING);
 }
 
-// overall tokenize input function to tokenize the input
 t_token	*tokenize_input(char **split)
 {
 	t_token	*head;
 	t_token	*new;
+	t_token	*last;
 	int		i;
 
-	i = -1;
 	head = NULL;
-	new = NULL;
+	last = NULL;
+	i = -1;
 	while (split[++i])
 	{
 		new = create_token(split[i], classify_token(split[i]));
 		if (!new)
+			return (free_tokens(&head), NULL);
+		if (should_concatenate(last, split[i]))
+			concatenate_quoted_strings(last, new);
+		else
 		{
-			free_tokens(&head);
-			return (NULL);
+			add_token(&head, new);
+			last = new;
 		}
-		add_token(&head, new);
 	}
 	new = create_token("", T_EOF);
 	if (!new)
 		return (free_tokens(&head), NULL);
-	add_token(&head, new);
-	return (head);
+	return (add_token(&head, new), head);
 }
+
+// overall tokenize input function to tokenize the input
+// t_token	*tokenize_input(char **split)
+// {
+// 	t_token	*head;
+// 	t_token	*new;
+// 	int		i;
+
+// 	i = -1;
+// 	head = NULL;
+// 	new = NULL;
+// 	while (split[++i])
+// 	{
+// 		new = create_token(split[i], classify_token(split[i]));
+// 		if (!new)
+// 		{
+// 			free_tokens(&head);
+// 			return (NULL);
+// 		}
+// 		add_token(&head, new);
+// 	}
+// 	new = create_token("", T_EOF);
+// 	if (!new)
+// 		return (free_tokens(&head), NULL);
+// 	add_token(&head, new);
+// 	return (head);
+// }
 
 // const char	*get_token_type_str(t_token_type type)
 // {
