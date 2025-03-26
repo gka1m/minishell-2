@@ -6,14 +6,11 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:15:04 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/25 18:14:35 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/26 12:24:00 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
-
-int	check_grammar(t_token *head);
-int	check_heredoc(t_token *head);
 
 // function to create a new token and fill out the necessary information
 t_token	*create_token(char *value, t_token_type type)
@@ -154,7 +151,7 @@ t_token	*tokenize_input(char **split)
 // 		if (!input)
 // 		{
 // 			printf("exit\n");
-// 			break;
+// 			break ;
 // 		}
 // 		// Add non-empty input to history
 // 		if (*input)
@@ -166,7 +163,7 @@ t_token	*tokenize_input(char **split)
 // 		if (!split)
 // 		{
 // 			printf("Error: Failed to split input.\n");
-// 			continue;
+// 			continue ;
 // 		}
 
 // 		// Tokenize the split input
@@ -175,7 +172,7 @@ t_token	*tokenize_input(char **split)
 // 		if (!head)
 // 		{
 // 			printf("Error: Failed to tokenize input.\n");
-// 			continue;
+// 			continue ;
 // 		}
 
 // 		// Check grammar rules
@@ -183,7 +180,7 @@ t_token	*tokenize_input(char **split)
 // 		{
 // 			printf("Syntax error detected.\n");
 // 			free_tokens(&head);
-// 			continue;
+// 			continue ;
 // 		}
 
 // 		// If syntax is correct, display tokens (for testing purposes)

@@ -6,15 +6,11 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 14:44:21 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/25 18:20:08 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/26 16:43:16 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
-
-void		free_ast(t_ast *node);
-void		add_argument(char ***args, char *value);
-t_ast		*parse_command(t_token **tokens, t_minishell *shell);
 
 t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell)
 {
