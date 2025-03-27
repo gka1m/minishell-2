@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/26 16:40:44 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/27 13:05:05 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,6 +177,10 @@ int				handle_dquote_expansion(t_parse_ctx *ctx, int *start);
 int				handle_specials(char *input, int *i, t_minishell *shell,
 					char **result);
 
+void	expand_squote_redir(char **input, int *i, char **result);
+void	expand_dquote_redir(char **input, int *i, t_minishell *shell,
+	char **result);
+char	*expand_redirection_target(char *input, t_minishell *shell);
 // void	process_dquote_content(t_parse_ctx *ctx);
 // void	redir_dquote(t_parse_ctx *ctx);
 // void	process_squote_content(t_parse_ctx *ctx);

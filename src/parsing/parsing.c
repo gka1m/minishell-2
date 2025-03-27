@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 14:44:21 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/26 16:43:16 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/27 13:04:23 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ t_ast	*parse_redir(t_token **tokens, t_minishell *shell)
 {
 	t_ast		*redir_node;
 	t_ast_type	type;
+	char		*expanded;
 
 	if (!tokens || !*tokens)
 		return (NULL);
@@ -58,9 +59,10 @@ t_ast	*parse_redir(t_token **tokens, t_minishell *shell)
 	*tokens = (*tokens)->next;
 	if (*tokens && (*tokens)->type == T_STRING)
 	{
-		redir_node->file = ft_strdup((*tokens)->value);
-		if (!redir_node->file)
+		expanded = expand_redirection_target((*tokens)->value, shell);
+		if (!expanded)
 			return (free(redir_node), NULL);
+		redir_node->file = expanded;
 		*tokens = (*tokens)->next;
 	}
 	return (redir_node);
@@ -78,17 +80,11 @@ t_ast	*parse_hd(t_token **tokens, t_minishell *shell)
 	{
 		hd_node->file = ft_strdup((*tokens)->value);
 		if (!hd_node->file)
-		{
-			free(hd_node);
-			return (NULL);
-		}
+			return (free(hd_node), NULL);
 		*tokens = (*tokens)->next;
 	}
 	else
-	{
-		free(hd_node);
-		return (NULL);
-	}
+		return (free(hd_node), NULL);
 	return (hd_node);
 }
 

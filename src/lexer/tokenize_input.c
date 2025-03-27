@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 12:15:04 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/26 12:24:00 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/27 14:13:58 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,14 +54,14 @@ t_token_type	classify_token(char *input)
 {
 	if (ft_strncmp(input, "<<", 2) == 0)
 		return (T_HEREDOC);
+	if (ft_strncmp(input, ">>", 2) == 0)
+		return (T_APPEND);
 	if (ft_strncmp(input, "|", 1) == 0)
 		return (T_PIPE);
 	if (ft_strncmp(input, ">", 1) == 0)
 		return (T_REDIR_OUT);
 	if (ft_strncmp(input, "<", 1) == 0)
 		return (T_REDIR_IN);
-	if (ft_strncmp(input, ">>", 2) == 0)
-		return (T_APPEND);
 	if (ft_strncmp(input, "", 1) == 0)
 		return (T_EOF);
 	return (T_STRING);
