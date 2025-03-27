@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 12:06:24 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/25 18:13:38 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/27 14:43:13 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,12 +105,6 @@ int	check_heredoc(t_token *head)
 			if (!temp->next || temp->next->type != T_STRING)
 			{
 				printf("Heredoc must be followed by a delimiter.\n");
-				return (0);
-			}
-			// Heredoc cannot be the last token
-			if (!temp->next)
-			{
-				printf("Heredoc cannot be the last token.\n");
 				return (0);
 			}
 		}
