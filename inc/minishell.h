@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/27 15:49:27 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/28 13:43:50 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ extern volatile sig_atomic_t	g_signal_flag; // Tracks signal events
 typedef struct s_minishell
 {
 	char	**env; // Array of environment variables (similar to environ)
-	t_env	*env_list;
+	struct s_env	*env_list;
 	int		last_exit_code; // Stores the exit code of the last executed command ($?)
 	char	cwd[PATH_MAX]; // Current working directory
 	int		interactive; // Boolean: 1 for interactive mode,0 for non-interactive
