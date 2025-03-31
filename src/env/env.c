@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 11:53:42 by theophane         #+#    #+#             */
-/*   Updated: 2025/03/25 16:13:47 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/31 12:57:02 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,33 +43,24 @@ t_minishell	*init_minishell(char **envp)
 	return (minishell);
 }
 
-void	init_fields(t_minishell *minishell, char **envp)
+void init_fields(t_minishell *minishell, char **envp)
 {
-	int	env_count;
-	int	i;
-
-	i = -1;
-	env_count = 0;
-	while (envp[env_count])
-		env_count++;
-	minishell->env = malloc((env_count + 1) * sizeof(char *));
-	if (!minishell->env)
-	{
-		perror("malloc error for env");
-		free(minishell);
-		exit(EXIT_FAILURE);
-	}
-	while (++i < env_count)
-		minishell->env[i] = ft_strdup(envp[i]);
-	minishell->env[env_count] = NULL;
-	minishell->last_exit_code = 0;
-	if (!getcwd(minishell->cwd, PATH_MAX))
-	{
-		perror("getcwd");
-		free(minishell->env);
-		free(minishell);
-		exit(EXIT_FAILURE);
-	}
+    minishell->env_list = init_env(envp);
+    if (!minishell->env_list)
+    {
+        perror("environment initialization failed");
+        free(minishell);
+        exit(EXIT_FAILURE);
+    }
+    update_shlvl(minishell->env_list);
+    minishell->last_exit_code = 0;
+    if (!getcwd(minishell->cwd, PATH_MAX))
+    {
+        perror("getcwd");
+        free_env(minishell->env_list);
+        free(minishell);
+        exit(EXIT_FAILURE);
+    }
 }
 
 // function to free memory after exit
@@ -77,15 +68,10 @@ void	init_fields(t_minishell *minishell, char **envp)
 // Free the environment variables then free struct itself
 void	free_minishell(t_minishell *minishell)
 {
-	int	i;
-
-	i = 0;
-	while (minishell->env[i])
-	{
-		free(minishell->env[i]);
-		i++;
-	}
-	free(minishell->env);
+	if (!minishell)
+		return ;
+	if (minishell->env_list)
+		free_env(minishell->env_list);
 	free(minishell);
 }
 

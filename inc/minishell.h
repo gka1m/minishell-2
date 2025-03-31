@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/28 13:43:50 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/31 12:39:29 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,6 +193,15 @@ char	*expand_redirection_target(char *input, t_minishell *shell);
 t_minishell		*init_minishell(char **envp);
 void			init_fields(t_minishell *minishell, char **envp);
 void			free_minishell(t_minishell *minishell);
+t_env	*new_env_node(const char *key, const char *value);
+void	add_env_var(t_env **env, const char *key, const char *value);
+t_env	*find_env_var(t_env *env, const char *key);
+void	update_env_var(t_env *env, const char *key, const char *new_value);
+t_env	*init_env(char **envp);
+void	update_shlvl(t_env *env);
+void	print_env_vars(t_env *env);
+void	delete_env_var(t_env **env, const char *key);
+void	free_env(t_env *env);
 
 // signals
 // void    sigint_handler(int signo);

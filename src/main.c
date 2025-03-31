@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/25 18:20:16 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/03/31 12:45:27 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,79 +63,68 @@ void	print_tokens(t_token *tokens)
 	}
 }
 
-void	print_env_vars(char **env)
-{
-	int	i;
-
-	i = 0;
-	while (env[i])
-	{
-		printf("%s\n", env[i]);
-		i++;
-	}
-}
-
 int	main(int argc, char **argv, char **envp)
 {
-	char		*input;
-    char        **split;
-	t_token		*tokens;
 	t_minishell	*shell;
-	t_ast		*ast;
+	// char		*input;
+    // char        **split;
+	// t_token		*tokens;
+	// t_ast		*ast;
 	
 	((void)argc, (void)argv);
 
 	// Initialize the shell
 	shell = init_minishell(envp);
 	// print_env_vars(envp);
+	print_env_vars(shell->env_list);
 	
 	// Main loop
-	while (1)
-	{
-		// Step 1: Read input
-		input = readline("minishell> ");
-		if (!input)
-		{
-			printf("exit\n"); // Handle EOF (Ctrl+D)
-			break;
-		}
-		// Step 2: Lexical analysis (tokenization)
-        split = split_preserve_quotes(input, ' ');
-        if (!split)
-            return 1;
-		tokens = tokenize_input(split);
-		if (!tokens)
-		{
-			free_split(split);
-			continue; // Skip to the next iteration if tokenization fails
-		}
+	// while (1)
+	// {
+	// 	// Step 1: Read input
+	// 	input = readline("minishell> ");
+	// 	if (!input)
+	// 	{
+	// 		printf("exit\n"); // Handle EOF (Ctrl+D)
+	// 		break;
+	// 	}
+	// 	// Step 2: Lexical analysis (tokenization)
+    //     split = split_preserve_quotes(input, ' ');
+    //     if (!split)
+    //         return 1;
+	// 	tokens = tokenize_input(split);
+	// 	if (!tokens)
+	// 	{
+	// 		free_split(split);
+	// 		continue; // Skip to the next iteration if tokenization fails
+	// 	}
 		
-		// Step 4: Grammar checking
-		if (!check_grammar(tokens))
-		{
-			printf("Syntax error\n");
-			free_tokens(&tokens);
-			free(input);
-			continue; // Skip to the next iteration if grammar is invalid
-		}
-		print_tokens(tokens);
-		ast = parse_pipeline(&tokens, shell);
-		if (!ast)
-		{
-			printf("Syntax error\n");
-			free_tokens(&tokens);
-			free(input);
-			continue;
-		}
+	// 	// Step 4: Grammar checking
+	// 	if (!check_grammar(tokens))
+	// 	{
+	// 		printf("Syntax error\n");
+	// 		free_tokens(&tokens);
+	// 		free(input);
+	// 		continue; // Skip to the next iteration if grammar is invalid
+	// 	}
+	// 	print_tokens(tokens);
+	// 	ast = parse_pipeline(&tokens, shell);
+	// 	if (!ast)
+	// 	{
+	// 		printf("Syntax error\n");
+	// 		free_tokens(&tokens);
+	// 		free(input);
+	// 		continue;
+	// 	}
 		
-		print_ast(ast, 0);
-		// TODO: Add parsing and execution steps here
-	}
+	// 	print_ast(ast, 0);
+	// 	// TODO: Add parsing and execution steps here
+	// }
 
-	// Clean up before exiting
-	rl_clear_history(); // Clear readline history
-	free_tokens(&tokens);
-	free(input);
+	// // Clean up before exiting
+	// rl_clear_history(); // Clear readline history
+	// free_tokens(&tokens);
+	// free(input);
 	// free_ast(ast);
 	free_minishell(shell);
 	return (0);

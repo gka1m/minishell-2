@@ -13,6 +13,7 @@ TOKEN = src/lexer/
 PARSE = src/parsing/
 EXPAND = src/expansion/
 SIGNAL = src/signals/
+ENV = src/env/
 
 # Subdirectories inside src/
 SRC_SUBDIRS = lexer parser
@@ -22,7 +23,7 @@ SRC		= $(TOKEN)free.c $(TOKEN)grammar.c $(TOKEN)tokenize_input.c \
 		  $(TOKEN)quotes.c $(TOKEN)quotes2.c \
 		  $(PARSE)parsing.c $(PARSE)ast_utils.c $(PARSE)expand_utils.c \
 		  $(PARSE)str_expand.c $(PARSE)expand_utils2.c $(PARSE)redir_expand.c \
-		  $(SRC_DIR)env/env.c \
+		  $(ENV)env.c $(ENV)setup.c $(ENV)freeing.c \
 		  $(SRC_DIR)main.c
 
 # Object files
