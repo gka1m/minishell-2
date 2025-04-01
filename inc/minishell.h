@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/31 12:39:29 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/01 16:24:28 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,6 +202,30 @@ void	update_shlvl(t_env *env);
 void	print_env_vars(t_env *env);
 void	delete_env_var(t_env **env, const char *key);
 void	free_env(t_env *env);
+
+int	is_valid_env_name(const char *str);
+void	print_export_var(t_env *var, int fd_out);
+char	**env_to_keys_array(t_env *env);
+void	print_sorted_env(t_env *env, int fd_out);
+void	swap_strings(char **a, char **b);
+void	sort_keys(char **tab);
+
+// builtin functions
+int	update_pwds(t_minishell *shell, t_env **env_list, char *new_path);
+int	change_directory(t_minishell *shell, t_env **env_list, char *path);
+char	*expand_path(t_minishell *shell, t_env **env_list, char *path);
+int	b_cd(t_minishell *shell, t_env **env_list, char **args);
+void    print_args(char **args, int nflag);
+int b_echo(char **args);
+int b_env(t_env *env_list);
+int	is_valid_exit_arg(char *arg);
+void	cleanup_and_exit(t_minishell *shell, int exit_code);
+int	b_exit(t_minishell *shell, char **args);
+int b_pwd(void);
+int b_unset(t_env *env, char **args);
+int	process_export_arg(t_env **env, char *arg);
+int	bi_export(t_minishell *shell, char **args, int fd_out);
+
 
 // signals
 // void    sigint_handler(int signo);
