@@ -11,9 +11,12 @@ SRC_DIR = src/
 LIBFT_DIR = libft/
 TOKEN = src/lexer/
 PARSE = src/parsing/
-EXPAND = src/expansion/
 SIGNAL = src/signals/
 ENV = src/env/
+BUILTIN = src/builtin/
+EXEC = src/execution/
+SIG = src/signals/
+HISTORY = src/history/
 
 # Subdirectories inside src/
 SRC_SUBDIRS = lexer parser
@@ -25,6 +28,7 @@ SRC		= $(TOKEN)free.c $(TOKEN)grammar.c $(TOKEN)tokenize_input.c \
 		  $(PARSE)str_expand.c $(PARSE)expand_utils2.c $(PARSE)redir_expand.c \
 		  $(ENV)env.c $(ENV)setup.c $(ENV)freeing.c $(ENV)add.c \
 		  $(ENV)delete.c $(ENV)print.c $(ENV)search.c $(ENV)update.c \
+		  $(ENV)print_export.c \
 		  $(SRC_DIR)main.c
 
 # Object files
