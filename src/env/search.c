@@ -1,28 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   freeing.c                                          :+:      :+:    :+:   */
+/*   search.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/28 13:24:47 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/31 16:09:39 by kagoh            ###   ########.fr       */
+/*   Created: 2025/04/01 12:29:45 by kagoh             #+#    #+#             */
+/*   Updated: 2025/04/01 12:29:58 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-// Free the entire environment list
-void	free_env(t_env *env)
+// Find an environment variable in the list
+t_env	*find_env_var(t_env *env, const char *key)
 {
-	t_env	*tmp;
-
 	while (env)
 	{
-		tmp = env;
+		if (ft_strncmp(env->key, key, ft_strlen(key)) == 0)
+			return (env);
 		env = env->next;
-		free(tmp->key);
-		free(tmp->value);
-		free(tmp);
 	}
+	return (NULL);
 }

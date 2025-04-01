@@ -23,7 +23,8 @@ SRC		= $(TOKEN)free.c $(TOKEN)grammar.c $(TOKEN)tokenize_input.c \
 		  $(TOKEN)quotes.c $(TOKEN)quotes2.c \
 		  $(PARSE)parsing.c $(PARSE)ast_utils.c $(PARSE)expand_utils.c \
 		  $(PARSE)str_expand.c $(PARSE)expand_utils2.c $(PARSE)redir_expand.c \
-		  $(ENV)env.c $(ENV)setup.c $(ENV)freeing.c \
+		  $(ENV)env.c $(ENV)setup.c $(ENV)freeing.c $(ENV)add.c \
+		  $(ENV)delete.c $(ENV)print.c $(ENV)search.c $(ENV)update.c \
 		  $(SRC_DIR)main.c
 
 # Object files

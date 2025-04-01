@@ -1,28 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   freeing.c                                          :+:      :+:    :+:   */
+/*   print.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/28 13:24:47 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/31 16:09:39 by kagoh            ###   ########.fr       */
+/*   Created: 2025/04/01 12:30:13 by kagoh             #+#    #+#             */
+/*   Updated: 2025/04/01 12:30:22 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-// Free the entire environment list
-void	free_env(t_env *env)
+void	print_env_vars(t_env *env)
 {
-	t_env	*tmp;
-
 	while (env)
 	{
-		tmp = env;
+		if (env->value)
+			printf("%s=%s\n", env->key, env->value);
 		env = env->next;
-		free(tmp->key);
-		free(tmp->value);
-		free(tmp);
 	}
 }

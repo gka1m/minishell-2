@@ -6,80 +6,11 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 17:08:13 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/31 12:55:43 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/01 12:30:38 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
-
-t_env	*new_env_node(const char *key, const char *value);
-void	add_env_var(t_env **env, const char *key, const char *value);
-t_env	*find_env_var(t_env *env, const char *key);
-void	update_env_var(t_env *env, const char *key, const char *new_value);
-t_env	*init_env(char **envp);
-void	update_shlvl(t_env *env);
-void	print_env_vars(t_env *env);
-void	delete_env_var(t_env **env, const char *key);
-void	free_env(t_env *env);
-
-// Create a new environment variable node
-t_env	*new_env_node(const char *key, const char *value)
-{
-	t_env	*node;
-
-	node = malloc(sizeof(t_env));
-	if (!node)
-		return (NULL);
-	node->key = ft_strdup(key);
-	node->value = ft_strdup(value);
-	node->next = NULL;
-	return (node);
-}
-
-// Add an environment variable to the linked list
-void	add_env_var(t_env **env, const char *key, const char *value)
-{
-	t_env	*new;
-	t_env	*temp;
-
-	new = new_env_node(key, value);
-	if (!new)
-		return ;
-	if (!*env)
-		*env = new;
-	else
-	{
-		temp = *env;
-		while (temp->next)
-			temp = temp->next;
-		temp->next = new;
-	}
-}
-
-// Find an environment variable in the list
-t_env	*find_env_var(t_env *env, const char *key)
-{
-	while (env)
-	{
-		if (ft_strncmp(env->key, key, ft_strlen(key)) == 0)
-			return (env);
-		env = env->next;
-	}
-	return (NULL);
-}
-
-// Update an environment variable's value
-void	update_env_var(t_env *env, const char *key, const char *new_value)
-{
-	t_env	*var;
-
-	var = find_env_var(env, key);
-	if (var)
-	{
-		free(var->value);
-		var->value = ft_strdup(new_value);
-	}
-}
 
 // Initialize the environment from `envp`
 t_env	*init_env(char **envp)
@@ -138,16 +69,6 @@ void	update_shlvl(t_env *env)
 	}
 }
 
-void	print_env_vars(t_env *env)
-{
-	while (env)
-	{
-		if (env->value)
-			printf("%s=%s\n", env->key, env->value);
-		env = env->next;
-	}
-}
-
 // // Update an existing environment variable
 // void	update_env_var(t_env *env, const char *key, const char *new_value)
 // {
@@ -165,39 +86,6 @@ void	print_env_vars(t_env *env)
 // 		var = var->next;
 // 	}
 // }
-
-// Delete an environment variable
-void	delete_env_var(t_env **env, const char *key)
-{
-	t_env	*temp;
-	t_env	*prev;
-
-	temp = *env;
-	prev = NULL;
-	// If head node holds the key
-	if (temp && ft_strncmp(temp->key, key, ft_strlen(key)) == 0)
-	{
-		*env = temp->next;
-		free(temp->key);
-		free(temp->value);
-		free(temp);
-		return ;
-	}
-	// Search for the key in the list
-	while (temp && ft_strncmp(temp->key, key, ft_strlen(key)) != 0)
-	{
-		prev = temp;
-		temp = temp->next;
-	}
-	// If key not found
-	if (!temp)
-		return ;
-	// Unlink and delete the node
-	prev->next = temp->next;
-	free(temp->key);
-	free(temp->value);
-	free(temp);
-}
 
 // int main(int argc, char **argv, char **envp)
 // {

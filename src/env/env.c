@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 11:53:42 by theophane         #+#    #+#             */
-/*   Updated: 2025/03/31 12:57:02 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/01 12:51:34 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,24 +43,24 @@ t_minishell	*init_minishell(char **envp)
 	return (minishell);
 }
 
-void init_fields(t_minishell *minishell, char **envp)
+void	init_fields(t_minishell *minishell, char **envp)
 {
-    minishell->env_list = init_env(envp);
-    if (!minishell->env_list)
-    {
-        perror("environment initialization failed");
-        free(minishell);
-        exit(EXIT_FAILURE);
-    }
-    update_shlvl(minishell->env_list);
-    minishell->last_exit_code = 0;
-    if (!getcwd(minishell->cwd, PATH_MAX))
-    {
-        perror("getcwd");
-        free_env(minishell->env_list);
-        free(minishell);
-        exit(EXIT_FAILURE);
-    }
+	minishell->env_list = init_env(envp);
+	if (!minishell->env_list)
+	{
+		perror("environment initialization failed");
+		free(minishell);
+		exit(EXIT_FAILURE);
+	}
+	update_shlvl(minishell->env_list);
+	minishell->last_exit_code = 0;
+	if (!getcwd(minishell->cwd, PATH_MAX))
+	{
+		perror("getcwd");
+		free_env(minishell->env_list);
+		free(minishell);
+		exit(EXIT_FAILURE);
+	}
 }
 
 // function to free memory after exit
