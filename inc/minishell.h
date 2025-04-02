@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/01 16:24:28 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/02 13:48:27 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,6 +228,11 @@ int	bi_export(t_minishell *shell, char **args, int fd_out);
 
 
 // signals
+void    sig_interactive(void);
+void    handle_sigint(int sig_num);
+void    sig_reset(bool for_child);
+void    sig_ignore(void);
+void    sig_cmd(int sig_num);
 // void    sigint_handler(int signo);
 // void    sigint_heredoc(int signo);
 // int rl_event_hd(void);

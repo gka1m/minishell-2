@@ -29,6 +29,7 @@ SRC		= $(TOKEN)free.c $(TOKEN)grammar.c $(TOKEN)tokenize_input.c \
 		  $(ENV)env.c $(ENV)setup.c $(ENV)freeing.c $(ENV)add.c \
 		  $(ENV)delete.c $(ENV)print.c $(ENV)search.c $(ENV)update.c \
 		  $(ENV)print_export.c \
+		  $(SIG)signal.c \
 		  $(SRC_DIR)main.c
 
 # Object files
