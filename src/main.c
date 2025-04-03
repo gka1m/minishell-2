@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/03 11:34:23 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/03 15:44:17 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,27 @@ void	print_tokens(t_token *tokens)
 	}
 }
 
+// void print_env_array(char **env_array)
+// {
+//     if (!env_array)
+//     {
+//         printf("Environment array is NULL\n");
+//         return;
+//     }
+
+//     printf("\nCurrent Environment:\n");
+//     for (int i = 0; env_array[i]; i++)
+//     {
+//         printf("%s\n", env_array[i]);
+//     }
+// }
+
 int	main(int argc, char **argv, char **envp)
 {
 	t_minishell	*shell;
 	char		*input;
     char        **split;
+	// char		**array;
 	t_token		*tokens;
 	t_ast		*ast;
 	
@@ -77,6 +93,8 @@ int	main(int argc, char **argv, char **envp)
 	shell = init_minishell(envp);
 	// print_env_vars(envp);
 	print_env_vars(shell->env_list);
+	// array = convert_env_to_array(shell->env_list);
+	// print_env_array(array);
 	
 	// Main loop
 	while (1)

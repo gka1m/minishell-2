@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/02 16:04:34 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/03 16:28:44 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,7 +202,6 @@ void	update_shlvl(t_env *env);
 void	print_env_vars(t_env *env);
 void	delete_env_var(t_env **env, const char *key);
 void	free_env(t_env *env);
-
 int	is_valid_env_name(const char *str);
 void	print_export_var(t_env *var, int fd_out);
 char	**env_to_keys_array(t_env *env);
@@ -226,7 +225,6 @@ int b_unset(t_env *env, char **args);
 int	process_export_arg(t_env **env, char *arg);
 int	bi_export(t_minishell *shell, char **args, int fd_out);
 
-
 // signals
 void    sig_interactive(void);
 void    handle_sigint(int sig_num);
@@ -240,5 +238,9 @@ void    sig_cmd(int sig_num);
 // void	setup_sig_exec(void);
 // void	setup_sig_heredoc(void);
 // int process_input(char **input);
+
+
+// char	*join_str(char const *s1, char const *s2, char const *s3);
+// char	**convert_env_to_array(t_env *env_list);
 
 #endif
