@@ -18,9 +18,6 @@ EXEC = src/execution/
 SIG = src/signals/
 HISTORY = src/history/
 
-# Subdirectories inside src/
-SRC_SUBDIRS = lexer parser
-
 # Source files (manually listed)
 SRC		= $(TOKEN)free.c $(TOKEN)grammar.c $(TOKEN)tokenize_input.c \
 		  $(TOKEN)quotes.c $(TOKEN)quotes2.c \
@@ -45,27 +42,27 @@ LIBFT	= $(LIBFT_DIR)/libft.a
 $(NAME): $(LIBFT) $(OBJ)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT) $(EXT_FLAGS)
 
-	# Compile .c files to .o files
+# Compile .c files to .o files
 %.o: %.c $(INCLUDES)
-	@mkdir -p $(OBJ_DIR)
-	for dir in $(SRC_SUBDIRS); do mkdir -p $(OBJ_DIR)/$$dir; done
 	$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR) -c $< -o $@
 
 # Compile Libft
 $(LIBFT):
-	$(MAKE) -C $(LIBFT_DIR) all
+	@$(MAKE) -C $(LIBFT_DIR) all --silent
 
 # Clean object files
 clean:
-	rm -f $(OBJ)
-	$(MAKE) -C $(LIBFT_DIR) clean
+	@rm -f $(OBJ)
+	@$(MAKE) -C $(LIBFT_DIR) clean --silent
+	@echo "Cleaned object files."
 
 # Remove binary and object directory
 fclean: clean
-	rm -f $(NAME)
-	rm -rf $(OBJ_DIR)
-	rm -f .minishell_history
-	$(MAKE) -C $(LIBFT_DIR) fclean
+	@rm -f $(NAME)
+	@rm -rf $(OBJ_DIR)
+	@rm -f .minishell_history
+	@$(MAKE) -C $(LIBFT_DIR) fclean --silent
+	@echo "Fully cleaned project."
 
 # Rebuild everything
 re: fclean all
