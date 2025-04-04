@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/03 15:44:17 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/04 14:14:20 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,10 +82,10 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_minishell	*shell;
 	char		*input;
-    char        **split;
+    // char        **split;
 	// char		**array;
 	t_token		*tokens;
-	t_ast		*ast;
+	// t_ast		*ast;
 	
 	((void)argc, (void)argv);
 
@@ -104,43 +104,41 @@ int	main(int argc, char **argv, char **envp)
 		if (input)
 			add_history(input);
 		// Step 2: Lexical analysis (tokenization)
-        split = split_preserve_quotes(input, ' ');
-        if (!split)
-            return 1;
-		tokens = tokenize_input(split);
+        // split = split_preserve_quotes(input, ' ');
+        // if (!split)
+        //     return 1;
+		tokens = tokenize(input);
 		if (!tokens)
-		{
-			free_split(split);
-			continue; // Skip to the next iteration if tokenization fails
-		}
-		
-		// Step 4: Grammar checking
-		if (!check_grammar(tokens))
-		{
-			printf("Syntax error\n");
-			free_tokens(&tokens);
-			free(input);
-			continue; // Skip to the next iteration if grammar is invalid
-		}
+			return (1);
 		print_tokens(tokens);
-		ast = parse_pipeline(&tokens, shell);
-		if (!ast)
-		{
-			printf("Syntax error\n");
-			free_tokens(&tokens);
-			free(input);
-			continue;
-		}
+		// Step 4: Grammar checking
+		// if (!check_grammar(tokens))
+		// {
+		// 	printf("Syntax error\n");
+		// 	free_tokens(&tokens);
+		// 	free(input);
+		// 	continue; // Skip to the next iteration if grammar is invalid
+		// }
+		// print_tokens(tokens);
+		// ast = parse_pipeline(&tokens, shell);
+		// if (!ast)
+		// {
+		// 	printf("Syntax error\n");
+		// 	free_tokens(&tokens);
+		// 	free(input);
+		// 	continue;
+		// }
 		
-		print_ast(ast, 0);
+		// print_ast(ast, 0);
 		// TODO: Add parsing and execution steps here
+		
 	}
 
 	// Clean up before exiting
 	rl_clear_history(); // Clear readline history
 	free_tokens(&tokens);
 	free(input);
-	free_ast(ast);
+	// free_ast(ast);
 	free_minishell(shell);
 	return (0);
 }

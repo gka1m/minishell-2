@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 10:09:44 by zchan             #+#    #+#             */
-/*   Updated: 2025/03/10 16:54:43 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/04 11:27:05 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@ int execution_logic(t_ast *ast, t_minishell *minishell)
     if (ast == NULL)
         return -1;
     if (ast->type == AST_PIPE)
-        execute_pipe(ast, minishell);
+        execute_pipeline(ast, minishell);
     else if (ast->type == AST_REDIR_IN || ast->type == AST_REDIR_OUT ||
             ast->type == AST_HEREDOC || ast->type == AST_APPEND)
-        handle_redirection(ast);
+        execute_redirection(ast, minishell);
     else if (ast->type == AST_CMD)
         execute_command(ast, minishell);
     else

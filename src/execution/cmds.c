@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/03 16:21:48 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/04 11:33:23 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,19 +16,19 @@ int	execute_builtin(t_minishell *shell, char **args, int fd_out)
 {
 	if (!args[0])
 		return (0);
-	if (ft_strcmp(args[0], "cd") == 0)
+	if (ft_strncmp(args[0], "cd", 2) == 0)
 		return (b_cd(shell, &shell->env_list, args));
-	if (ft_strcmp(args[0], "echo") == 0)
+	if (ft_strncmp(args[0], "echo", 4) == 0)
 		return (b_echo(args));
-	if (ft_strcmp(args[0], "env") == 0)
+	if (ft_strncmp(args[0], "env", 3) == 0)
 		return (b_env(shell->env_list));
-	if (ft_strcmp(args[0], "exit") == 0)
+	if (ft_strncmp(args[0], "exit", 4) == 0)
 		return (b_exit(shell, args));
-	if (ft_strcmp(args[0], "export") == 0)
+	if (ft_strncmp(args[0], "export", 6) == 0)
 		return (bi_export(shell, args, fd_out));
-	if (ft_strcmp(args[0], "unset") == 0)
+	if (ft_strncmp(args[0], "unset", 5) == 0)
 		return (b_unset(shell->env_list, args));
-	if (ft_strcmp(args[0], "pwd") == 0)
+	if (ft_strncmp(args[0], "pwd", 3) == 0)
 		return (b_pwd());
 	return (0);
 }
@@ -51,7 +51,7 @@ void	execute_external(t_ast *node, t_minishell *shell)
 		// Set default signal handlers
 		sig_reset(true);
 		// Handle redirections
-		if (setup_redirections(node) == -1)
+		if (setup_redirections(node, shell) == -1)
 			exit(1);
 		// Convert environment
 		env_array = convert_env_to_array(shell->env_list);
@@ -78,7 +78,7 @@ void	execute_external(t_ast *node, t_minishell *shell)
 
 char	*find_command_path(char *cmd, t_env *env_list)
 {
-	char	*path;
+	t_env	*path;
 	char	**dirs;
 	char	*full_path;
 	int		i;
@@ -119,7 +119,7 @@ char	*find_command_path(char *cmd, t_env *env_list)
 
 void	execute_command(t_ast *node, t_minishell *shell)
 {
-	char	**env_array;
+	// char	**env_array;
 	int		builtin_status;
 
 	if (!node || !node->args)
@@ -134,3 +134,4 @@ void	execute_command(t_ast *node, t_minishell *shell)
 	// Handle external commands
 	execute_external(node, shell);
 }
+

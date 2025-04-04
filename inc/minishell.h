@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/03 16:28:44 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/04 14:01:43 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ typedef enum e_token_type
 	T_REDIR_OUT,
 	T_APPEND,
 	T_PIPE,
-	T_EOF,
+	// T_EOF,
 }						t_token_type;
 
 // consider using doubly linked list for token management
@@ -127,29 +127,42 @@ typedef struct s_env
 /* function prototypes */
 
 // lexing functions
-int				check_pipe(t_token *head);
-int				check_redirects(t_token *head);
-int				check_append(t_token *head);
-int				check_heredoc(t_token *head);
-int				check_grammar(t_token *head);
-int				check_eof(t_token *head);
-int				check_quotes(t_token *head);
-void			toggle_quote_state(char c, int *in_dquote,
-					int *in_squote);
-t_token			*create_token(char *value, t_token_type type);
-void			add_token(t_token **head, t_token *new);
-t_token_type	classify_token(char *input);
-void			free_tokens(t_token **head);
-t_token			*tokenize_input(char **split);
-void			free_split(char **split);
-int				is_quote(char c);
-int				get_quoted_len(const char *s);
-int				count_words(const char *s, char c);
-char			*get_next_word(const char *s, char c, int *i);
-char			**split_preserve_quotes(const char *s, char c);
+// int				check_pipe(t_token *head);
+// int				check_redirects(t_token *head);
+// int				check_append(t_token *head);
+// int				check_heredoc(t_token *head);
+// int				check_grammar(t_token *head);
+// int				check_eof(t_token *head);
+// int				check_quotes(t_token *head);
+// void			toggle_quote_state(char c, int *in_dquote,
+// 					int *in_squote);
+// t_token			*create_token(char *value, t_token_type type);
+// void			add_token(t_token **head, t_token *new);
+// t_token_type	classify_token(char *input);
+// void			free_tokens(t_token **head);
+// t_token			*tokenize_input(char **split);
+// void			free_split(char **split);
+// int				is_quote(char c);
+// int				get_quoted_len(const char *s);
+// int				count_words(const char *s, char c);
+// char			*get_next_word(const char *s, char c, int *i);
+// char			**split_preserve_quotes(const char *s, char c);
 
-void			concatenate_quoted_strings(t_token *last, t_token *new);
-int				should_concatenate(t_token *last, char *current_str);
+// void			concatenate_quoted_strings(t_token *last, t_token *new);
+// int				should_concatenate(t_token *last, char *current_str);
+
+t_token	*create_token(char *value, t_token_type type);
+void	free_tokens(t_token **head);
+bool	is_metachar(char c);
+bool	is_heredoc(char *input, int i);
+bool	is_append(char *input, int i);
+t_token	*tokenize_hd(char *input, int *i, t_token *current);
+t_token	*tokenize_append(char *input, int *i, t_token *current);
+t_token	*tokenize_metachar(char *input, int *i, t_token *current);
+char	*extract_string(char *input, int *i);
+t_token	*tokenize_string(char *input, int *i, t_token *current);
+t_token	*tokenize(char *input);
+int ft_isspace(int c);
 
 // parsing functions
 t_ast			*create_ast_node(t_ast_type type, t_minishell *shell);
@@ -239,8 +252,17 @@ void    sig_cmd(int sig_num);
 // void	setup_sig_heredoc(void);
 // int process_input(char **input);
 
-
-// char	*join_str(char const *s1, char const *s2, char const *s3);
-// char	**convert_env_to_array(t_env *env_list);
+// execution functions
+int	execute_builtin(t_minishell *shell, char **args, int fd_out);
+void	execute_external(t_ast *node, t_minishell *shell);
+char	*find_command_path(char *cmd, t_env *env_list);
+void	execute_command(t_ast *node, t_minishell *shell);
+void error_command_not_found(char *cmd);
+void	handle_exec_error(char *cmd, char *path, char **env_array);
+void	execute_pipeline(t_ast *node, t_minishell *shell);
+int	execute_redirection(t_ast *node, t_minishell *shell);
+char	**convert_env_to_array(t_env *env_list);
+char	*join_str(char const *s1, char const *s2, char const *s3);
+int setup_redirections(t_ast *node, t_minishell *shell);
 
 #endif
