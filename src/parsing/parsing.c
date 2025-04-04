@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 14:44:21 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/27 13:04:23 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/04 15:30:39 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,8 @@ t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell)
 	while (*tokens && (*tokens)->type == T_PIPE)
 	{
 		*tokens = (*tokens)->next;
-		if ((*tokens)->type == T_EOF)
-			return (NULL);
+		// if ((*tokens)->type == T_EOF)
+		// 	return (NULL);
 		right = parse_pipeline(tokens, shell);
 		if (!right)
 			return (NULL);
@@ -116,7 +116,7 @@ t_ast	*parse_command(t_token **tokens, t_minishell *shell)
 		return (NULL);
 	parse_arguments(tokens, cmd_node);
 	last_redir = NULL;
-	while (*tokens && (*tokens)->type != T_PIPE && (*tokens)->type != T_EOF)
+	while (*tokens && (*tokens)->type != T_PIPE)
 	{
 		if ((*tokens)->type == T_REDIR_IN || (*tokens)->type == T_REDIR_OUT
 			|| (*tokens)->type == T_APPEND)

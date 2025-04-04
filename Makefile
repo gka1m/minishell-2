@@ -26,8 +26,8 @@ SRC		= $(LEXER)lex_utils.c $(LEXER)lexer.c $(LEXER)grammar_check.c \
 		  $(ENV)print_export.c \
 		  $(SIG)signal.c \
 		  $(SRC_DIR)main.c \
-		#   $(PARSE)parsing.c $(PARSE)ast_utils.c $(PARSE)expand_utils.c \
-		#   $(PARSE)str_expand.c $(PARSE)expand_utils2.c $(PARSE)redir_expand.c \
+		  $(PARSE)parsing.c $(PARSE)ast_utils.c $(PARSE)expand_utils.c \
+		  $(PARSE)str_expand.c $(PARSE)expand_utils2.c $(PARSE)redir_expand.c \
 		#   $(EXEC)utils.c $(EXEC)exec.c $(EXEC)cmds.c $(EXEC)error.c \
 		#   $(EXEC)pipe.c $(EXEC)redir.c \
 		#   $(BUILTIN)b_cd.c $(BUILTIN)b_echo.c $(BUILTIN)b_env.c \

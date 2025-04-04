@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/04 15:11:11 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/04 15:29:03 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ int	main(int argc, char **argv, char **envp)
     // char        **split;
 	// char		**array;
 	t_token		*tokens;
-	// t_ast		*ast;
+	t_ast		*ast;
 	
 	((void)argc, (void)argv);
 
@@ -116,16 +116,16 @@ int	main(int argc, char **argv, char **envp)
 		}
 		print_tokens(tokens);
 		// print_tokens(tokens);
-		// ast = parse_pipeline(&tokens, shell);
-		// if (!ast)
-		// {
-		// 	printf("Syntax error\n");
-		// 	free_tokens(&tokens);
-		// 	free(input);
-		// 	continue;
-		// }
+		ast = parse_pipeline(&tokens, shell);
+		if (!ast)
+		{
+			printf("Syntax error\n");
+			free_tokens(&tokens);
+			free(input);
+			continue;
+		}
 		
-		// print_ast(ast, 0);
+		print_ast(ast, 0);
 		// TODO: Add parsing and execution steps here
 	}
 
@@ -133,7 +133,7 @@ int	main(int argc, char **argv, char **envp)
 	rl_clear_history(); // Clear readline history
 	free_tokens(&tokens);
 	free(input);
-	// free_ast(ast);
+	free_ast(ast);
 	free_minishell(shell);
 	return (0);
 }
