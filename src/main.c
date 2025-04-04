@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/04 14:14:20 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/04 15:11:11 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ int	main(int argc, char **argv, char **envp)
 	// Initialize the shell
 	shell = init_minishell(envp);
 	// print_env_vars(envp);
-	print_env_vars(shell->env_list);
+	// print_env_vars(shell->env_list);
 	// array = convert_env_to_array(shell->env_list);
 	// print_env_array(array);
 	
@@ -103,22 +103,18 @@ int	main(int argc, char **argv, char **envp)
 		input = readline("minishell> ");
 		if (input)
 			add_history(input);
-		// Step 2: Lexical analysis (tokenization)
-        // split = split_preserve_quotes(input, ' ');
-        // if (!split)
-        //     return 1;
 		tokens = tokenize(input);
 		if (!tokens)
 			return (1);
-		print_tokens(tokens);
 		// Step 4: Grammar checking
-		// if (!check_grammar(tokens))
-		// {
-		// 	printf("Syntax error\n");
-		// 	free_tokens(&tokens);
-		// 	free(input);
-		// 	continue; // Skip to the next iteration if grammar is invalid
-		// }
+		if (!check_grammar(tokens))
+		{
+			printf("Syntax error\n");
+			free_tokens(&tokens);
+			free(input);
+			continue; // Skip to the next iteration if grammar is invalid
+		}
+		print_tokens(tokens);
 		// print_tokens(tokens);
 		// ast = parse_pipeline(&tokens, shell);
 		// if (!ast)
@@ -131,7 +127,6 @@ int	main(int argc, char **argv, char **envp)
 		
 		// print_ast(ast, 0);
 		// TODO: Add parsing and execution steps here
-		
 	}
 
 	// Clean up before exiting

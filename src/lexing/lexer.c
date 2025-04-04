@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 12:01:42 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/04 14:13:12 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/04 14:55:29 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,15 @@ t_token	*tokenize_hd(char *input, int *i, t_token *current)
 {
 	t_token	*token;
 
-    (void)input;
+	(void)input;
 	token = create_token("<<", T_HEREDOC);
 	if (current)
-		current = current->next;
+		current->next = token; // Fixed linkage
 	token->previous = current;
 	*i += 2;
+	// Skip whitespace after heredoc
+	while (input[*i] && ft_isspace(input[*i]))
+		(*i)++;
 	return (token);
 }
 
@@ -29,7 +32,7 @@ t_token	*tokenize_append(char *input, int *i, t_token *current)
 {
 	t_token	*token;
 
-    (void)input;
+	(void)input;
 	token = create_token(">>", T_APPEND);
 	if (current)
 		current = current->next;
@@ -95,6 +98,12 @@ t_token	*tokenize_string(char *input, int *i, t_token *current)
 	t_token	*token;
 
 	str = extract_string(input, i);
+	// Skip empty strings (can happen with trailing spaces)
+	if (!str || str[0] == '\0')
+	{
+		free(str);
+		return (current); // Return current without creating new token
+	}
 	token = create_token(str, T_STRING);
 	free(str);
 	if (current)
@@ -105,11 +114,15 @@ t_token	*tokenize_string(char *input, int *i, t_token *current)
 
 t_token	*tokenize(char *input)
 {
-	t_token *head = NULL;
-	t_token *current = NULL;
-	int i = 0;
-	int len = ft_strlen(input);
+	t_token	*head;
+	t_token	*current;
+	int		i;
+	int		len;
 
+	head = NULL;
+	current = NULL;
+	i = 0;
+	len = ft_strlen(input);
 	while (i < len)
 	{
 		if (ft_isspace(input[i]))
@@ -119,21 +132,21 @@ t_token	*tokenize(char *input)
 			current = tokenize_hd(input, &i, current);
 			if (!head)
 				head = current;
-            continue;
+			continue ;
 		}
 		if (is_append(input, i))
 		{
 			current = tokenize_append(input, &i, current);
 			if (!head)
 				head = current;
-            continue;
+			continue ;
 		}
 		if (is_metachar(input[i]))
 		{
 			current = tokenize_metachar(input, &i, current);
 			if (!head)
 				head = current;
-            continue;
+			continue ;
 		}
 		current = tokenize_string(input, &i, current);
 		if (!head)

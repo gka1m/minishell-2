@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/04 14:01:43 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/04 15:01:48 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,15 +127,15 @@ typedef struct s_env
 /* function prototypes */
 
 // lexing functions
-// int				check_pipe(t_token *head);
-// int				check_redirects(t_token *head);
+int				check_pipe(t_token *head);
+int				check_redirects(t_token *token);
 // int				check_append(t_token *head);
-// int				check_heredoc(t_token *head);
-// int				check_grammar(t_token *head);
+int				check_heredoc(t_token *head);
+int				check_grammar(t_token *head);
+int				check_quotes(t_token *head);
 // int				check_eof(t_token *head);
-// int				check_quotes(t_token *head);
-// void			toggle_quote_state(char c, int *in_dquote,
-// 					int *in_squote);
+void			toggle_quote_state(char c, int *in_dquote,
+					int *in_squote);
 // t_token			*create_token(char *value, t_token_type type);
 // void			add_token(t_token **head, t_token *new);
 // t_token_type	classify_token(char *input);
