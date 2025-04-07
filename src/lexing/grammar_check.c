@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 14:59:23 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/04 15:09:06 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/07 10:37:19 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,12 +143,23 @@ int	check_heredoc(t_token *head)
 
 int	check_grammar(t_token *head)
 {
+	t_token	*temp;
+
+	temp = head;
 	if (!check_quotes(head))
 		return (0);
 	if (!check_pipe(head))
 		return (0);
-	if (!check_redirects(head))
-		return (0);
+	while (temp)
+	{
+		if (temp->type == T_REDIR_IN || temp->type == T_REDIR_OUT || 
+			temp->type == T_APPEND || temp->type == T_HEREDOC)
+		{
+			if (!check_redirects(temp))  // New single-redirect checker
+				return (0);
+		}
+		temp = temp->next;
+	}
 	if (!check_heredoc(head))
 		return (0);
 	return (1);
