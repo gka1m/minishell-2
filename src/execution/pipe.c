@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:08:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/03 11:18:30 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/07 14:02:09 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	execute_pipeline(t_ast *node, t_minishell *shell)
 	{
 		perror("minishell: pipe");
 		shell->last_exit_code = 1;
-		setup_sig_interactive(); // Restore signals on error
+		sig_interactive(); // Restore signals on error
 		return ;
 	}
 	// Left command (writes to pipe)
@@ -51,7 +51,9 @@ void	execute_pipeline(t_ast *node, t_minishell *shell)
 	else if (pid < 0)
 	{
 		perror("minishell: fork");
-		close_pipe(pipe_fd);
+		// close_pipe(pipe_fd);
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
 		shell->last_exit_code = 1;
 		sig_interactive(); // Restore signals
 		return ;

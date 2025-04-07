@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:45:04 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/02 13:49:04 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/07 12:27:42 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,4 +59,13 @@ void    sig_cmd(int sig_num)
         g_signal_flag = 1;
     write(STDERR_FILENO, "\n", 1);
     rl_on_new_line();   
+}
+
+void handle_heredoc_sigint(int sig)
+{
+    (void)sig;
+    g_signal_flag = 1;
+    write(STDERR_FILENO, "\n", 1);
+    rl_replace_line("", 0);
+    rl_on_new_line();
 }

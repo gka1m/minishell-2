@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/04 15:29:03 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/07 13:44:15 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,62 +78,117 @@ void	print_tokens(t_token *tokens)
 //     }
 // }
 
-int	main(int argc, char **argv, char **envp)
-{
-	t_minishell	*shell;
-	char		*input;
-    // char        **split;
-	// char		**array;
-	t_token		*tokens;
-	t_ast		*ast;
+// int	main(int argc, char **argv, char **envp)
+// {
+// 	t_minishell	*shell;
+// 	char		*input;
+//     // char        **split;
+// 	// char		**array;
+// 	t_token		*tokens;
+// 	t_ast		*ast;
 	
-	((void)argc, (void)argv);
+// 	((void)argc, (void)argv);
 
-	// Initialize the shell
-	shell = init_minishell(envp);
-	// print_env_vars(envp);
-	// print_env_vars(shell->env_list);
-	// array = convert_env_to_array(shell->env_list);
-	// print_env_array(array);
+// 	// Initialize the shell
+// 	shell = init_minishell(envp);
+// 	// print_env_vars(envp);
+// 	// print_env_vars(shell->env_list);
+// 	// array = convert_env_to_array(shell->env_list);
+// 	// print_env_array(array);
 	
-	// Main loop
-	while (1)
-	{
-		// Step 1: Read input
-		input = readline("minishell> ");
-		if (input)
-			add_history(input);
-		tokens = tokenize(input);
-		if (!tokens)
-			return (1);
-		// Step 4: Grammar checking
-		if (!check_grammar(tokens))
-		{
-			printf("Syntax error\n");
-			free_tokens(&tokens);
-			free(input);
-			continue; // Skip to the next iteration if grammar is invalid
-		}
-		print_tokens(tokens);
-		// print_tokens(tokens);
-		ast = parse_pipeline(&tokens, shell);
-		if (!ast)
-		{
-			printf("Syntax error\n");
-			free_tokens(&tokens);
-			free(input);
-			continue;
-		}
+// 	// Main loop
+// 	while (1)
+// 	{
+// 		// Step 1: Read input
+// 		input = readline("minishell> ");
+// 		if (input)
+// 			add_history(input);
+// 		tokens = tokenize(input);
+// 		if (!tokens)
+// 			return (1);
+// 		// Step 4: Grammar checking
+// 		if (!check_grammar(tokens))
+// 		{
+// 			printf("Syntax error\n");
+// 			free_tokens(&tokens);
+// 			free(input);
+// 			continue; // Skip to the next iteration if grammar is invalid
+// 		}
+// 		print_tokens(tokens);
+// 		// print_tokens(tokens);
+// 		ast = parse_pipeline(&tokens, shell);
+// 		if (!ast)
+// 		{
+// 			printf("Syntax error\n");
+// 			free_tokens(&tokens);
+// 			free(input);
+// 			continue;
+// 		}
 		
-		print_ast(ast, 0);
-		// TODO: Add parsing and execution steps here
-	}
+// 		print_ast(ast, 0);
+// 		// TODO: Add parsing and execution steps here
+// 	}
 
-	// Clean up before exiting
-	rl_clear_history(); // Clear readline history
-	free_tokens(&tokens);
-	free(input);
-	free_ast(ast);
-	free_minishell(shell);
-	return (0);
+// 	// Clean up before exiting
+// 	rl_clear_history(); // Clear readline history
+// 	free_tokens(&tokens);
+// 	free(input);
+// 	free_ast(ast);
+// 	free_minishell(shell);
+// 	return (0);
+// }
+
+int main(int argc, char **argv, char **envp)
+{
+    t_minishell *shell = init_minishell(envp);
+    char *input;
+    t_token *tokens;
+    t_ast *ast;
+    int exit_status = 0;
+
+    (void)argc, (void)argv;
+
+    while (1)
+    {
+        // Reset signal flag and get input
+        g_signal_flag = 0;
+        input = readline("minishell> ");
+        if (!input) {  // Handle Ctrl+D
+            printf("exit\n");
+            break;
+        }
+        if (*input) add_history(input);
+
+        // Tokenization and parsing
+        tokens = tokenize(input);
+        if (!tokens || !check_grammar(tokens)) {
+            if (!tokens) fprintf(stderr, "Tokenization error\n");
+            free(input);
+            continue;
+        }
+
+        ast = parse_pipeline(&tokens, shell);
+        free_tokens(&tokens);
+        if (!ast) {
+            free(input);
+            continue;
+        }
+
+        // Execution
+        if (ast->type == AST_CMD && is_builtin(ast->args[0])) {
+            exit_status = execute_builtin(shell, ast->args, STDOUT_FILENO);
+        } else {
+            execute_pipeline(ast, shell);
+            // Get exit status from shell structure if needed
+        }
+
+        // Cleanup for next iteration
+        free_ast(ast);
+        free(input);
+    }
+
+    // Final cleanup
+    rl_clear_history();
+    free_minishell(shell);
+    return exit_status;
 }

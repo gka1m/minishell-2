@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 11:59:01 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/04 14:01:34 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/07 14:12:23 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,4 +64,14 @@ int ft_isspace(int c)
 {
     return (c == ' '  || c == '\t' || c == '\n' \
             || c == '\v' || c == '\f' || c == '\r');
+}
+
+void	free_split(char **split)
+{
+	int	i;
+
+	i = 0;
+	while (split[i])
+		free(split[i++]);
+	free(split);
 }

@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:19:27 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/04 11:23:47 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/07 14:03:19 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int	execute_redirection(t_ast *node, t_minishell *shell)
 	int flags;
 	int original_fd = -1;
 
+	(void)shell;
 	if (!node || !node->file)
 		return (-1);
 	if (node->type == AST_REDIR_IN) // <
@@ -38,11 +39,11 @@ int	execute_redirection(t_ast *node, t_minishell *shell)
 		fd = open(node->file, flags, 0644);
 		original_fd = STDOUT_FILENO;
 	}
-	else if (node->type == AST_HEREDOC) // <<
-	{
-		fd = execute_heredoc(node->file, shell);
-		original_fd = STDIN_FILENO;
-	}
+	// else if (node->type == AST_HEREDOC) // <<
+	// {
+	// 	fd = execute_heredoc(node->file, shell);
+	// 	original_fd = STDIN_FILENO;
+	// }
 	else
 		return (-1);
 	if (fd == -1)
@@ -60,11 +61,8 @@ int	execute_redirection(t_ast *node, t_minishell *shell)
 
 int setup_redirections(t_ast *node, t_minishell *shell)
 {
-    t_ast *current;
-
     if (!node)
         return (-1);
-
     // Handle current node's redirection
     if (node->type == AST_REDIR_IN || node->type == AST_REDIR_OUT || 
         node->type == AST_APPEND || node->type == AST_HEREDOC)
@@ -72,14 +70,11 @@ int setup_redirections(t_ast *node, t_minishell *shell)
         if (execute_redirection(node, shell) == -1)
             return (-1);
     }
-
     // Process left subtree (redirections come before commands)
     if (node->left && setup_redirections(node->left, shell) == -1)
         return (-1);
-
     // Process right subtree (for pipes or chained redirections)
     if (node->right && setup_redirections(node->right, shell) == -1)
         return (-1);
-
     return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 14:59:23 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/07 10:37:19 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/07 11:23:10 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,7 +155,7 @@ int	check_grammar(t_token *head)
 		if (temp->type == T_REDIR_IN || temp->type == T_REDIR_OUT || 
 			temp->type == T_APPEND || temp->type == T_HEREDOC)
 		{
-			if (!check_redirects(temp))  // New single-redirect checker
+			if (!check_redirects(temp))
 				return (0);
 		}
 		temp = temp->next;

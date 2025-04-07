@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 14:44:21 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/04 15:30:39 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/07 13:32:21 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,20 +71,58 @@ t_ast	*parse_redir(t_token **tokens, t_minishell *shell)
 t_ast	*parse_hd(t_token **tokens, t_minishell *shell)
 {
 	t_ast	*hd_node;
+	void	(*orig_sigint)(int);
+	void	(*orig_sigquit)(int);
+	char	*delim;
+	int fd[2];
+	char *line;
 
 	hd_node = create_ast_node(AST_HEREDOC, shell);
 	if (!hd_node)
 		return (NULL);
-	*tokens = (*tokens)->next;
-	if (*tokens && (*tokens)->type == T_STRING)
+	// Save original signal handlers
+	(orig_sigint) = signal(SIGINT, handle_heredoc_sigint);
+	(orig_sigquit) = signal(SIGQUIT, SIG_IGN);
+	g_signal_flag = 0;
+	// Initialize fd to -1 to indicate not set
+	hd_node->heredoc_fd = -1;
+	if (*tokens && (*tokens)->next && (*tokens)->next->type == T_STRING)
 	{
-		hd_node->file = ft_strdup((*tokens)->value);
-		if (!hd_node->file)
-			return (free(hd_node), NULL);
-		*tokens = (*tokens)->next;
+		*tokens = (*tokens)->next; // Move to delimiter
+		delim = (*tokens)->value;
+		if (pipe(fd) == -1)
+		{
+			perror("minishell: pipe");
+			signal(SIGINT, orig_sigint);
+			signal(SIGQUIT, orig_sigquit);
+			free(hd_node);
+			return (NULL);
+		}
+		hd_node->heredoc_fd = fd[0];
+		while (!g_signal_flag && (line = readline("> ")))
+		{
+			if (ft_strncmp(line, delim, ft_strlen(delim)) == 0)
+			{
+				free(line);
+				break ;
+			}
+			write(fd[1], line, ft_strlen(line));
+			write(fd[1], "\n", 1);
+			free(line);
+		}
+		close(fd[1]); // Close write end
+		if (g_signal_flag)
+		{
+			close(hd_node->heredoc_fd);
+			free(hd_node);
+			hd_node = NULL;
+		}
+		else
+			*tokens = (*tokens)->next; // Move past delimiter
 	}
-	else
-		return (free(hd_node), NULL);
+	// Restore original signal handlers
+	signal(SIGINT, orig_sigint);
+	signal(SIGQUIT, orig_sigquit);
 	return (hd_node);
 }
 

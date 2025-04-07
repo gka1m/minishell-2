@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 14:33:47 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/31 15:00:44 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/07 14:07:25 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int b_unset(t_env *env, char **args)
         return (0);
     while (args[i])
     {
-        delete_env_var(env, args[i]);
+        delete_env_var(&env, args[i]);
         i++;
     }
     return (0);

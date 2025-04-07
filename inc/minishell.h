@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/04 15:01:48 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/07 13:55:36 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,8 @@ typedef enum e_ast_type
 typedef struct s_ast
 {
 	t_ast_type		type;
+	int	heredoc_fd;
+	bool	hd_quoted;
 	char			**args;
 	char			*file; // For redirections
 	struct s_ast	*left;
@@ -141,7 +143,7 @@ void			toggle_quote_state(char c, int *in_dquote,
 // t_token_type	classify_token(char *input);
 // void			free_tokens(t_token **head);
 // t_token			*tokenize_input(char **split);
-// void			free_split(char **split);
+void			free_split(char **split);
 // int				is_quote(char c);
 // int				get_quoted_len(const char *s);
 // int				count_words(const char *s, char c);
@@ -195,6 +197,9 @@ void	expand_squote_redir(char **input, int *i, char **result);
 void	expand_dquote_redir(char **input, int *i, t_minishell *shell,
 	char **result);
 char	*expand_redirection_target(char *input, t_minishell *shell);
+
+char *remove_quotes(char *str);
+char	*expand_heredoc_line(char *line, t_minishell *shell);
 // void	process_dquote_content(t_parse_ctx *ctx);
 // void	redir_dquote(t_parse_ctx *ctx);
 // void	process_squote_content(t_parse_ctx *ctx);
@@ -244,6 +249,7 @@ void    handle_sigint(int sig_num);
 void    sig_reset(bool for_child);
 void    sig_ignore(void);
 void    sig_cmd(int sig_num);
+void handle_heredoc_sigint(int sig);
 // void    sigint_handler(int signo);
 // void    sigint_heredoc(int signo);
 // int rl_event_hd(void);
@@ -264,5 +270,7 @@ int	execute_redirection(t_ast *node, t_minishell *shell);
 char	**convert_env_to_array(t_env *env_list);
 char	*join_str(char const *s1, char const *s2, char const *s3);
 int setup_redirections(t_ast *node, t_minishell *shell);
+int is_builtin(char *cmd);
+void handle_parent_process(pid_t pid, t_minishell *shell);
 
 #endif
