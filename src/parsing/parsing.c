@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/20 14:44:21 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/07 13:32:21 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/08 15:44:55 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,6 @@ t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell)
 	while (*tokens && (*tokens)->type == T_PIPE)
 	{
 		*tokens = (*tokens)->next;
-		// if ((*tokens)->type == T_EOF)
-		// 	return (NULL);
 		right = parse_pipeline(tokens, shell);
 		if (!right)
 			return (NULL);
