@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/08 16:08:30 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/09 11:30:14 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,36 +167,36 @@ int ft_isspace(int c);
 
 
 // parsing functions
-// t_ast			*create_ast_node(t_ast_type type, t_minishell *shell);
-// t_ast			*parse_pipeline(t_token **tokens, t_minishell *shell);
-// t_ast			*parse_redir(t_token **tokens, t_minishell *shell);
-// t_ast			*parse_hd(t_token **tokens, t_minishell *shell);
-// void			parse_arguments(t_token **tokens, t_ast *cmd_node);
-// t_ast			*parse_command(t_token **tokens, t_minishell *shell);
-// void			print_ast(t_ast *node, int level);
-// void			free_ast(t_ast *node);
-// void			add_argument(char ***args, char *value);
+t_ast			*create_ast_node(t_ast_type type, t_minishell *shell);
+t_ast			*parse_pipeline(t_token **tokens, t_minishell *shell);
+t_ast			*parse_redir(t_token **tokens, t_minishell *shell);
+t_ast			*parse_hd(t_token **tokens, t_minishell *shell);
+void			parse_arguments(t_token **tokens, t_ast *cmd_node);
+t_ast			*parse_command(t_token **tokens, t_minishell *shell);
+void			print_ast(t_ast *node, int level);
+void			free_ast(t_ast *node);
+void			add_argument(char ***args, char *value);
 
-// int				is_valid_var_char(char c, int first_char);
-// char			*extract_var_name(char *input, int *i);
-// char			*handle_question_var(t_minishell *shell);
-// char			*get_var_value(char *var_name, t_minishell *shell);
-// char			*ft_strjoin_free(char *s1, char *s2);
-// char			*ft_strjoin_char(char *s1, char c);
-// int				handle_squote(char *input, int *i, char **result);
-// int				handle_dquote(char *input, int *i, t_minishell *shell,
-// 					char **result);
-// int				expand_var(char *input, int *i, t_minishell *shell,
-// 					char **result);
-// char			*expand_input(char *input, t_minishell *shell);
-// int				handle_dquote_expansion(t_parse_ctx *ctx, int *start);
-// int				handle_specials(char *input, int *i, t_minishell *shell,
-// 					char **result);
+int				is_valid_var_char(char c, int first_char);
+char			*extract_var_name(char *input, int *i);
+char			*handle_question_var(t_minishell *shell);
+char			*get_var_value(char *var_name, t_minishell *shell);
+char			*ft_strjoin_free(char *s1, char *s2);
+char			*ft_strjoin_char(char *s1, char c);
+int				handle_squote(char *input, int *i, char **result);
+int				handle_dquote(char *input, int *i, t_minishell *shell,
+					char **result);
+int				expand_var(char *input, int *i, t_minishell *shell,
+					char **result);
+char			*expand_input(char *input, t_minishell *shell);
+int				handle_dquote_expansion(t_parse_ctx *ctx, int *start);
+int				handle_specials(char *input, int *i, t_minishell *shell,
+					char **result);
 
-// void	expand_squote_redir(char **input, int *i, char **result);
-// void	expand_dquote_redir(char **input, int *i, t_minishell *shell,
-// 	char **result);
-// char	*expand_redirection_target(char *input, t_minishell *shell);
+void	expand_squote_redir(char **input, int *i, char **result);
+void	expand_dquote_redir(char **input, int *i, t_minishell *shell,
+	char **result);
+char	*expand_redirection_target(char *input, t_minishell *shell);
 
 // char *remove_quotes(char *str);
 // char	*expand_heredoc_line(char *line, t_minishell *shell);
@@ -206,15 +206,15 @@ int ft_isspace(int c);
 // void	redir_squote(t_parse_ctx *ctx);
 // void	handle_var_expansion(t_parse_ctx *ctx);
 // char	*expand_redir(char *input, t_minishell *shell, bool heredoc_mode);
-t_ast	*create_ast_node(t_ast_type type, t_minishell *shell);
-t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell);
-t_ast	*parse_command(t_token **tokens, t_minishell *shell);
-char	**parse_arguments(t_token **tokens);
-t_ast	*parse_redirection(t_token **tokens, t_ast *left, t_minishell *shell);
-size_t	count_arguments(t_token *tokens);
-bool	is_quoted(const char *str);
-bool	is_redirection(t_token *token);
-void	free_ast(t_ast *node);
+// t_ast	*create_ast_node(t_ast_type type, t_minishell *shell);
+// t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell);
+// t_ast	*parse_command(t_token **tokens, t_minishell *shell);
+// char	**parse_arguments(t_token **tokens);
+// t_ast	*parse_redirection(t_token **tokens, t_ast *left, t_minishell *shell);
+// size_t	count_arguments(t_token *tokens);
+// bool	is_quoted(const char *str);
+// bool	is_redirection(t_token *token);
+// void	free_ast(t_ast *node);
 
 
 // env functions
