@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/09 11:30:14 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/10 12:32:28 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,6 @@ typedef struct s_env
 // lexing functions
 int				check_pipe(t_token *head);
 int				check_redirects(t_token *token);
-// int				check_append(t_token *head);
 int				check_heredoc(t_token *head);
 int				check_grammar(t_token *head);
 int				check_quotes(t_token *head);
@@ -150,6 +149,14 @@ char	*extract_string(char *input, int *i);
 t_token	*tokenize_string(char *input, int *i, t_token *current);
 t_token	*tokenize(char *input);
 int ft_isspace(int c);
+
+bool	is_redirection(t_token *token);
+char	*remove_quotes(char *str);
+void	expand_variables(t_token *token, t_minishell *shell);
+t_token	*handle_redirection_expansion(t_token *token, t_minishell *shell);
+t_token	*expand_all_tokens(t_token *tokens, t_minishell *shell);
+t_token *concatenate_adjacent_strings(t_token *tokens);
+
 // int				check_eof(t_token *head);
 // t_token			*create_token(char *value, t_token_type type);
 // void			add_token(t_token **head, t_token *new);

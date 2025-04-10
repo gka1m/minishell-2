@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/07 17:27:10 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/10 11:23:22 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,8 @@ int main(int argc, char **argv, char **envp)
     t_minishell *shell;
     char *input;
     t_token *tokens;
-    t_ast *ast;
+    t_token *current;
+    // t_ast *ast;
     int exit_status = 0;
 
     (void)argc;
@@ -157,6 +158,7 @@ int main(int argc, char **argv, char **envp)
         return (1);
     }
 
+    // print_env_vars(shell->env_list);
     // Main loop
     while (1)
     {
@@ -195,17 +197,18 @@ int main(int argc, char **argv, char **envp)
             free(input);
             continue;
         }
-		print_tokens(tokens);
+        current = expand_all_tokens(tokens, shell);
+		print_tokens(current);
         // Parsing
-        ast = parse_pipeline(&tokens, shell);
-        free_tokens(&tokens);  // Tokens are no longer needed after parsing
-        if (!ast)
-        {
-            shell->last_exit_code = 2;
-            free(input);
-            continue;
-        }
-		print_ast(ast, 0);
+        // ast = parse_pipeline(&tokens, shell);
+        // free_tokens(&tokens);  // Tokens are no longer needed after parsing
+        // if (!ast)
+        // {
+        //     shell->last_exit_code = 2;
+        //     free(input);
+        //     continue;
+        // }
+		// print_ast(ast, 0);
         // // Execution
         // if (ast->type == AST_CMD && is_builtin(ast->args[0]))
         // {
