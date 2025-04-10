@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:47:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/08 16:04:31 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/10 14:48:22 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,24 +39,38 @@ t_ast	*parse_command(t_token **tokens, t_minishell *shell)
 {
 	t_ast	*cmd_node;
 	t_ast	*result;
+	t_ast	*redir_node;
 
-	cmd_node = create_ast_node(AST_CMD, shell);
-	if (!cmd_node)
-		return (NULL);
-	cmd_node->args = parse_arguments(tokens);
-	if (!cmd_node->args && *tokens && (*tokens)->type != T_PIPE
-		&& !is_redirection(*tokens))
+	cmd_node = NULL;
+	result = NULL;
+	// Only create CMD node if we have arguments or no redirections
+	if (*tokens && (*tokens)->type == T_STRING)
 	{
-		free_ast(cmd_node);
-		return (NULL);
+		cmd_node = create_ast_node(AST_CMD, shell);
+		// if (!cmd_node)
+		// 	return (NULL);
+		cmd_node->args = parse_arguments(tokens);
+		result = cmd_node;
 	}
-	result = cmd_node;
-	while (*tokens && is_redirection(*tokens))
+	// Handle redirections
+	if (*tokens && is_redirection(*tokens))
 	{
-		result = parse_redirection(tokens, result, shell);
-		if (!result)
+		if ((*tokens)->type == T_HEREDOC)
+			redir_node = parse_heredoc(tokens, result, shell);
+		else
+			redir_node = parse_redirection(tokens, result, shell);
+		if (!redir_node)
+		{
+			if (cmd_node)
+				free_ast(cmd_node);
 			return (NULL);
+		}
+		result = redir_node;
 	}
+	// If we only had redirections, return the last redirection node
+	// if (!cmd_node)
+	// 	return (result);
+	// If we had both command and redirections, return the structure
 	return (result);
 }
 
@@ -92,52 +106,55 @@ char	**parse_arguments(t_token **tokens)
 
 t_ast	*parse_redirection(t_token **tokens, t_ast *left, t_minishell *shell)
 {
-	t_token *redir_token;
-	t_token *file_token;
-	t_ast *redir_node;
-	t_ast_type type;
+	t_token		*redir_token;
+	t_token		*file_token;
+	t_ast		*redir_node;
+	t_ast_type	type;
 
 	redir_token = *tokens;
-	// Directly assign AST type based on token type
 	if (redir_token->type == T_REDIR_IN)
 		type = AST_REDIR_IN;
 	else if (redir_token->type == T_REDIR_OUT)
 		type = AST_REDIR_OUT;
 	else if (redir_token->type == T_APPEND)
 		type = AST_APPEND;
-	else if (redir_token->type == T_HEREDOC)
-		type = AST_HEREDOC;
 	else
-	{
-		free_ast(left);
-		return (NULL); // Not a redirection token
-	}
+		return (free_ast(left), NULL);
 	*tokens = (*tokens)->next;
 	if (!*tokens || (*tokens)->type != T_STRING)
-	{
-		free_ast(left);
-		return (NULL); // Missing filename
-	}
+		return (free_ast(left), NULL);
 	file_token = *tokens;
 	*tokens = (*tokens)->next;
 	redir_node = create_ast_node(type, shell);
 	if (!redir_node)
-	{
-		free_ast(left);
-		return (NULL);
-	}
+		return (free_ast(left), NULL);
 	redir_node->file = ft_strdup(file_token->value);
 	if (!redir_node->file)
-	{
-		free_ast(redir_node);
-		free_ast(left);
-		return (NULL);
-	}
+		return (free_ast(redir_node), free_ast(left), NULL);
 	redir_node->left = left;
-	// Handle heredoc quote status
-	if (type == AST_HEREDOC)
-		redir_node->hd_quoted = (file_token->value[0] == '\''
-				|| file_token->value[0] == '"');
 	return (redir_node);
 }
 
+t_ast	*parse_heredoc(t_token **tokens, t_ast *left, t_minishell *shell)
+{
+	t_token *heredoc_token;
+	t_token *delim_token;
+	t_ast *heredoc_node;
+
+	heredoc_token = *tokens;
+	*tokens = (*tokens)->next;
+	if (!*tokens || (*tokens)->type != T_STRING)
+		return (free_ast(left), NULL);
+	delim_token = *tokens;
+	*tokens = (*tokens)->next;
+	heredoc_node = create_ast_node(AST_HEREDOC, shell);
+	if (!heredoc_node)
+		return (free_ast(left), NULL);
+	heredoc_node->file = ft_strdup(delim_token->value);
+	if (!heredoc_node->file)
+		return (free_ast(heredoc_node), free_ast(left), NULL);
+	heredoc_node->left = left;
+	heredoc_node->hd_quoted = (delim_token->value[0] == '\''
+			|| delim_token->value[0] == '"');
+	return (heredoc_node);
+}

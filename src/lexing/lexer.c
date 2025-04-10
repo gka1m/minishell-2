@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 12:01:42 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/04 14:55:29 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/10 15:14:40 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,12 @@ t_token	*tokenize(char *input)
 	{
 		if (ft_isspace(input[i]))
 			i++;
+		if (is_invalid_redirection_sequence(input, i))
+		{
+			printf("minishell: syntax error near unexpected token `%.3s'\n",
+				input + i);
+			return (NULL);
+		}
 		if (is_heredoc(input, i))
 		{
 			current = tokenize_hd(input, &i, current);

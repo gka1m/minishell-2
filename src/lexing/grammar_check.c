@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 14:59:23 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/07 11:23:10 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/10 15:17:43 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,12 +191,4 @@ int	check_quotes(t_token *tokens)
 	if (in_dquote || in_squote)
 		return (printf("syntax error: unmatched quotes\n"), 0);
 	return (1);
-}
-
-void	toggle_quote_state(char c, int *in_dquote, int *in_squote)
-{
-	if (!(*in_squote) && c == '"')
-		*in_dquote = !(*in_dquote);
-	else if (!(*in_dquote) && c == '\'')
-		*in_squote = !(*in_squote);
 }

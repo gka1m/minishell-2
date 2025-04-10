@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 11:59:01 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/10 11:03:02 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/10 15:17:51 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,39 +45,37 @@ void	free_tokens(t_token **head)
 	*head = NULL;
 }
 
-bool	is_metachar(char c)
-{
-	return (c == '|' || c == '<' || c == '>');
-}
-
-bool	is_heredoc(char *input, int i)
-{
-	return (input[i] == '<' && input[i + 1] == '<');
-}
-
-bool	is_append(char *input, int i)
-{
-	return (input[i] == '>' && input[i + 1] == '>');
-}
-
-int	ft_isspace(int c)
-{
-	return (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f'
-		|| c == '\r');
-}
-
-bool	is_redirection(t_token *token)
-{
-	return (token->type == T_REDIR_IN || token->type == T_REDIR_OUT
-		|| token->type == T_APPEND);
-}
-
 void	free_split(char **split)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (split[i])
 		free(split[i++]);
 	free(split);
+}
+
+bool	is_invalid_redirection_sequence(char *input, int i)
+{
+	if (!input[i])
+		return (false);
+	// Reject >>> or <<< (triple)
+	if ((input[i] == '>' && input[i + 1] == '>' && input[i + 2] == '>')
+		|| (input[i] == '<' && input[i + 1] == '<' && input[i + 2] == '<'))
+		return (true);
+	// Reject combinations like << <, >> >, > >>, < << etc.
+	if ((input[i] == '<' || input[i] == '>') && (input[i + 1] == '<' || input[i
+			+ 1] == '>') && (input[i + 2] == '<' || input[i + 2] == '>')
+		&& !(input[i] == input[i + 1] && input[i + 1] == input[i + 2]))
+		// allow << or >> only
+		return (true);
+	return (false);
+}
+
+void	toggle_quote_state(char c, int *in_dquote, int *in_squote)
+{
+	if (!(*in_squote) && c == '"')
+		*in_dquote = !(*in_dquote);
+	else if (!(*in_dquote) && c == '\'')
+		*in_squote = !(*in_squote);
 }
