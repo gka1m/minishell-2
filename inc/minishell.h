@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/14 14:13:30 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/14 17:07:13 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -307,5 +307,7 @@ int is_builtin(char *cmd);
 void handle_parent_process(pid_t pid, t_minishell *shell);
 
 int execution_logic(t_ast *ast, t_minishell *minishell);
+// void	restore_standard_fds(void);
+
 
 #endif

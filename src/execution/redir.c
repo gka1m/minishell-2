@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:19:27 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/07 16:46:59 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/14 17:07:20 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,11 @@
 
 int	execute_redirection(t_ast *node, t_minishell *shell)
 {
-	int fd;
-	int flags;
-	int original_fd = -1;
+	int	fd;
+	int	flags;
+	int	original_fd;
 
+	original_fd = -1;
 	(void)shell;
 	if (!node || !node->file)
 		return (-1);
@@ -59,22 +60,22 @@ int	execute_redirection(t_ast *node, t_minishell *shell)
 	return (close(fd), 0);
 }
 
-int setup_redirections(t_ast *node, t_minishell *shell)
+int	setup_redirections(t_ast *node, t_minishell *shell)
 {
-    if (!node)
-        return (-1);
-    // Handle current node's redirection
-    if (node->type == AST_REDIR_IN || node->type == AST_REDIR_OUT || 
-        node->type == AST_APPEND || node->type == AST_HEREDOC)
-    {
-        if (execute_redirection(node, shell) == -1)
-            return (-1);
-    }
-    // Process left subtree (redirections come before commands)
-    if (node->left && setup_redirections(node->left, shell) == -1)
-        return (-1);
-    // Process right subtree (for pipes or chained redirections)
-    if (node->right && setup_redirections(node->right, shell) == -1)
-        return (-1);
-    return (0);
+	if (!node)
+		return (0);
+	// Process left subtree first (redirections)
+	if (setup_redirections(node->left, shell) == -1)
+		return (-1);
+	// Handle current node's redirection
+	if (node->type == AST_REDIR_IN || node->type == AST_REDIR_OUT
+		|| node->type == AST_APPEND)
+	{
+		if (execute_redirection(node, shell) == -1)
+			return (-1);
+	}
+	// Process right subtree (commands)
+	if (setup_redirections(node->right, shell) == -1)
+		return (-1);
+	return (0);
 }

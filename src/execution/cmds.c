@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/14 14:18:30 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/14 17:07:07 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,6 @@ void	execute_external(t_ast *node, t_minishell *shell)
 			free_split(env_array);
 			exit(127);
 		}
-		// Debug: Print final execution path
-		// ft_putstr_fd("DEBUG: Executing: ", STDERR_FILENO);
-		// ft_putendl_fd(full_path, STDERR_FILENO);
 		execve(full_path, node->args, env_array);
 		// If execve fails
 		perror("minishell: execve");
@@ -85,9 +82,6 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 
 	if (!cmd || !shell || !shell->env_list)
 		return (NULL);
-	// Debug: Print command being searched
-	// ft_putstr_fd("DEBUG: Searching for command: ", STDERR_FILENO);
-	// ft_putendl_fd(cmd, STDERR_FILENO);
 	// Handle absolute/relative paths
 	if (ft_strchr(cmd, '/'))
 	{
@@ -116,9 +110,6 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 		ft_putstr_fd(": PATH not set\n", STDERR_FILENO);
 		return (NULL);
 	}
-	// Debug: Print PATH being used
-	// ft_putstr_fd("DEBUG: Using PATH: ", STDERR_FILENO);
-	// ft_putendl_fd(path_node->value, STDERR_FILENO);
 	// Split PATH into directories
 	dirs = ft_split(path_node->value, ':');
 	if (!dirs)
@@ -130,10 +121,6 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 		full_path = join_str(dirs[i], "/", cmd);
 		if (!full_path)
 			continue ;
-
-		// ft_putstr_fd("DEBUG: Checking path: ", STDERR_FILENO);
-		// ft_putendl_fd(full_path, STDERR_FILENO);
-
 		if (access(full_path, F_OK) == 0)
 		{
 			if (access(full_path, X_OK) == 0)
@@ -158,16 +145,36 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 
 void	execute_command(t_ast *node, t_minishell *shell)
 {
+	pid_t	pid;
+
 	if (!node || !node->args || !node->args[0])
 		return ;
-	// Check if command is a builtin
 	if (is_builtin(node->args[0]))
 	{
-		shell->last_exit_code = execute_builtin(shell, node->args,
-				STDOUT_FILENO);
+		// Check if there are any redirections
+		if (node->type == AST_REDIR_IN || node->type == AST_REDIR_OUT
+			|| node->type == AST_APPEND || node->type == AST_HEREDOC
+			|| node->left || node->right)
+			// left/right may hold redirection nodes
+		{
+			pid = fork();
+			if (pid == 0)
+			{
+				sig_reset(true);
+				if (setup_redirections(node, shell) == -1)
+					exit(1);
+				exit(execute_builtin(shell, node->args, STDOUT_FILENO));
+			}
+			else
+				handle_parent_process(pid, shell);
+		}
+		else
+			// No redirections? Run in parent directly
+			shell->last_exit_code = execute_builtin(shell, node->args,
+					STDOUT_FILENO);
 		return ;
 	}
-	// Handle external commands
+	// External command
 	execute_external(node, shell);
 }
 
