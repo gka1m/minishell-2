@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/07 16:21:33 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/14 14:18:30 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,8 @@ void	execute_external(t_ast *node, t_minishell *shell)
 			exit(127);
 		}
 		// Debug: Print final execution path
-		ft_putstr_fd("DEBUG: Executing: ", STDERR_FILENO);
-		ft_putendl_fd(full_path, STDERR_FILENO);
+		// ft_putstr_fd("DEBUG: Executing: ", STDERR_FILENO);
+		// ft_putendl_fd(full_path, STDERR_FILENO);
 		execve(full_path, node->args, env_array);
 		// If execve fails
 		perror("minishell: execve");
@@ -86,8 +86,8 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 	if (!cmd || !shell || !shell->env_list)
 		return (NULL);
 	// Debug: Print command being searched
-	ft_putstr_fd("DEBUG: Searching for command: ", STDERR_FILENO);
-	ft_putendl_fd(cmd, STDERR_FILENO);
+	// ft_putstr_fd("DEBUG: Searching for command: ", STDERR_FILENO);
+	// ft_putendl_fd(cmd, STDERR_FILENO);
 	// Handle absolute/relative paths
 	if (ft_strchr(cmd, '/'))
 	{
@@ -117,8 +117,8 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 		return (NULL);
 	}
 	// Debug: Print PATH being used
-	ft_putstr_fd("DEBUG: Using PATH: ", STDERR_FILENO);
-	ft_putendl_fd(path_node->value, STDERR_FILENO);
+	// ft_putstr_fd("DEBUG: Using PATH: ", STDERR_FILENO);
+	// ft_putendl_fd(path_node->value, STDERR_FILENO);
 	// Split PATH into directories
 	dirs = ft_split(path_node->value, ':');
 	if (!dirs)
@@ -131,8 +131,8 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 		if (!full_path)
 			continue ;
 
-		ft_putstr_fd("DEBUG: Checking path: ", STDERR_FILENO);
-		ft_putendl_fd(full_path, STDERR_FILENO);
+		// ft_putstr_fd("DEBUG: Checking path: ", STDERR_FILENO);
+		// ft_putendl_fd(full_path, STDERR_FILENO);
 
 		if (access(full_path, F_OK) == 0)
 		{

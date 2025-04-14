@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/14 12:06:44 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/14 14:13:53 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,7 +198,7 @@ int main(int argc, char **argv, char **envp)
             continue;
         }
         current = expand_all_tokens(tokens, shell);
-		print_tokens(current);
+		// print_tokens(current);
         // Parsing
         ast = parse_pipeline(&tokens, shell);
         free_tokens(&tokens);  // Tokens are no longer needed after parsing
@@ -208,7 +208,7 @@ int main(int argc, char **argv, char **envp)
             free(input);
             continue;
         }
-		print_ast(ast, 0);
+		// print_ast(ast, 0);
         process_heredocs(ast, shell);
         // Execution
         // if (ast->type == AST_CMD && is_builtin(ast->args[0]))
@@ -217,6 +217,7 @@ int main(int argc, char **argv, char **envp)
         // }
         // else
         //     execute_pipeline(ast, shell);
+        exit_status = execution_logic(ast, shell);
 
         // Cleanup for this iteration
         free_ast(ast);
