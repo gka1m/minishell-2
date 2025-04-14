@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/10 15:09:04 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/14 12:06:44 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@ int main(int argc, char **argv, char **envp)
     char *input;
     t_token *tokens;
     t_token *current;
-    // t_ast *ast;
+    t_ast *ast;
     int exit_status = 0;
 
     (void)argc;
@@ -200,16 +200,17 @@ int main(int argc, char **argv, char **envp)
         current = expand_all_tokens(tokens, shell);
 		print_tokens(current);
         // Parsing
-        // ast = parse_pipeline(&tokens, shell);
-        // free_tokens(&tokens);  // Tokens are no longer needed after parsing
-        // if (!ast)
-        // {
-        //     shell->last_exit_code = 2;
-        //     free(input);
-        //     continue;
-        // }
-		// print_ast(ast, 0);
-        // // Execution
+        ast = parse_pipeline(&tokens, shell);
+        free_tokens(&tokens);  // Tokens are no longer needed after parsing
+        if (!ast)
+        {
+            shell->last_exit_code = 2;
+            free(input);
+            continue;
+        }
+		print_ast(ast, 0);
+        process_heredocs(ast, shell);
+        // Execution
         // if (ast->type == AST_CMD && is_builtin(ast->args[0]))
         // {
         //     shell->last_exit_code = execute_builtin(shell, ast->args, STDOUT_FILENO);
@@ -217,9 +218,9 @@ int main(int argc, char **argv, char **envp)
         // else
         //     execute_pipeline(ast, shell);
 
-        // // Cleanup for this iteration
-        // free_ast(ast);
-        // free(input);
+        // Cleanup for this iteration
+        free_ast(ast);
+        free(input);
     }
     // Final cleanup
     rl_clear_history();

@@ -33,7 +33,7 @@ SRC		= $(LEXER)lex_utils.c $(LEXER)lexer.c $(LEXER)grammar_check.c \
 		  $(BUILTIN)b_cd.c $(BUILTIN)b_echo.c $(BUILTIN)b_env.c \
 		  $(BUILTIN)b_exit.c $(BUILTIN)b_export.c $(BUILTIN)b_pwd.c \
 		  $(BUILTIN)b_unset.c \
-		#   $(PARSE)parser.c $(PARSE)parse_utils.c \
+		  $(PARSE)parser.c $(PARSE)parse_utils.c $(PARSE)heredoc.c \
 		#   $(PARSE)parsing.c $(PARSE)ast_utils.c $(PARSE)expand_utils.c \
 		#   $(PARSE)str_expand.c $(PARSE)expand_utils2.c $(PARSE)redir_expand.c \
 		#   $(PARSE)hd_parsing.c \

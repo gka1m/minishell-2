@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/10 15:14:32 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/14 12:04:29 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,7 @@ typedef struct s_parse_ctx
 typedef struct s_heredoc
 {
 	char				*delimiter;
+	bool	hd_quoted;
 	int					pipefd[2];
 	t_ast				*node; // this is from kagoh AST
 	struct s_heredoc	*next;
@@ -234,6 +235,10 @@ void	free_ast(t_ast *node);
 t_ast	*create_ast_node(t_ast_type type, t_minishell *shell);
 t_ast_type classify_redir(t_token_type token_type);
 
+void	process_heredocs(t_ast *ast, t_minishell *shell);
+void	process_heredoc_input(t_heredoc *hd, t_minishell *shell);
+int	create_heredoc_pipe(t_heredoc *hd);
+
 // env functions
 t_minishell		*init_minishell(char **envp);
 void			init_fields(t_minishell *minishell, char **envp);
@@ -277,6 +282,7 @@ void    sig_reset(bool for_child);
 void    sig_ignore(void);
 void    sig_cmd(int sig_num);
 void handle_heredoc_sigint(int sig);
+void setup_heredoc_signals(void);
 // void    sigint_handler(int signo);
 // void    sigint_heredoc(int signo);
 // int rl_event_hd(void);

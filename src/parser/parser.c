@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:47:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/10 14:48:22 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/14 12:01:02 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,14 +137,17 @@ t_ast	*parse_redirection(t_token **tokens, t_ast *left, t_minishell *shell)
 
 t_ast	*parse_heredoc(t_token **tokens, t_ast *left, t_minishell *shell)
 {
-	t_token *heredoc_token;
-	t_token *delim_token;
-	t_ast *heredoc_node;
+	t_token	*delim_token;
+	t_ast	*heredoc_node;
 
-	heredoc_token = *tokens;
+	if (!tokens || !*tokens || (*tokens)->type != T_HEREDOC)
+		return (NULL);
 	*tokens = (*tokens)->next;
 	if (!*tokens || (*tokens)->type != T_STRING)
+	{
+		printf("minishell: syntax error near unexpected token `newline'\n");
 		return (free_ast(left), NULL);
+	}
 	delim_token = *tokens;
 	*tokens = (*tokens)->next;
 	heredoc_node = create_ast_node(AST_HEREDOC, shell);
@@ -153,8 +156,8 @@ t_ast	*parse_heredoc(t_token **tokens, t_ast *left, t_minishell *shell)
 	heredoc_node->file = ft_strdup(delim_token->value);
 	if (!heredoc_node->file)
 		return (free_ast(heredoc_node), free_ast(left), NULL);
-	heredoc_node->left = left;
 	heredoc_node->hd_quoted = (delim_token->value[0] == '\''
 			|| delim_token->value[0] == '"');
+	heredoc_node->left = left;
 	return (heredoc_node);
 }
