@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 10:09:44 by zchan             #+#    #+#             */
-/*   Updated: 2025/04/15 17:14:32 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/15 17:18:01 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	execution_logic(t_ast *ast, t_minishell *minishell)
 	else
 	{
 		ft_putstr_fd("Unknown node type\n", 2);
-        // fprintf(stderr, "Unknown node type\n");
+		// fprintf(stderr, "Unknown node type\n");
 		return (-1);
 	}
 	return (0);
@@ -153,7 +153,7 @@ t_node	*create_mock_command_node(char *cmd, char **args) {
 	node->type = COMMAND;
 	node->command = cmd;
 	node->args = args;
-	return node;
+	return (node);
 }
 
 t_node	*create_mock_pipe_node(t_node *left, t_node *right) {
@@ -161,7 +161,7 @@ t_node	*create_mock_pipe_node(t_node *left, t_node *right) {
 	node->type = PIPE;
 	node->left = left;
 	node->right = right;
-	return node;
+	return (node);
 }
 
 // need to re-write the code block above to this
@@ -177,7 +177,7 @@ int	execution_logic(t_node *ast, t_minishell *minishell)
 	else
 	{
 		fprintf(stderr, "Unknown node type\n");
-		return -1;
+		return (-1);
 	}
 }
 
