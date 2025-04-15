@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/15 16:18:03 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/15 16:25:07 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,6 @@ char	*extract_string(char *input, int *i);
 t_token	*tokenize_string(char *input, int *i, t_token *current);
 t_token	*tokenize(char *input);
 int ft_isspace(int c);
-
 bool	is_redirection(t_token *token);
 char	*remove_quotes(char *str);
 void	expand_variables(t_token *token, t_minishell *shell);
@@ -160,78 +159,14 @@ t_token	*expand_all_tokens(t_token *tokens, t_minishell *shell);
 t_token *concatenate_adjacent_strings(t_token *tokens);
 bool	is_invalid_redirection_sequence(char *input, int i);
 
-// int				check_eof(t_token *head);
-// t_token			*create_token(char *value, t_token_type type);
-// void			add_token(t_token **head, t_token *new);
-// t_token_type	classify_token(char *input);
-// void			free_tokens(t_token **head);
-// t_token			*tokenize_input(char **split);
-// int				is_quote(char c);
-// int				get_quoted_len(const char *s);
-// int				count_words(const char *s, char c);
-// char			*get_next_word(const char *s, char c, int *i);
-// char			**split_preserve_quotes(const char *s, char c);
-
-// void			concatenate_quoted_strings(t_token *last, t_token *new);
-// int				should_concatenate(t_token *last, char *current_str);
-
 
 // parsing functions
-// t_ast			*create_ast_node(t_ast_type type, t_minishell *shell);
-// t_ast			*parse_pipeline(t_token **tokens, t_minishell *shell);
-// t_ast			*parse_redir(t_token **tokens, t_minishell *shell);
-// t_ast			*parse_hd(t_token **tokens, t_minishell *shell);
-// void			parse_arguments(t_token **tokens, t_ast *cmd_node);
-// t_ast			*parse_command(t_token **tokens, t_minishell *shell);
-// void			print_ast(t_ast *node, int level);
-// void			free_ast(t_ast *node);
-// void			add_argument(char ***args, char *value);
-
-// int				is_valid_var_char(char c, int first_char);
-// char			*extract_var_name(char *input, int *i);
-// char			*handle_question_var(t_minishell *shell);
-// char			*get_var_value(char *var_name, t_minishell *shell);
-// char			*ft_strjoin_free(char *s1, char *s2);
-// char			*ft_strjoin_char(char *s1, char c);
-// int				handle_squote(char *input, int *i, char **result);
-// int				handle_dquote(char *input, int *i, t_minishell *shell,
-// 					char **result);
-// int				expand_var(char *input, int *i, t_minishell *shell,
-// 					char **result);
-// char			*expand_input(char *input, t_minishell *shell);
-// int				handle_dquote_expansion(t_parse_ctx *ctx, int *start);
-// int				handle_specials(char *input, int *i, t_minishell *shell,
-// 					char **result);
-
-// void	expand_squote_redir(char **input, int *i, char **result);
-// void	expand_dquote_redir(char **input, int *i, t_minishell *shell,
-// 	char **result);
-// char	*expand_redirection_target(char *input, t_minishell *shell);
-
-// char *remove_quotes(char *str);
-// char	*expand_heredoc_line(char *line, t_minishell *shell);
-// void	process_dquote_content(t_parse_ctx *ctx);
-// void	redir_dquote(t_parse_ctx *ctx);
-// void	process_squote_content(t_parse_ctx *ctx);
-// void	redir_squote(t_parse_ctx *ctx);
-// void	handle_var_expansion(t_parse_ctx *ctx);
-// char	*expand_redir(char *input, t_minishell *shell, bool heredoc_mode);
-// t_ast	*create_ast_node(t_ast_type type, t_minishell *shell);
-// t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell);
-// t_ast	*parse_command(t_token **tokens, t_minishell *shell);
-// char	**parse_arguments(t_token **tokens);
-// t_ast	*parse_redirection(t_token **tokens, t_ast *left, t_minishell *shell);
-// size_t	count_arguments(t_token *tokens);
-// bool	is_quoted(const char *str);
-// bool	is_redirection(t_token *token);
-// void	free_ast(t_ast *node);
 t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell);
 t_ast	*parse_command(t_token **tokens, t_minishell *shell);
 char	**parse_arguments(t_token **tokens);
 t_ast	*parse_redirection(t_token **tokens, t_ast *left, t_minishell *shell);
 size_t	count_arguments(t_token *tokens);
 t_ast	*parse_heredoc(t_token **tokens, t_ast *left, t_minishell *shell);
-// bool	is_redirection(t_token *token);
 void	free_ast(t_ast *node);
 t_ast	*create_ast_node(t_ast_type type, t_minishell *shell);
 t_ast_type classify_redir(t_token_type token_type);
@@ -284,13 +219,6 @@ void    sig_ignore(void);
 void    sig_cmd(int sig_num);
 void handle_heredoc_sigint(int sig);
 void setup_heredoc_signals(void);
-// void    sigint_handler(int signo);
-// void    sigint_heredoc(int signo);
-// int rl_event_hd(void);
-// void	setup_sig_interactive(void);
-// void	setup_sig_exec(void);
-// void	setup_sig_heredoc(void);
-// int process_input(char **input);
 
 // execution functions
 int	execute_builtin(t_minishell *shell, char **args, int fd_out);
@@ -308,7 +236,5 @@ int is_builtin(char *cmd);
 void handle_parent_process(pid_t pid, t_minishell *shell);
 int execution_logic(t_ast *ast, t_minishell *minishell);
 void restore_standard_fds();
-
-// void	restore_standard_fds(void);
 
 #endif

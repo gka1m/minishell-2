@@ -9,18 +9,15 @@ EXT_FLAGS = -lreadline
 # Directories
 SRC_DIR = src/
 LIBFT_DIR = libft/
-# TOKEN = src/lexer/
 LEXER = src/lexing/
-# PARSE = src/parsing/
 PARSE = src/parser/
 SIGNAL = src/signals/
 ENV = src/env/
 BUILTIN = src/builtin/
 EXEC = src/execution/
 SIG = src/signals/
-HISTORY = src/history/
 
-# Source files (manually listed)
+# Source files
 SRC		= $(LEXER)lex_utils.c $(LEXER)lexer.c $(LEXER)grammar_check.c \
 		  $(LEXER)expand.c $(LEXER)lex_utils2.c \
 		  $(ENV)env.c $(ENV)setup.c $(ENV)freeing.c $(ENV)add.c \
@@ -34,9 +31,6 @@ SRC		= $(LEXER)lex_utils.c $(LEXER)lexer.c $(LEXER)grammar_check.c \
 		  $(BUILTIN)b_exit.c $(BUILTIN)b_export.c $(BUILTIN)b_pwd.c \
 		  $(BUILTIN)b_unset.c \
 		  $(PARSE)parser.c $(PARSE)parse_utils.c $(PARSE)heredoc.c \
-		#   $(PARSE)parsing.c $(PARSE)ast_utils.c $(PARSE)expand_utils.c \
-		#   $(PARSE)str_expand.c $(PARSE)expand_utils2.c $(PARSE)redir_expand.c \
-		#   $(PARSE)hd_parsing.c \
 
 # Object files
 OBJ		= $(SRC:.c=.o)
