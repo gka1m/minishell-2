@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/15 16:25:07 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/15 16:46:21 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,6 +194,7 @@ char	**env_to_keys_array(t_env *env);
 void	print_sorted_env(t_env *env, int fd_out);
 void	swap_strings(char **a, char **b);
 void	sort_keys(char **tab);
+char	*ft_strndup(const char *s, size_t n);
 
 // builtin functions
 int	update_pwds(t_minishell *shell, t_env **env_list, char *new_path);
