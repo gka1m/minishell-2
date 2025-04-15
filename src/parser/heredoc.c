@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/14 12:08:23 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/15 12:16:25 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,9 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 	setup_heredoc_signals();
 	while (!g_signal_flag)
 	{
-		line = readline("> ");
+		line = readline("hd> ");
 		if (!line || ft_strncmp(line, hd->delimiter,
-				ft_strlen(hd->delimiter)) == 0)
+				ft_strlen(line)) == 0)
 		{
 			free(line);
 			break ;

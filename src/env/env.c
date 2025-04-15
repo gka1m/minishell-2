@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 11:53:42 by theophane         #+#    #+#             */
-/*   Updated: 2025/04/01 12:51:34 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/15 13:58:36 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,9 @@ t_minishell	*init_minishell(char **envp)
 	}
 	init_fields(minishell, envp);
 	minishell->interactive = isatty(STDIN_FILENO);
+	minishell->stdio_backup[0] = -1;
+    minishell->stdio_backup[1] = -1;
+    minishell->stdio_backup[2] = -1;
 	return (minishell);
 }
 

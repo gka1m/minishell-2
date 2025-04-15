@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/14 17:07:07 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/15 14:59:17 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,9 +153,8 @@ void	execute_command(t_ast *node, t_minishell *shell)
 	{
 		// Check if there are any redirections
 		if (node->type == AST_REDIR_IN || node->type == AST_REDIR_OUT
-			|| node->type == AST_APPEND || node->type == AST_HEREDOC
-			|| node->left || node->right)
-			// left/right may hold redirection nodes
+			|| node->type == AST_APPEND || node->left || node->right)
+		// left/right may hold redirection nodes
 		{
 			pid = fork();
 			if (pid == 0)
@@ -170,8 +169,7 @@ void	execute_command(t_ast *node, t_minishell *shell)
 		}
 		else
 			// No redirections? Run in parent directly
-			shell->last_exit_code = execute_builtin(shell, node->args,
-					STDOUT_FILENO);
+			shell->last_exit_code = execute_builtin(shell, node->args, 1);
 		return ;
 	}
 	// External command

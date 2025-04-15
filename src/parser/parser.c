@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:47:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/14 12:01:02 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/15 12:26:54 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,7 @@ t_ast	*parse_command(t_token **tokens, t_minishell *shell)
 		else
 			redir_node = parse_redirection(tokens, result, shell);
 		if (!redir_node)
-		{
-			if (cmd_node)
-				free_ast(cmd_node);
-			return (NULL);
-		}
+			return (free_ast(cmd_node), NULL);
 		result = redir_node;
 	}
 	// If we only had redirections, return the last redirection node

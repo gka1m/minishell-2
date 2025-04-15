@@ -9,7 +9,7 @@ EXT_FLAGS = -lreadline
 # Directories
 SRC_DIR = src/
 LIBFT_DIR = libft/
-TOKEN = src/lexer/
+# TOKEN = src/lexer/
 LEXER = src/lexing/
 # PARSE = src/parsing/
 PARSE = src/parser/

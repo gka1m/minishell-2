@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/14 17:07:13 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/15 14:12:42 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef struct s_minishell
 {
 	char	**env; // Array of environment variables (similar to environ)
 	struct s_env	*env_list;
+	int stdio_backup[3];
 	int		last_exit_code; // Stores the exit code of the last executed command ($?)
 	char	cwd[PATH_MAX]; // Current working directory
 	int		interactive; // Boolean: 1 for interactive mode,0 for non-interactive
@@ -305,9 +306,7 @@ char	*join_str(char const *s1, char const *s2, char const *s3);
 int setup_redirections(t_ast *node, t_minishell *shell);
 int is_builtin(char *cmd);
 void handle_parent_process(pid_t pid, t_minishell *shell);
-
 int execution_logic(t_ast *ast, t_minishell *minishell);
 // void	restore_standard_fds(void);
-
 
 #endif

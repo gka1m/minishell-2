@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:19:27 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/14 17:07:20 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/15 14:32:17 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,6 @@ int	execute_redirection(t_ast *node, t_minishell *shell)
 		fd = open(node->file, flags, 0644);
 		original_fd = STDOUT_FILENO;
 	}
-	// else if (node->type == AST_HEREDOC) // <<
-	// {
-	// 	fd = execute_heredoc(node->file, shell);
-	// 	original_fd = STDIN_FILENO;
-	// }
 	else
 		return (-1);
 	if (fd == -1)
