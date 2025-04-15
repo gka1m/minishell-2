@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:45:04 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/14 12:04:19 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/15 16:15:09 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ void    sig_interactive(void)
 {
     signal(SIGINT, handle_sigint); //ctrl-c
     signal(SIGQUIT, SIG_IGN); // ctrl-backslash
+    rl_event_hook = NULL;
 }
 
 /* handle_sigint function (interactive input handling) */

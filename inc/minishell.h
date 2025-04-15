@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/15 14:12:42 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/15 16:18:03 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -307,6 +307,8 @@ int setup_redirections(t_ast *node, t_minishell *shell);
 int is_builtin(char *cmd);
 void handle_parent_process(pid_t pid, t_minishell *shell);
 int execution_logic(t_ast *ast, t_minishell *minishell);
+void restore_standard_fds();
+
 // void	restore_standard_fds(void);
 
 #endif

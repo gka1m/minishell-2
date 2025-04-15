@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/15 14:59:17 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/15 16:17:04 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,10 +151,8 @@ void	execute_command(t_ast *node, t_minishell *shell)
 		return ;
 	if (is_builtin(node->args[0]))
 	{
-		// Check if there are any redirections
-		if (node->type == AST_REDIR_IN || node->type == AST_REDIR_OUT
-			|| node->type == AST_APPEND || node->left || node->right)
-		// left/right may hold redirection nodes
+		if (node->type == AST_APPEND || node->type == AST_REDIR_IN
+			|| node->type == AST_REDIR_OUT)
 		{
 			pid = fork();
 			if (pid == 0)
@@ -165,15 +163,36 @@ void	execute_command(t_ast *node, t_minishell *shell)
 				exit(execute_builtin(shell, node->args, STDOUT_FILENO));
 			}
 			else
+			{
 				handle_parent_process(pid, shell);
+				restore_standard_fds();
+				sig_interactive(); // Restore signal handlers
+			}
 		}
 		else
-			// No redirections? Run in parent directly
-			shell->last_exit_code = execute_builtin(shell, node->args, 1);
-		return ;
+		{
+			shell->last_exit_code = execute_builtin(shell, node->args,
+					STDOUT_FILENO);
+		}
 	}
-	// External command
-	execute_external(node, shell);
+	else
+	{
+		pid = fork();
+		if (pid == 0)
+		{
+			sig_reset(true);
+			if (setup_redirections(node, shell) == -1)
+				exit(1);
+			execute_external(node, shell);
+			exit(shell->last_exit_code);
+		}
+		else
+		{
+			handle_parent_process(pid, shell);
+			restore_standard_fds();
+			sig_interactive(); // Restore signal handlers
+		}
+	}
 }
 
 int	is_builtin(char *cmd)

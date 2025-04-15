@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/14 15:20:57 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/15 15:44:49 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,6 +218,7 @@ int main(int argc, char **argv, char **envp)
         // else
         //     execute_pipeline(ast, shell);
         exit_status = execution_logic(ast, shell);
+        // print_ast(ast, 0);
         // Cleanup for this iteration
         free_ast(ast);
         free(input);
