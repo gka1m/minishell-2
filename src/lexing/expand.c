@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 10:57:25 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/16 16:09:00 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/16 16:22:32 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,94 @@ char	*remove_quotes(char *str)
 }
 
 // Fixed expand_variables
+// void	expand_variables(t_token *token, t_minishell *shell)
+// {
+// 	char	*result;
+// 	int		i;
+// 	int		in_squote;
+// 	int		in_dquote;
+// 	char	*temp;
+// 	char	*var_name;
+// 	char	*var_value;
+// 	int		start;
+// 	t_env	*env_var;
+
+// 	if (!token || token->type != T_STRING || !token->value)
+// 		return ;
+// 	result = ft_strdup("");
+// 	i = 0;
+// 	in_squote = 0;
+// 	in_dquote = 0;
+// 	while (token->value[i])
+// 	{
+// 		char ch[2] = {token->value[i], 0}; // Moved INSIDE loop
+// 		if (token->value[i] == '\'' && !in_dquote)
+// 		{
+// 			in_squote = !in_squote;
+// 			temp = ft_strjoin(result, "'");
+// 			free(result);
+// 			result = temp ? temp : result;
+// 			i++;
+// 		}
+// 		else if (token->value[i] == '"' && !in_squote)
+// 		{
+// 			in_dquote = !in_dquote;
+// 			temp = ft_strjoin(result, "\"");
+// 			free(result);
+// 			result = temp ? temp : result;
+// 			i++;
+// 		}
+// 		else if (token->value[i] == '$' && !in_squote && token->value[i + 1])
+// 		{
+// 			i++;
+// 			var_name = NULL;
+// 			var_value = NULL;
+// 			if (token->value[i] == '?')
+// 			{
+// 				var_name = ft_strdup("?");
+// 				i++;
+// 			}
+// 			else
+// 			{
+// 				start = i;
+// 				while (token->value[i] && (ft_isalnum(token->value[i])
+// 						|| token->value[i] == '_'))
+// 					i++;
+// 				var_name = ft_substr(token->value, start, i - start);
+// 			}
+// 			if (var_name)
+// 			{
+// 				if (ft_strncmp(var_name, "?", 1) == 0)
+// 				{
+// 					var_value = ft_itoa(shell->last_exit_code);
+// 				}
+// 				else
+// 				{
+// 					env_var = find_env_var(shell->env_list, var_name);
+// 					var_value = env_var ? ft_strdup(env_var->value) : ft_strdup("");
+// 				}
+// 				if (var_value)
+// 				{
+// 					temp = ft_strjoin(result, var_value);
+// 					free(result);
+// 					result = temp ? temp : result;
+// 					free(var_value);
+// 				}
+// 				free(var_name);
+// 			}
+// 		}
+// 		else
+// 		{
+// 			temp = ft_strjoin(result, ch);
+// 			free(result);
+// 			result = temp ? temp : result;
+// 			i++; // CRITICAL: Was missing in your code
+// 		}
+// 	}
+// 	free(token->value);
+// 	token->value = result;
+// }
+
 void	expand_variables(t_token *token, t_minishell *shell)
 {
 	char	*result;
@@ -133,6 +221,8 @@ void	expand_variables(t_token *token, t_minishell *shell)
 	char	*var_value;
 	int		start;
 	t_env	*env_var;
+	char	ch[2];
+		
 
 	if (!token || token->type != T_STRING || !token->value)
 		return ;
@@ -142,13 +232,16 @@ void	expand_variables(t_token *token, t_minishell *shell)
 	in_dquote = 0;
 	while (token->value[i])
 	{
-		char ch[2] = {token->value[i], 0}; // Moved INSIDE loop
+		// char ch[2] = {token->value[i], 0};
+		ch[0] = token->value[i];
+		ch[1] = 0;
 		if (token->value[i] == '\'' && !in_dquote)
 		{
 			in_squote = !in_squote;
 			temp = ft_strjoin(result, "'");
 			free(result);
-			result = temp ? temp : result;
+			if (temp)
+				result = temp;
 			i++;
 		}
 		else if (token->value[i] == '"' && !in_squote)
@@ -156,7 +249,8 @@ void	expand_variables(t_token *token, t_minishell *shell)
 			in_dquote = !in_dquote;
 			temp = ft_strjoin(result, "\"");
 			free(result);
-			result = temp ? temp : result;
+			if (temp)
+				result = temp;
 			i++;
 		}
 		else if (token->value[i] == '$' && !in_squote && token->value[i + 1])
@@ -180,19 +274,21 @@ void	expand_variables(t_token *token, t_minishell *shell)
 			if (var_name)
 			{
 				if (ft_strncmp(var_name, "?", 1) == 0)
-				{
 					var_value = ft_itoa(shell->last_exit_code);
-				}
 				else
 				{
 					env_var = find_env_var(shell->env_list, var_name);
-					var_value = env_var ? ft_strdup(env_var->value) : ft_strdup("");
+					if (env_var)
+						var_value = ft_strdup(env_var->value);
+					else
+						var_value = ft_strdup("");
 				}
 				if (var_value)
 				{
 					temp = ft_strjoin(result, var_value);
 					free(result);
-					result = temp ? temp : result;
+					if (temp)
+						result = temp;
 					free(var_value);
 				}
 				free(var_name);
@@ -202,8 +298,9 @@ void	expand_variables(t_token *token, t_minishell *shell)
 		{
 			temp = ft_strjoin(result, ch);
 			free(result);
-			result = temp ? temp : result;
-			i++; // CRITICAL: Was missing in your code
+			if (temp)
+				result = temp;
+			i++;
 		}
 	}
 	free(token->value);
@@ -223,8 +320,8 @@ t_token	*expand_all_tokens(t_token *tokens, t_minishell *shell)
 		if (is_redirection(current))
 		{
 			current = handle_redirection_expansion(current, shell);
-            if (current)
-                current = current->next;
+			if (current)
+				current = current->next;
 		}
 		else if (current->type == T_STRING)
 		{
