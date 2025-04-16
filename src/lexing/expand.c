@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 10:57:25 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/16 16:01:19 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/16 16:09:00 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,16 +222,9 @@ t_token	*expand_all_tokens(t_token *tokens, t_minishell *shell)
 	{
 		if (is_redirection(current))
 		{
-			current = current->next;
-			if (current)
-			{
-				expand_variables(current, shell);
-				unquoted = remove_quotes(current->value);
-				// remove quotes in filenames
-				free(current->value);
-				current->value = unquoted;
-				current = current->next;
-			}
+			current = handle_redirection_expansion(current, shell);
+            if (current)
+                current = current->next;
 		}
 		else if (current->type == T_STRING)
 		{
