@@ -6,72 +6,112 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 10:57:25 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/10 12:35:44 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/16 16:01:19 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
+// char	*remove_quotes(char *str)
+// {
+// 	size_t	len;
+// 	char	*result;
+// 	int		in_outer_quotes;
+// 	char	outer_quote_char;
+// 	size_t	i;
+// 	int		in_squote;
+// 	int		in_dquote;
+// 	char	*temp;
+
+// 	in_outer_quotes = 0;
+// 	outer_quote_char = 0;
+// 	i = 0;
+// 	in_squote = 0;
+// 	in_dquote = 0;
+// 	if (!str)
+// 		return (NULL);
+// 	len = ft_strlen(str);
+// 	if (len < 2)
+// 		return (ft_strdup(str));
+// 	result = ft_strdup("");
+// 	if (!result)
+// 		return (NULL);
+// 	// Check outer quotes
+// 	if ((str[0] == '\'' && str[len - 1] == '\'') || (str[0] == '"' && str[len
+// 			- 1] == '"'))
+// 	{
+// 		outer_quote_char = str[0];
+// 		in_outer_quotes = 1;
+// 		i = 1;
+// 		len--;
+// 	}
+// 	while (i < len)
+// 	{
+// 		char ch[2] = {str[i], 0}; // Moved inside loop
+// 		if (str[i] == '\'' && !in_dquote)
+// 		{
+// 			in_squote = !in_squote;
+// 			if (!in_outer_quotes || outer_quote_char != '\'')
+// 			{
+// 				temp = ft_strjoin(result, ch);
+// 				free(result);
+// 				result = temp;
+// 			}
+// 			i++;
+// 		}
+// 		else if (str[i] == '"' && !in_squote)
+// 		{
+// 			in_dquote = !in_dquote;
+// 			if (!in_outer_quotes || outer_quote_char != '"')
+// 			{
+// 				temp = ft_strjoin(result, ch);
+// 				free(result);
+// 				result = temp;
+// 			}
+// 			i++;
+// 		}
+// 		else
+// 		{
+// 			temp = ft_strjoin(result, ch);
+// 			free(result);
+// 			result = temp;
+// 			i++;
+// 		}
+// 	}
+// 	return (result);
+// }
+
 char	*remove_quotes(char *str)
 {
-	size_t	len;
 	char	*result;
-	int		in_outer_quotes;
-	char	outer_quote_char;
-	size_t	i;
+	char	*temp;
 	int		in_squote;
 	int		in_dquote;
-	char	*temp;
+	size_t	i;
+	char	ch[2];
 
-	in_outer_quotes = 0;
-	outer_quote_char = 0;
-	i = 0;
+	result = ft_strdup("");
 	in_squote = 0;
 	in_dquote = 0;
+	i = 0;
 	if (!str)
 		return (NULL);
-	len = ft_strlen(str);
-	if (len < 2)
-		return (ft_strdup(str));
-	result = ft_strdup("");
-	if (!result)
-		return (NULL);
-	// Check outer quotes
-	if ((str[0] == '\'' && str[len - 1] == '\'') || (str[0] == '"' && str[len
-			- 1] == '"'))
+	while (str[i])
 	{
-		outer_quote_char = str[0];
-		in_outer_quotes = 1;
-		i = 1;
-		len--;
-	}
-	while (i < len)
-	{
-		char ch[2] = {str[i], 0}; // Moved inside loop
 		if (str[i] == '\'' && !in_dquote)
 		{
 			in_squote = !in_squote;
-			if (!in_outer_quotes || outer_quote_char != '\'')
-			{
-				temp = ft_strjoin(result, ch);
-				free(result);
-				result = temp;
-			}
 			i++;
 		}
 		else if (str[i] == '"' && !in_squote)
 		{
 			in_dquote = !in_dquote;
-			if (!in_outer_quotes || outer_quote_char != '"')
-			{
-				temp = ft_strjoin(result, ch);
-				free(result);
-				result = temp;
-			}
 			i++;
 		}
 		else
 		{
+			ch[0] = str[i];
+			ch[1] = '\0';
 			temp = ft_strjoin(result, ch);
 			free(result);
 			result = temp;
@@ -176,27 +216,28 @@ t_token	*expand_all_tokens(t_token *tokens, t_minishell *shell)
 	t_token	*current;
 	char	*unquoted;
 
-	tokens = concatenate_adjacent_strings(tokens);
+	tokens = concatenate_adjacent_strings(tokens); // Join "ec""ho" to "echo"
 	current = tokens;
 	while (current)
 	{
 		if (is_redirection(current))
 		{
-			// Process redirection operator
-			current = current->next; // Move to filename
+			current = current->next;
 			if (current)
 			{
 				expand_variables(current, shell);
 				unquoted = remove_quotes(current->value);
+				// remove quotes in filenames
 				free(current->value);
 				current->value = unquoted;
-				current = current->next; // Move to next token
+				current = current->next;
 			}
 		}
 		else if (current->type == T_STRING)
 		{
-			expand_variables(current, shell);
+			expand_variables(current, shell); // expand $VAR or $?
 			unquoted = remove_quotes(current->value);
+			// remove quotes after expansion
 			free(current->value);
 			current->value = unquoted;
 			current = current->next;
@@ -237,12 +278,11 @@ t_token	*concatenate_adjacent_strings(t_token *tokens)
 	while (curr && curr->next)
 	{
 		next = curr->next;
-		// Check if both values were originally quoted
-		if (curr->type == T_STRING && next->type == T_STRING
-			&& (curr->value[0] == '\'' || curr->value[0] == '"')
-				&& (next->value[0] == '\'' || next->value[0] == '"'))
+		// Only merge adjacent quoted strings
+		if (curr->type == T_STRING && next->type == T_STRING && next->adjacent
+			&& (curr->value[0] == '"' || curr->value[0] == '\'')
+				&& (next->value[0] == '"' || next->value[0] == '\''))
 		{
-			// Remove the outer quotes before concatenating
 			curr_unquoted = remove_quotes(curr->value);
 			next_unquoted = remove_quotes(next->value);
 			temp = ft_strjoin(curr_unquoted, next_unquoted);

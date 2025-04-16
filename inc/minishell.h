@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/15 16:46:21 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/16 16:00:24 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ typedef struct s_token
 {
 	char				*value;
 	t_token_type		type;
+	bool	adjacent;
 	struct s_token		*previous;
 	struct s_token		*next;
 }						t_token;
@@ -152,12 +153,12 @@ t_token	*tokenize_string(char *input, int *i, t_token *current);
 t_token	*tokenize(char *input);
 int ft_isspace(int c);
 bool	is_redirection(t_token *token);
+bool	is_invalid_redirection_sequence(char *input, int i);
 char	*remove_quotes(char *str);
 void	expand_variables(t_token *token, t_minishell *shell);
 t_token	*handle_redirection_expansion(t_token *token, t_minishell *shell);
 t_token	*expand_all_tokens(t_token *tokens, t_minishell *shell);
 t_token *concatenate_adjacent_strings(t_token *tokens);
-bool	is_invalid_redirection_sequence(char *input, int i);
 
 
 // parsing functions
