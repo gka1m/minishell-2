@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:45:04 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/15 16:15:09 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/17 14:48:26 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,23 @@ volatile sig_atomic_t   g_signal_flag;
 /* to handle ctrl-C and ctrl-\ (initialize interactive mode)*/
 void    sig_interactive(void)
 {
-    signal(SIGINT, handle_sigint); //ctrl-c
-    signal(SIGQUIT, SIG_IGN); // ctrl-backslash
-    rl_event_hook = NULL;
+    struct sigaction sa;
+    
+    sa.sa_handler = handle_sigint;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;  // Restart system calls if interrupted
+    sigaction(SIGINT, &sa, NULL);
+    signal(SIGQUIT, SIG_IGN);  // Still ignore Ctrl backslash
 }
 
 /* handle_sigint function (interactive input handling) */
-void    handle_sigint(int sig_num)
+void handle_sigint(int sig_num)
 {
     (void)sig_num;
     g_signal_flag = 1;
-    rl_on_new_line();
+    write(STDOUT_FILENO, "\n", 1);
     rl_replace_line("", 0);
+    rl_on_new_line();
     rl_redisplay();
 }
 
