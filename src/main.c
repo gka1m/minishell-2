@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/16 16:03:03 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/17 15:29:30 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,6 +159,7 @@ int main(int argc, char **argv, char **envp)
     }
 
     // print_env_vars(shell->env_list);
+	sig_interactive();
     // Main loop
     while (1)
     {

@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/15 16:17:04 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/17 15:28:27 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,6 +149,7 @@ void	execute_command(t_ast *node, t_minishell *shell)
 
 	if (!node || !node->args || !node->args[0])
 		return ;
+	sig_ignore();
 	if (is_builtin(node->args[0]))
 	{
 		if (node->type == AST_APPEND || node->type == AST_REDIR_IN
@@ -173,6 +174,7 @@ void	execute_command(t_ast *node, t_minishell *shell)
 		{
 			shell->last_exit_code = execute_builtin(shell, node->args,
 					STDOUT_FILENO);
+			sig_interactive();
 		}
 	}
 	else
@@ -190,9 +192,10 @@ void	execute_command(t_ast *node, t_minishell *shell)
 		{
 			handle_parent_process(pid, shell);
 			restore_standard_fds();
-			sig_interactive(); // Restore signal handlers
+			sig_interactive();
 		}
 	}
+	sig_interactive(); // Restore signal handlers
 }
 
 int	is_builtin(char *cmd)
