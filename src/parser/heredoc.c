@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/15 12:16:25 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/17 17:22:14 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,16 +30,25 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 	setup_heredoc_signals();
 	while (!g_signal_flag)
 	{
-		line = readline("hd> ");
-		if (!line || ft_strncmp(line, hd->delimiter,
-				ft_strlen(line)) == 0)
+		line = readline("> ");
+		if (g_signal_flag)
+		{
+			free(line);
+			break ;
+		}
+		if (!line)
+		{
+			ft_putstr_fd("minishell: warning: here-document delimited by end-of-file\n",
+				STDERR_FILENO);
+			break ;
+		}
+		if (hd->delimiter && strcmp(line, hd->delimiter) == 0)
 		{
 			free(line);
 			break ;
 		}
 		if (!hd->hd_quoted)
 		{
-			// Create a temporary token for expansion
 			temp_token = create_token(line, T_STRING);
 			if (temp_token)
 			{
@@ -50,11 +59,13 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 			}
 		}
 		else
+		{
 			write(hd->pipefd[1], line, ft_strlen(line));
+		}
 		write(hd->pipefd[1], "\n", 1);
 		free(line);
 	}
-	close(hd->pipefd[1]);
+	close(hd->pipefd[1]); // Close write end immediately after input is done
 }
 
 void	process_heredocs(t_ast *ast, t_minishell *shell)
@@ -70,8 +81,8 @@ void	process_heredocs(t_ast *ast, t_minishell *shell)
 		if (!create_heredoc_pipe(&hd))
 			return ;
 		process_heredoc_input(&hd, shell);
-		ast->heredoc_fd = hd.pipefd[0];
-		close(hd.pipefd[1]);
+		ast->heredoc_fd = hd.pipefd[0]; // Store only the read end
+		// Write end is already closed by process_heredoc_input
 		if (g_signal_flag)
 			shell->last_exit_code = 130;
 	}

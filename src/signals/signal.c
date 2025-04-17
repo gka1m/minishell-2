@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:45:04 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/17 14:48:26 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/17 15:55:07 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ void handle_heredoc_sigint(int sig)
     write(STDERR_FILENO, "\n", 1);
     rl_replace_line("", 0);
     rl_on_new_line();
+    rl_done = 1;
 }
 
 void setup_heredoc_signals(void)
@@ -82,7 +83,9 @@ void setup_heredoc_signals(void)
     
     sa.sa_handler = handle_heredoc_sigint;
     sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
+    sa.sa_flags = SA_RESTART;
     sigaction(SIGINT, &sa, NULL);
     signal(SIGQUIT, SIG_IGN);
+    rl_catch_signals = 1;
+    rl_event_hook = NULL;
 }

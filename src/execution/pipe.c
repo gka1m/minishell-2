@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:08:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/07 14:02:09 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/17 17:36:17 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	execute_pipeline(t_ast *node, t_minishell *shell)
 	{
 		perror("minishell: pipe");
 		shell->last_exit_code = 1;
-		sig_interactive(); // Restore signals on error
+		sig_interactive();
 		return ;
 	}
 	// Left command (writes to pipe)
@@ -36,13 +36,12 @@ void	execute_pipeline(t_ast *node, t_minishell *shell)
 	if (pid == 0)
 	{
 		// Child process setup
-		sig_reset(true); // Default handlers with SA_RESTART
-		close(pipe_fd[0]);
-		if (left_fd != STDIN_FILENO)
-		{
-			dup2(left_fd, STDIN_FILENO);
-			close(left_fd);
-		}
+		sig_reset(true);
+		close(pipe_fd[0]); // Close unused read end
+		// Setup redirections (including heredoc if present)
+		if (setup_redirections(node->left, shell) == -1)
+			exit(1);
+		// Connect stdout to pipe
 		dup2(pipe_fd[1], STDOUT_FILENO);
 		close(pipe_fd[1]);
 		execute_command(node->left, shell);
@@ -51,29 +50,33 @@ void	execute_pipeline(t_ast *node, t_minishell *shell)
 	else if (pid < 0)
 	{
 		perror("minishell: fork");
-		// close_pipe(pipe_fd);
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
 		shell->last_exit_code = 1;
-		sig_interactive(); // Restore signals
+		sig_interactive();
 		return ;
 	}
 	// Right side preparation
-	close(pipe_fd[1]);
-	left_fd = pipe_fd[0];
-	// Handle right side (recursive for multiple pipes)
+	close(pipe_fd[1]);    // Close write end in parent
+	left_fd = pipe_fd[0]; // Save read end for next command
+	// Handle right side
 	if (node->right->type == AST_PIPE)
+	{
 		execute_pipeline(node->right, shell);
+	}
 	else
 	{
 		pid = fork();
 		if (pid == 0)
 		{
-			// Last command in pipeline
-			sig_reset(true); // Default handlers
+			// Child process setup
+			sig_reset(true);
+			// Connect stdin to pipe
 			dup2(left_fd, STDIN_FILENO);
-			if (left_fd != STDIN_FILENO)
-				close(left_fd);
+			close(left_fd);
+			// Setup other redirections
+			if (setup_redirections(node->right, shell) == -1)
+				exit(1);
 			execute_command(node->right, shell);
 			exit(shell->last_exit_code);
 		}
@@ -82,13 +85,12 @@ void	execute_pipeline(t_ast *node, t_minishell *shell)
 			perror("minishell: fork");
 			close(left_fd);
 			shell->last_exit_code = 1;
-			sig_interactive(); // Restore signals
+			sig_interactive();
 			return ;
 		}
 	}
 	// Cleanup in parent
 	close(left_fd);
-	// Restore interactive signals before waiting
 	sig_interactive();
 	// Wait for pipeline completion
 	while (wait(&status) > 0)
