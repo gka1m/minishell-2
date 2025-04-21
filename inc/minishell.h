@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/17 17:36:20 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/21 16:19:45 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,6 @@ typedef enum e_token_type
 	T_REDIR_OUT,
 	T_APPEND,
 	T_PIPE,
-	// T_EOF,
 }						t_token_type;
 
 // consider using doubly linked list for token management
@@ -92,14 +91,6 @@ typedef struct s_ast
 	struct s_ast	*right;
 	t_minishell		*shell;
 }						t_ast;
-
-typedef struct s_parse_ctx
-{
-	char		*input;
-	int			*i;
-	t_minishell	*shell;
-	char		**result;
-}						t_parse_ctx;
 
 // prototype fordoing heredoc
 typedef struct s_heredoc
@@ -171,7 +162,6 @@ t_ast	*parse_heredoc(t_token **tokens, t_ast *left, t_minishell *shell);
 void	free_ast(t_ast *node);
 t_ast	*create_ast_node(t_ast_type type, t_minishell *shell);
 t_ast_type classify_redir(t_token_type token_type);
-
 void	process_heredocs(t_ast *ast, t_minishell *shell);
 void	process_heredoc_input(t_heredoc *hd, t_minishell *shell);
 int	create_heredoc_pipe(t_heredoc *hd);
@@ -229,7 +219,7 @@ char	*find_command_path(char *cmd, t_minishell *shell);
 void	execute_command(t_ast *node, t_minishell *shell);
 void error_command_not_found(char *cmd);
 void	handle_exec_error(char *cmd, char *path, char **env_array);
-void	execute_pipeline(t_ast *node, t_minishell *shell);
+void execute_pipeline(t_ast *node, t_minishell *shell);
 int	execute_redirection(t_ast *node, t_minishell *shell);
 char	**convert_env_to_array(t_env *env_list);
 char	*join_str(char const *s1, char const *s2, char const *s3);
@@ -237,6 +227,9 @@ int setup_redirections(t_ast *node, t_minishell *shell);
 int is_builtin(char *cmd);
 void handle_parent_process(pid_t pid, t_minishell *shell);
 int execution_logic(t_ast *ast, t_minishell *minishell);
-void restore_standard_fds();
+void	restore_standard_fds(t_minishell *shell);
+
+// void execute_pipe_segment(t_pipechild *pc);
+void wait_for_children(t_minishell *shell);
 
 #endif

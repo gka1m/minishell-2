@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/17 17:22:14 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/21 17:17:22 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 		write(hd->pipefd[1], "\n", 1);
 		free(line);
 	}
-	close(hd->pipefd[1]); // Close write end immediately after input is done
+	close(hd->pipefd[1]);
 }
 
 void	process_heredocs(t_ast *ast, t_minishell *shell)

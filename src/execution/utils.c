@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 15:34:55 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/03 15:55:41 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/21 15:54:28 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,4 +63,17 @@ char	*join_str(char const *s1, char const *s2, char const *s3)
 	pos += ft_strlcpy(result + pos, s2, len - pos);
 	pos += ft_strlcpy(result + pos, s3, len - pos);
 	return (result);
+}
+
+void wait_for_children(t_minishell *shell)
+{
+    int status;
+    pid_t pid;
+
+    while ((pid = waitpid(-1, &status, 0)) > 0) {
+        if (WIFEXITED(status))
+            shell->last_exit_code = WEXITSTATUS(status);
+        else if (WIFSIGNALED(status))
+            shell->last_exit_code = 128 + WTERMSIG(status);
+    }
 }

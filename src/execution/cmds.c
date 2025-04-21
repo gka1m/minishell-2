@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/17 15:58:56 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/21 17:12:35 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,44 +33,72 @@ int	execute_builtin(t_minishell *shell, char **args, int fd_out)
 	return (0);
 }
 
+// void	execute_external(t_ast *node, t_minishell *shell)
+// {
+// 	pid_t	pid;
+// 	char	**env_array;
+// 	char	*full_path;
+
+// 	if (!node || !node->args || !node->args[0])
+// 		return ;
+// 	pid = fork();
+// 	if (pid == -1)
+// 	{
+// 		perror("minishell: fork");
+// 		shell->last_exit_code = 1;
+// 		return ;
+// 	}
+// 	if (pid == 0)
+// 	{ // Child process
+// 		sig_reset(true);
+// 		if (setup_redirections(node, shell) == -1)
+// 			exit(1);
+// 		env_array = convert_env_to_array(shell->env_list);
+// 		if (!env_array)
+// 			exit(1);
+// 		full_path = find_command_path(node->args[0], shell); // Pass shell now
+// 		if (!full_path)
+// 		{
+// 			free_split(env_array);
+// 			exit(127);
+// 		}
+// 		execve(full_path, node->args, env_array);
+// 		// If execve fails
+// 		perror("minishell: execve");
+// 		free(full_path);
+// 		free_split(env_array);
+// 		exit(126);
+// 	}
+// 	else // Parent process
+// 		handle_parent_process(pid, shell);
+// }
+
 void	execute_external(t_ast *node, t_minishell *shell)
 {
-	pid_t	pid;
 	char	**env_array;
 	char	*full_path;
 
 	if (!node || !node->args || !node->args[0])
-		return ;
-	pid = fork();
-	if (pid == -1)
+		exit(127);
+
+	sig_reset(true); // In case it's called directly
+
+	env_array = convert_env_to_array(shell->env_list);
+	if (!env_array)
+		exit(1);
+
+	full_path = find_command_path(node->args[0], shell);
+	if (!full_path)
 	{
-		perror("minishell: fork");
-		shell->last_exit_code = 1;
-		return ;
-	}
-	if (pid == 0)
-	{ // Child process
-		sig_reset(true);
-		if (setup_redirections(node, shell) == -1)
-			exit(1);
-		env_array = convert_env_to_array(shell->env_list);
-		if (!env_array)
-			exit(1);
-		full_path = find_command_path(node->args[0], shell); // Pass shell now
-		if (!full_path)
-		{
-			free_split(env_array);
-			exit(127);
-		}
-		execve(full_path, node->args, env_array);
-		// If execve fails
-		perror("minishell: execve");
-		free(full_path);
 		free_split(env_array);
-		exit(126);
+		exit(127);
 	}
-	else // Parent process
-		handle_parent_process(pid, shell);
+
+	execve(full_path, node->args, env_array);
+	perror("minishell: execve");
+	free(full_path);
+	free_split(env_array);
+	exit(126);
 }
 
 char	*find_command_path(char *cmd, t_minishell *shell)
@@ -150,31 +178,29 @@ void	execute_command(t_ast *node, t_minishell *shell)
 	if (!node || !node->args || !node->args[0])
 		return ;
 	sig_ignore();
+
 	if (is_builtin(node->args[0]))
 	{
-		if (node->type == AST_APPEND || node->type == AST_REDIR_IN
-			|| node->type == AST_REDIR_OUT)
+		// Redirection requires fork for builtins
+		if (setup_redirections(node, shell) == -1)
+			return ;
+		if (node->type == AST_APPEND || node->type == AST_REDIR_IN || node->type == AST_REDIR_OUT || node->type == AST_HEREDOC)
 		{
 			pid = fork();
 			if (pid == 0)
 			{
 				sig_reset(true);
-				if (setup_redirections(node, shell) == -1)
-					exit(1);
 				exit(execute_builtin(shell, node->args, STDOUT_FILENO));
 			}
 			else
 			{
 				handle_parent_process(pid, shell);
-				restore_standard_fds();
-				sig_interactive(); // Restore signal handlers
+				restore_standard_fds(shell);
 			}
 		}
 		else
 		{
-			shell->last_exit_code = execute_builtin(shell, node->args,
-					STDOUT_FILENO);
-			sig_interactive();
+			shell->last_exit_code = execute_builtin(shell, node->args, STDOUT_FILENO);
 		}
 	}
 	else
@@ -191,12 +217,52 @@ void	execute_command(t_ast *node, t_minishell *shell)
 		else
 		{
 			handle_parent_process(pid, shell);
-			restore_standard_fds();
-			sig_interactive();
+			restore_standard_fds(shell);
 		}
 	}
-	sig_interactive(); // Restore signal handlers
+	sig_interactive();
 }
+
+// void execute_command(t_ast *node, t_minishell *shell)
+// {
+//     pid_t pid;
+//     int status;
+
+//     if (!node || !node->args || !node->args[0])
+//         return;
+    
+//     if (is_builtin(node->args[0]))
+//     {
+//         if (setup_redirections(node, shell) == -1)
+//             return;
+//         shell->last_exit_code = execute_builtin(shell, node->args, STDOUT_FILENO);
+//     }
+//     else
+//     {
+//         if (setup_redirections(node, shell) == -1)
+//             return;
+        
+//         pid = fork();
+//         if (pid == -1)
+//         {
+//             perror("minishell: fork");
+//             shell->last_exit_code = 1;
+//             return;
+//         }
+//         else if (pid == 0) // Child process
+//         {
+//             execute_external(node, shell);
+//         }
+//         else // Parent process
+//         {
+//             waitpid(pid, &status, 0);
+//             if (WIFEXITED(status))
+//                 shell->last_exit_code = WEXITSTATUS(status);
+//         }
+//     }
+// 	sig_interactive();
+// }
+
 
 int	is_builtin(char *cmd)
 {

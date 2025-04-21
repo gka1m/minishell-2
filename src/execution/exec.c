@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 10:09:44 by zchan             #+#    #+#             */
-/*   Updated: 2025/04/15 17:18:01 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/21 14:27:18 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,23 +20,31 @@ int	execution_logic(t_ast *ast, t_minishell *minishell)
 {
 	if (ast == NULL)
 		return (-1);
-	if (ast->type == AST_PIPE)
-		execute_pipeline(ast, minishell);
-	else if (ast->type == AST_REDIR_IN || ast->type == AST_REDIR_OUT
-		|| ast->type == AST_HEREDOC || ast->type == AST_APPEND)
+	// Handle commands and their redirections first
+	if (ast->type == AST_CMD)
 	{
 		if (setup_redirections(ast, minishell) == -1)
 			return (-1);
-		// ➜ Now execute the actual command node, usually on the left
+		execute_command(ast, minishell);
+	}
+	// Handle pipe nodes (right-recursive structure)
+	else if (ast->type == AST_PIPE)
+	{
+		execute_pipeline(ast, minishell);
+	}
+	// Handle standalone redirections
+	else if (ast->type == AST_REDIR_IN || ast->type == AST_REDIR_OUT
+		|| ast->type == AST_APPEND || ast->type == AST_HEREDOC)
+		// Helper macro/function
+	{
+		if (setup_redirections(ast, minishell) == -1)
+			return (-1);
 		if (ast->left)
 			return (execution_logic(ast->left, minishell));
 	}
-	else if (ast->type == AST_CMD)
-		execute_command(ast, minishell);
 	else
 	{
-		ft_putstr_fd("Unknown node type\n", 2);
-		// fprintf(stderr, "Unknown node type\n");
+		ft_putstr_fd("minishell: unknown node type\n", STDERR_FILENO);
 		return (-1);
 	}
 	return (0);
