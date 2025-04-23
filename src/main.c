@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/23 14:29:58 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/23 17:20:11 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,21 +159,22 @@ int main(int argc, char **argv, char **envp)
     }
 
     // print_env_vars(shell->env_list);
-	sig_interactive();
+    rl_catch_signals = 0;
     // Main loop
     while (1)
     {
+        sig_interactive();
         // Reset signal flag and get input
         g_signal_flag = 0;
         input = readline("minishell> ");
         if (!input)  // Handle Ctrl+D
         {
             ft_putstr_fd("exit\n", STDOUT_FILENO);
-            break;
+            exit(0);
         }
 
         // Skip empty input
-        if (ft_strlen(input) == 0)
+        if (ft_strlen(input) == 0 || g_signal_flag == 1)
         {
             free(input);
             continue;

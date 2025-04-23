@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:45:04 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/23 14:30:46 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/23 17:18:03 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,10 @@ void	sig_interactive(void)
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART; // Restart system calls if interrupted
 	sigaction(SIGINT, &sa, NULL);
-	signal(SIGQUIT, SIG_IGN); // Still ignore Ctrl backslash
+
+    sa.sa_handler = SIG_IGN;
+	// signal(SIGQUIT, SIG_IGN); // Still ignore Ctrl backslash
+    sigaction(SIGQUIT, &sa, NULL);
 }
 
 /* handle_sigint function (interactive input handling) */
@@ -40,28 +43,28 @@ void	handle_signal(int sig)
 	}
 }
 
-void	sig_reset(bool for_child)
-{
-	struct sigaction	sa;
+// void	sig_reset(bool for_child)
+// {
+// 	struct sigaction	sa;
 
-	sigemptyset(&sa.sa_mask);
-	if (for_child)
-	{
-		// For child processes, restore default behavior
-		sa.sa_handler = SIG_DFL;
-		sa.sa_flags = SA_RESTART;
-		sigaction(SIGINT, &sa, NULL);
-		sigaction(SIGQUIT, &sa, NULL);
-	}
-	else
-	{
-		// For parent process during child execution
-		sa.sa_handler = SIG_IGN;
-		sa.sa_flags = 0;
-		sigaction(SIGINT, &sa, NULL);
-		sigaction(SIGQUIT, &sa, NULL);
-	}
-}
+// 	sigemptyset(&sa.sa_mask);
+// 	if (for_child)
+// 	{
+// 		// For child processes, restore default behavior
+// 		sa.sa_handler = SIG_DFL;
+// 		sa.sa_flags = SA_RESTART;
+// 		sigaction(SIGINT, &sa, NULL);
+// 		sigaction(SIGQUIT, &sa, NULL);
+// 	}
+// 	else
+// 	{
+// 		// For parent process during child execution
+// 		sa.sa_handler = SIG_IGN;
+// 		sa.sa_flags = 0;
+// 		sigaction(SIGINT, &sa, NULL);
+// 		sigaction(SIGQUIT, &sa, NULL);
+// 	}
+// }
 
 void	setup_heredoc_signals(void)
 {
@@ -71,8 +74,8 @@ void	setup_heredoc_signals(void)
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
-	signal(SIGQUIT, SIG_IGN);
-	// rl_catch_signals = 1;
+	sigaction(SIGQUIT, &sa, NULL);
+	rl_catch_signals = 0;
 	// rl_event_hook = NULL;
 }
 void	handle_heredoc_sigint(int sig)
@@ -82,24 +85,25 @@ void	handle_heredoc_sigint(int sig)
 	write(STDERR_FILENO, "\n", 1);
 	rl_replace_line("", 0);
 	rl_on_new_line();
-    // rl_redisplay();
+    rl_redisplay();
 	rl_done = 1;
 }
+
 /* handles signals during execution (running a command)
 resets signals to default handlers */
-// void	sig_reset(bool for_child)
-// {
-// 	struct sigaction	sig_act;
+void	sig_reset(bool for_child)
+{
+	struct sigaction	sig_act;
 
-// 	sig_act.sa_handler = SIG_DFL;
-// 	sigemptyset(&sig_act.sa_mask);
-// 	if (for_child == true)
-// 		sig_act.sa_flags = SA_RESTART;
-// 	else
-// 		sig_act.sa_flags = 0;
-// 	sigaction(SIGINT, &sig_act, NULL);
-// 	sigaction(SIGQUIT, &sig_act, NULL);
-// }
+	sig_act.sa_handler = SIG_DFL;
+	sigemptyset(&sig_act.sa_mask);
+	if (for_child == true)
+		sig_act.sa_flags = SA_RESTART;
+	else
+		sig_act.sa_flags = 0;
+	sigaction(SIGINT, &sig_act, NULL);
+	sigaction(SIGQUIT, &sig_act, NULL);
+}
 
 // void	sig_ignore(void)
 // {

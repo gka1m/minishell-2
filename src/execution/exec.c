@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 10:09:44 by zchan             #+#    #+#             */
-/*   Updated: 2025/04/21 14:27:18 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/23 15:48:44 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,31 +16,57 @@
 
 // Main logic for executing
 // See below for LONG full version to refactor
+// int	execution_logic(t_ast *ast, t_minishell *minishell)
+// {
+// 	if (ast == NULL)
+// 		return (-1);
+// 	// Handle commands and their redirections first
+// 	if (ast->type == AST_CMD)
+// 	{
+// 		if (setup_redirections(ast, minishell) == -1)
+// 			return (-1);
+// 		execute_command(ast, minishell);
+// 	}
+// 	// Handle pipe nodes (right-recursive structure)
+// 	else if (ast->type == AST_PIPE)
+// 	{
+// 		execute_pipeline(ast, minishell);
+// 	}
+// 	// Handle standalone redirections
+// 	else if (ast->type == AST_REDIR_IN || ast->type == AST_REDIR_OUT
+// 		|| ast->type == AST_APPEND || ast->type == AST_HEREDOC)
+// 		// Helper macro/function
+// 	{
+// 		if (setup_redirections(ast, minishell) == -1)
+// 			return (-1);
+// 		if (ast->left)
+// 			return (execution_logic(ast->left, minishell));
+// 	}
+// 	else
+// 	{
+// 		ft_putstr_fd("minishell: unknown node type\n", STDERR_FILENO);
+// 		return (-1);
+// 	}
+// 	return (0);
+// }
+
 int	execution_logic(t_ast *ast, t_minishell *minishell)
 {
-	if (ast == NULL)
+	if (!ast)
 		return (-1);
-	// Handle commands and their redirections first
-	if (ast->type == AST_CMD)
+
+	// Apply redirections FIRST (from the root down)
+	if (setup_redirections(ast, minishell) == -1)
+		return (-1);
+
+	if (ast->type == AST_CMD || ast->type == AST_REDIR_IN || ast->type == AST_REDIR_OUT
+		|| ast->type == AST_APPEND || ast->type == AST_HEREDOC)
 	{
-		if (setup_redirections(ast, minishell) == -1)
-			return (-1);
-		execute_command(ast, minishell);
+		execute_command(ast, minishell); // no need to check type again
 	}
-	// Handle pipe nodes (right-recursive structure)
 	else if (ast->type == AST_PIPE)
 	{
 		execute_pipeline(ast, minishell);
-	}
-	// Handle standalone redirections
-	else if (ast->type == AST_REDIR_IN || ast->type == AST_REDIR_OUT
-		|| ast->type == AST_APPEND || ast->type == AST_HEREDOC)
-		// Helper macro/function
-	{
-		if (setup_redirections(ast, minishell) == -1)
-			return (-1);
-		if (ast->left)
-			return (execution_logic(ast->left, minishell));
 	}
 	else
 	{

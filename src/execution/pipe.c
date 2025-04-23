@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:08:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/23 12:58:03 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/23 16:14:33 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ void	execute_pipeline(t_ast *node, t_minishell *shell)
 	{
 		perror("minishell: pipe");
 		shell->last_exit_code = 1;
-		sig_interactive();
+		// sig_interactive();
 		return ;
 	}
 
@@ -153,7 +153,7 @@ void	execute_pipeline(t_ast *node, t_minishell *shell)
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
 		shell->last_exit_code = 1;
-		sig_interactive();
+		// sig_interactive();
 		return ;
 	}
 
@@ -192,14 +192,14 @@ void	execute_pipeline(t_ast *node, t_minishell *shell)
 			perror("minishell: fork");
 			close(left_fd);
 			shell->last_exit_code = 1;
-			sig_interactive();
+			// sig_interactive();
 			return ;
 		}
 	}
 
 	// Cleanup in parent
 	close(left_fd);
-	sig_interactive();
+	
 
 	// Wait for pipeline completion
 	while (wait(&status) > 0)
@@ -213,4 +213,6 @@ void	execute_pipeline(t_ast *node, t_minishell *shell)
 				ft_putstr_fd("\n", STDERR_FILENO);
 		}
 	}
+	restore_standard_fds(shell);
+	sig_interactive();
 }

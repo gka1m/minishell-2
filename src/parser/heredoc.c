@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/23 14:28:41 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/23 17:21:55 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,8 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 		if (g_signal_flag)
 		{
 			free(line);
-			break ;
+			// break ;
+			exit(130);
 		}
 		if (!line)
 		{
