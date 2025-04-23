@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 15:17:17 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/10 15:17:37 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/23 13:04:03 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,5 +38,5 @@ bool	is_redirection(t_token *token)
 	if (!token)
 		return (false);
 	return (token->type == T_REDIR_IN || token->type == T_REDIR_OUT
-		|| token->type == T_APPEND || token->type == T_HEREDOC);
+		|| token->type == T_APPEND);
 }

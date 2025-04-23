@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 10:57:25 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/20 15:19:51 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/23 13:03:46 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -325,12 +325,24 @@ t_token	*expand_all_tokens(t_token *tokens, t_minishell *shell)
 		}
 		else if (current->type == T_STRING)
 		{
-			expand_variables(current, shell); // expand $VAR or $?
-			unquoted = remove_quotes(current->value);
-			// remove quotes after expansion
-			free(current->value);
-			current->value = unquoted;
-			current = current->next;
+			// Special case: if previous token was heredoc, don't expand variables
+            if (current->previous && current->previous->type == T_HEREDOC)
+            {
+                // Only remove quotes without expanding variables
+                unquoted = remove_quotes(current->value);
+                free(current->value);
+                current->value = unquoted;
+                current = current->next;
+            }
+            else
+            {
+                // Normal string processing with expansion
+                expand_variables(current, shell);
+                unquoted = remove_quotes(current->value);
+                free(current->value);
+                current->value = unquoted;
+                current = current->next;
+            }
 		}
 		else
 			current = current->next;

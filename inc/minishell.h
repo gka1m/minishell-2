@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/21 16:19:45 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/23 12:49:49 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,12 +205,12 @@ int	bi_export(t_minishell *shell, char **args, int fd_out);
 
 // signals
 void    sig_interactive(void);
-void    handle_sigint(int sig_num);
-void    sig_reset(bool for_child);
-void    sig_ignore(void);
-void    sig_cmd(int sig_num);
+void    handle_signal(int sig_num);
 void handle_heredoc_sigint(int sig);
 void setup_heredoc_signals(void);
+void    sig_reset(bool for_child);
+// void    sig_ignore(void);
+// void    sig_cmd(int sig_num);
 
 // execution functions
 int	execute_builtin(t_minishell *shell, char **args, int fd_out);

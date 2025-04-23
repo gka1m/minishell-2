@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/21 17:12:35 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/23 12:49:22 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,7 +177,7 @@ void	execute_command(t_ast *node, t_minishell *shell)
 
 	if (!node || !node->args || !node->args[0])
 		return ;
-	sig_ignore();
+	sig_reset(false);
 
 	if (is_builtin(node->args[0]))
 	{
@@ -212,7 +212,7 @@ void	execute_command(t_ast *node, t_minishell *shell)
 			if (setup_redirections(node, shell) == -1)
 				exit(1);
 			execute_external(node, shell);
-			exit(shell->last_exit_code);
+			// exit(shell->last_exit_code);
 		}
 		else
 		{

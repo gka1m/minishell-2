@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/21 17:17:22 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/23 13:01:44 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,14 +55,15 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 				expand_variables(temp_token, shell);
 				write(hd->pipefd[1], temp_token->value,
 					ft_strlen(temp_token->value));
+				write(hd->pipefd[1], "\n", 1);
 				free_tokens(&temp_token);
 			}
 		}
 		else
 		{
 			write(hd->pipefd[1], line, ft_strlen(line));
+			write(hd->pipefd[1], "\n", 1);
 		}
-		write(hd->pipefd[1], "\n", 1);
 		free(line);
 	}
 	close(hd->pipefd[1]);
