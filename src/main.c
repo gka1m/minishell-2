@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/21 16:19:52 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/23 14:29:58 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,6 +211,13 @@ int main(int argc, char **argv, char **envp)
         }
 		// print_ast(ast, 0);
         process_heredocs(ast, shell);
+        if (g_signal_flag)
+        {
+            shell->last_exit_code = 130;
+            free_ast(ast);
+            free(input);
+            continue;
+        }
         // Execution
         exit_status = execution_logic(ast, shell);
         // print_ast(ast, 0);
@@ -221,6 +228,6 @@ int main(int argc, char **argv, char **envp)
     // Final cleanup
     rl_clear_history();
     free_minishell(shell);
-    // return (exit_status);
-    return (0);
+    return (exit_status);
+    // return (0);
 }

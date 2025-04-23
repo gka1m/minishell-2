@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:45:04 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/23 12:47:43 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/23 14:30:46 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ void	handle_signal(int sig)
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		rl_redisplay();
+        rl_done= 1;
 	}
 }
 
@@ -66,7 +67,7 @@ void	setup_heredoc_signals(void)
 {
 	struct sigaction sa;
 	
-	sa.sa_handler = SIG_DFL;
+	sa.sa_handler = handle_heredoc_sigint;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
@@ -81,6 +82,7 @@ void	handle_heredoc_sigint(int sig)
 	write(STDERR_FILENO, "\n", 1);
 	rl_replace_line("", 0);
 	rl_on_new_line();
+    // rl_redisplay();
 	rl_done = 1;
 }
 /* handles signals during execution (running a command)
