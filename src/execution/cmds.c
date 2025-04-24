@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/23 16:09:29 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/24 13:31:36 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -299,6 +299,6 @@ void	handle_parent_process(pid_t pid, t_minishell *shell)
 		if (WTERMSIG(status) == SIGINT)
 			write(STDERR_FILENO, "\n", 1);
 		else if (WTERMSIG(status) == SIGQUIT)
-			write(STDERR_FILENO, "Quit: 3\n", 8);
+			write(STDERR_FILENO, "Quit: Core dumped\n", 18);
 	}
 }

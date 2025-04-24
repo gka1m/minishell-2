@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:19:27 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/23 13:16:46 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/24 14:00:07 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ int	setup_redirections(t_ast *node, t_minishell *shell)
 	// Traverse left to get all redirections (left-associative)
 	if (setup_redirections(node->left, shell) == -1)
 		return (-1);
-	if (node->heredoc_fd != -1)
+	if (node->heredoc_fd >= 0)
 	{
 		if (shell->stdio_backup[0] == -1)
 			shell->stdio_backup[0] = dup(STDIN_FILENO);

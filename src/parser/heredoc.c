@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/23 17:21:55 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/24 14:03:45 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 		{
 			ft_putstr_fd("minishell: warning: here-document delimited by end-of-file\n",
 				STDERR_FILENO);
+			g_signal_flag = 1;
 			break ;
 		}
 		if (strcmp(line, hd->delimiter) == 0)
@@ -145,51 +146,98 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 // 	process_heredocs(ast->right, shell);
 // }
 
-void	process_heredocs(t_ast *ast, t_minishell *shell)
+// void	process_heredocs(t_ast *ast, t_minishell *shell)
+// {
+// 	t_heredoc	hd;
+// 	pid_t		pid;
+// 	int			status;
+
+// 	if (!ast)
+// 		return;
+
+// 	if (ast->type == AST_HEREDOC)
+// 	{
+// 		hd.delimiter = ast->file;
+// 		hd.hd_quoted = ast->hd_quoted;
+// 		if (!create_heredoc_pipe(&hd))
+// 			return;
+
+// 		pid = fork();
+// 		if (pid == 0)
+// 			process_heredoc_input(&hd, shell); // child
+
+// 		// parent
+// 		close(hd.pipefd[1]); // close write end immediately
+// 		waitpid(pid, &status, 0);
+
+// 		if (WIFEXITED(status))
+// 		{
+// 			int exit_code = WEXITSTATUS(status);
+// 			if (exit_code != 0) // interrupted
+// 			{
+// 				close(hd.pipefd[0]);
+// 				g_signal_flag = 1;
+// 				shell->last_exit_code = 130;
+// 				return;
+// 			}
+// 			ast->heredoc_fd = hd.pipefd[0]; // valid heredoc
+// 		}
+// 		else if (WIFSIGNALED(status))
+// 		{
+// 			close(hd.pipefd[0]);
+// 			g_signal_flag = 1;
+// 			shell->last_exit_code = 128 + WTERMSIG(status);
+// 			return;
+// 		}
+// 	}
+
+// 	process_heredocs(ast->left, shell);
+// 	process_heredocs(ast->right, shell);
+// }
+
+void process_heredocs(t_ast *ast, t_minishell *shell)
 {
-	t_heredoc	hd;
-	pid_t		pid;
-	int			status;
+    t_heredoc hd;
+    pid_t pid;
+    int status;
 
-	if (!ast)
-		return;
+    if (!ast) return;
 
-	if (ast->type == AST_HEREDOC)
-	{
-		hd.delimiter = ast->file;
-		hd.hd_quoted = ast->hd_quoted;
-		if (!create_heredoc_pipe(&hd))
-			return;
+    if (ast->type == AST_HEREDOC)
+    {
+        hd.delimiter = ast->file;
+        hd.hd_quoted = ast->hd_quoted;
+        if (!create_heredoc_pipe(&hd))
+            return;
 
-		pid = fork();
-		if (pid == 0)
-			process_heredoc_input(&hd, shell); // child
-
-		// parent
-		close(hd.pipefd[1]); // close write end immediately
-		waitpid(pid, &status, 0);
-
-		if (WIFEXITED(status))
-		{
-			int exit_code = WEXITSTATUS(status);
-			if (exit_code == 130) // interrupted
-			{
-				close(hd.pipefd[0]);
-				g_signal_flag = 1;
-				shell->last_exit_code = 130;
-				return;
-			}
-			ast->heredoc_fd = hd.pipefd[0]; // valid heredoc
-		}
-		else if (WIFSIGNALED(status))
-		{
-			close(hd.pipefd[0]);
-			g_signal_flag = 1;
-			shell->last_exit_code = 128 + WTERMSIG(status);
-			return;
-		}
-	}
-
-	process_heredocs(ast->left, shell);
-	process_heredocs(ast->right, shell);
+        pid = fork();
+        if (pid == 0) {
+            // Child process - collect heredoc content
+            setup_heredoc_signals();
+            process_heredoc_input(&hd, shell);
+            exit(0);
+        } else {
+            // Parent process
+            close(hd.pipefd[1]); // Close write end
+            waitpid(pid, &status, 0);
+            
+            if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+                ast->heredoc_fd = hd.pipefd[0]; // Store read end
+                
+                // If this is a simple command (not pipeline), execute immediately
+                if (ast->right == NULL && ast->left == NULL) {
+                    execute_command(ast, shell);
+                    close(hd.pipefd[0]);
+                    return;
+                }
+            } else {
+                close(hd.pipefd[0]);
+                if (WIFSIGNALED(status)) {
+                    shell->last_exit_code = 128 + WTERMSIG(status);
+                }
+            }
+        }
+    }
+    process_heredocs(ast->left, shell);
+    process_heredocs(ast->right, shell);
 }

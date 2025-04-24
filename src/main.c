@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/23 17:20:11 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/24 13:50:58 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,9 +170,9 @@ int main(int argc, char **argv, char **envp)
         if (!input)  // Handle Ctrl+D
         {
             ft_putstr_fd("exit\n", STDOUT_FILENO);
-            exit(0);
+            // exit(0);
+            break ;
         }
-
         // Skip empty input
         if (ft_strlen(input) == 0 || g_signal_flag == 1)
         {
