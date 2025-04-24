@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 12:01:42 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/10 15:14:40 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/24 14:34:15 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,14 @@ t_token	*tokenize_append(char *input, int *i, t_token *current)
 
 	(void)input;
 	token = create_token(">>", T_APPEND);
+	// if (current)
+	// 	current = current->next;
+	// token->previous = current;
 	if (current)
-		current = current->next;
-	token->previous = current;
+	{
+		current->next = token;
+		token->previous = current;
+	}
 	*i += 2;
 	return (token);
 }

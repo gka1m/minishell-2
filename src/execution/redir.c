@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:19:27 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/24 14:00:07 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/24 14:27:16 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,11 @@ int	execute_redirection(t_ast *node, t_minishell *shell)
 		return (-1);
 
 	// Backup std fds
-	if (node->type == AST_REDIR_IN && shell->stdio_backup[0] == -1)
-		shell->stdio_backup[0] = dup(STDIN_FILENO);
-	if ((node->type == AST_REDIR_OUT || node->type == AST_APPEND)
-		&& shell->stdio_backup[1] == -1)
-		shell->stdio_backup[1] = dup(STDOUT_FILENO);
+	// if (node->type == AST_REDIR_IN && shell->stdio_backup[0] == -1)
+	// 	shell->stdio_backup[0] = dup(STDIN_FILENO);
+	// if ((node->type == AST_REDIR_OUT || node->type == AST_APPEND)
+	// 	&& shell->stdio_backup[1] == -1)
+	// 	shell->stdio_backup[1] = dup(STDOUT_FILENO);
 
 	if (node->type == AST_REDIR_IN)
 	{
@@ -45,6 +45,18 @@ int	execute_redirection(t_ast *node, t_minishell *shell)
 	}
 	else
 		return (-1);
+	
+	if ((original_fd == STDOUT_FILENO && shell->stdio_backup[1] == -1) ||
+        (original_fd == STDIN_FILENO && shell->stdio_backup[0] == -1))
+    {
+        int backup = dup(original_fd);
+        if (backup == -1)
+        {
+            perror("minishell: dup backup failed");
+            return (-1);
+        }
+        shell->stdio_backup[original_fd == STDOUT_FILENO ? 1 : 0] = backup;
+    }
 
 	fd = open(node->file, flags, 0644);
 	if (fd == -1)
@@ -110,9 +122,10 @@ int	setup_redirections(t_ast *node, t_minishell *shell)
 	}
 
 	// Continue to right in case of multiple chained redirections
+	// if (setup_redirections(node->left, shell) == -1)
+	// 	return (-1);
 	if (setup_redirections(node->right, shell) == -1)
 		return (-1);
-
 	return (0);
 }
 

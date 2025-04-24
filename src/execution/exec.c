@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 10:09:44 by zchan             #+#    #+#             */
-/*   Updated: 2025/04/24 14:01:25 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/24 14:23:03 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ int	execution_logic(t_ast *ast, t_minishell *minishell)
 		ft_putstr_fd("minishell: unknown node type\n", STDERR_FILENO);
 		return (-1);
 	}
+	restore_standard_fds(minishell);
 	return (0);
 }
 
