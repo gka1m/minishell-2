@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 12:26:46 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/25 13:01:48 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/25 16:03:59 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ t_env	*new_env_node(const char *key, const char *value)
 {
 	t_env	*node;
 
-	if (!key)
+	if (!key || !*key)
 		return (NULL);
 	node = malloc(sizeof(t_env));
 	if (!node)
@@ -39,7 +39,7 @@ void	add_env_var(t_env **env, const char *key, const char *value)
 	t_env	*new;
 	t_env	*temp;
 
-	if (!key)
+	if (!key || !*key)
 		return ;
 	new = new_env_node(key, value);
 	if (!new)

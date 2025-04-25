@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 15:57:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/25 12:42:02 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/25 16:20:11 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,9 @@ int	is_valid_env_name(const char *str)
 
 	if (!str || !str[0])
 		return (0);
-
 	// If it starts with '=', invalid
 	if (str[0] == '=')
 		return (0);
-
 	// Split off the key part if '=' is present
 	i = 0;
 	while (str[i] && str[i] != '=')
@@ -50,12 +48,30 @@ int	is_valid_env_name(const char *str)
 	return (1);
 }
 
-
 /* Prints a single variable in declare -x format */
+// void	print_export_var(t_env *var, int fd_out)
+// {
+// 	ft_putstr_fd("declare -x ", fd_out);
+// 	ft_putstr_fd(var->key, fd_out);
+// 	if (var->value)
+// 	{
+// 		ft_putstr_fd("=\"", fd_out);
+// 		ft_putstr_fd(var->value, fd_out);
+// 		ft_putstr_fd("\"", fd_out);
+// 	}
+// 	ft_putstr_fd("\n", fd_out);
+// }
+
 void	print_export_var(t_env *var, int fd_out)
 {
 	ft_putstr_fd("declare -x ", fd_out);
 	ft_putstr_fd(var->key, fd_out);
+	// Special case for "export a" variables
+	if (var->value && strcmp(var->value, "##NO_VALUE##") == 0)
+	{
+		ft_putstr_fd("\n", fd_out);
+		return ;
+	}
 	if (var->value)
 	{
 		ft_putstr_fd("=\"", fd_out);
@@ -94,14 +110,13 @@ char	**env_to_keys_array(t_env *env)
 /* Prints all variables in sorted order */
 void	print_sorted_env(t_env *env, int fd_out)
 {
-	char **keys;
-	t_env *var;
-	int i;
+	char	**keys;
+	t_env	*var;
+	int		i;
 
 	keys = env_to_keys_array(env);
 	if (!keys)
 		return ;
-
 	sort_keys(keys);
 	i = -1;
 	while (keys[++i])
@@ -115,7 +130,7 @@ void	print_sorted_env(t_env *env, int fd_out)
 /* Swaps two string pointers */
 void	swap_strings(char **a, char **b)
 {
-	char *tmp;
+	char	*tmp;
 
 	tmp = *a;
 	*a = *b;
@@ -130,7 +145,7 @@ void	sort_keys(char **tab)
 	int	size;
 
 	if (!tab || !*tab)
-		return;
+		return ;
 	// Calculate array size
 	size = 0;
 	while (tab[size])
