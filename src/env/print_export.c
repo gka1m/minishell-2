@@ -6,24 +6,50 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 15:57:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/02 12:47:32 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/25 12:42:02 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
+// int	is_valid_env_name(const char *str)
+// {
+// 	if (!str || !*str || ft_isdigit(*str))
+// 		return (0);
+// 	while (*str && *str != '=')
+// 	{
+// 		if (!ft_isalnum(*str) && *str != '_')
+// 			return (0);
+// 		str++;
+// 	}
+// 	return (1);
+// }
+
 int	is_valid_env_name(const char *str)
 {
-	if (!str || !*str || ft_isdigit(*str))
+	int	i;
+
+	if (!str || !str[0])
 		return (0);
-	while (*str && *str != '=')
+
+	// If it starts with '=', invalid
+	if (str[0] == '=')
+		return (0);
+
+	// Split off the key part if '=' is present
+	i = 0;
+	while (str[i] && str[i] != '=')
 	{
-		if (!ft_isalnum(*str) && *str != '_')
+		if (!ft_isalnum(str[i]) && str[i] != '_')
 			return (0);
-		str++;
+		// First char must not be a digit
+		if (i == 0 && ft_isdigit(str[i]))
+			return (0);
+		i++;
 	}
 	return (1);
 }
+
 
 /* Prints a single variable in declare -x format */
 void	print_export_var(t_env *var, int fd_out)
