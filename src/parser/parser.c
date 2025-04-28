@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:47:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/23 13:04:54 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/28 17:21:40 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ t_ast	*parse_command(t_token **tokens, t_minishell *shell)
 		result = cmd_node;
 	}
 	// Handle redirections
-	if (*tokens && (is_redirection(*tokens) || (*tokens)->type == T_HEREDOC))
+	while (*tokens && (is_redirection(*tokens) || (*tokens)->type == T_HEREDOC))
 	{
 		if ((*tokens)->type == T_HEREDOC)
 			redir_node = parse_heredoc(tokens, result, shell);

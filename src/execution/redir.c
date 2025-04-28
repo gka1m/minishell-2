@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:19:27 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/24 14:27:16 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/28 17:04:34 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,16 @@ int	setup_redirections(t_ast *node, t_minishell *shell)
 		return (0);
 
 	// Traverse left to get all redirections (left-associative)
+	if (setup_redirections(node->right, shell) == -1)
+		return (-1);
 	if (setup_redirections(node->left, shell) == -1)
 		return (-1);
+	if (node->type == AST_REDIR_IN || node->type == AST_REDIR_OUT
+		|| node->type == AST_APPEND)
+		{
+			if (execute_redirection(node, shell) == -1)
+			return (-1);
+		}
 	if (node->heredoc_fd >= 0)
 	{
 		if (shell->stdio_backup[0] == -1)
@@ -113,12 +121,6 @@ int	setup_redirections(t_ast *node, t_minishell *shell)
 		}
 		close(node->heredoc_fd);
 		node->heredoc_fd = -1; // prevent double dup
-	}
-	if (node->type == AST_REDIR_IN || node->type == AST_REDIR_OUT
-		|| node->type == AST_APPEND)
-	{
-		if (execute_redirection(node, shell) == -1)
-			return (-1);
 	}
 
 	// Continue to right in case of multiple chained redirections

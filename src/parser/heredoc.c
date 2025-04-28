@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/24 14:03:45 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/28 17:01:59 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,7 +202,6 @@ void process_heredocs(t_ast *ast, t_minishell *shell)
     int status;
 
     if (!ast) return;
-
     if (ast->type == AST_HEREDOC)
     {
         hd.delimiter = ast->file;
