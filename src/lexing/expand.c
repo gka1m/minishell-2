@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 10:57:25 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/25 16:36:57 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/29 11:42:29 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,24 @@ char	*remove_quotes(char *str)
 		}
 	}
 	return (result);
+}
+
+char	*remove_outer_quotes(char *str)
+{
+	size_t	len;
+	char	*result;
+
+	if (!str)
+		return (NULL);
+	len = ft_strlen(str);
+	if (len >= 2 && ((str[0] == '\'' && str[len - 1] == '\'') || (str[0] == '"' && str[len - 1] == '"')))
+	{
+		result = ft_substr(str, 1, len - 2);
+		if (!result)
+			return (NULL);
+		return (result);
+	}
+	return (ft_strdup(str));
 }
 
 // Fixed expand_variables
@@ -307,48 +325,124 @@ void	expand_variables(t_token *token, t_minishell *shell)
 	token->value = result;
 }
 
-// Fixed expand_all_tokens
-t_token	*expand_all_tokens(t_token *tokens, t_minishell *shell)
+char *expand_variables_with_quotes(char *str, t_minishell *shell)
 {
-	t_token	*current;
-	char	*unquoted;
+    size_t i = 0;
+    char *result = ft_strdup("");
+    char *temp;
+    char var_name[1024];
+    t_env *var;
+    int in_squote = 0;
+    int in_dquote = 0;
 
-	tokens = concatenate_adjacent_strings(tokens); // Join "ec""ho" to "echo"
-	current = tokens;
-	while (current)
-	{
-		if (is_redirection(current))
-		{
-			current = handle_redirection_expansion(current, shell);
-			if (current)
-				current = current->next;
-		}
-		else if (current->type == T_STRING)
-		{
-			// Special case: if previous token was heredoc, don't expand variables
-            if (current->previous && current->previous->type == T_HEREDOC)
+    if (!str)
+        return (NULL);
+
+    while (str[i])
+    {
+        if (str[i] == '\'' && !in_dquote)
+        {
+            in_squote = !in_squote;
+            i++;
+        }
+        else if (str[i] == '"' && !in_squote)
+        {
+            in_dquote = !in_dquote;
+            i++;
+        }
+        else if (str[i] == '$' && !in_squote) // Only expand $ outside single quotes
+        {
+            size_t j = 0;
+            i++;
+            if (str[i] == '?') // Special case: $?
             {
-                // Only remove quotes without expanding variables
-                unquoted = remove_quotes(current->value);
-                free(current->value);
-                current->value = unquoted;
-                current = current->next;
+                char *exit_status = ft_itoa(shell->last_exit_code);
+                temp = ft_strjoin(result, exit_status);
+                free(result);
+                result = temp;
+                free(exit_status);
+                i++;
+            }
+            else if (ft_isalpha(str[i]) || str[i] == '_') // Valid variable start
+            {
+                while ((ft_isalnum(str[i]) || str[i] == '_') && j < sizeof(var_name) - 1)
+                    var_name[j++] = str[i++];
+                var_name[j] = '\0';
+                var = find_env_var(shell->env_list, var_name);
+                if (var && var->value)
+                {
+                    temp = ft_strjoin(result, var->value);
+                    free(result);
+                    result = temp;
+                }
             }
             else
             {
-                // Normal string processing with expansion
-                expand_variables(current, shell);
-                unquoted = remove_quotes(current->value);
+                // Just a standalone $, keep it
+                temp = ft_strjoin(result, "$");
+                free(result);
+                result = temp;
+            }
+        }
+        else
+        {
+            // Normal character, append
+            char ch[2] = {str[i], '\0'};
+            temp = ft_strjoin(result, ch);
+            free(result);
+            result = temp;
+            i++;
+        }
+    }
+    return (result);
+}
+
+
+// Fixed expand_all_tokens
+t_token *expand_all_tokens(t_token *tokens, t_minishell *shell)
+{
+    t_token *current;
+    char *expanded;
+    char *unquoted;
+
+    current = tokens;
+    while (current)
+    {
+        if (is_redirection(current))
+        {
+            current = handle_redirection_expansion(current, shell);
+            if (current)
+                current = current->next;
+        }
+        else if (current->type == T_STRING)
+        {
+            if (current->previous && current->previous->type == T_HEREDOC)
+            {
+                // Heredoc: no variable expansion, only remove quotes
+                unquoted = remove_outer_quotes(current->value);
                 free(current->value);
                 current->value = unquoted;
-                current = current->next;
             }
-		}
-		else
-			current = current->next;
-	}
-	return (tokens);
+            else
+            {
+                expanded = expand_variables_with_quotes(current->value, shell);
+                free(current->value);
+                current->value = expanded;
+
+                unquoted = remove_outer_quotes(current->value);
+                free(current->value);
+                current->value = unquoted;
+            }
+            current = current->next;
+        }
+        else
+            current = current->next;
+    }
+    // Only AFTER expansion and unquoting
+    tokens = concatenate_adjacent_strings(tokens);
+    return (tokens);
 }
+
 
 // Simplified redirection handler
 t_token	*handle_redirection_expansion(t_token *token, t_minishell *shell)

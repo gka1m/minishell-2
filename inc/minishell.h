@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/25 16:20:56 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/29 11:33:04 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,6 +151,8 @@ t_token	*handle_redirection_expansion(t_token *token, t_minishell *shell);
 t_token	*expand_all_tokens(t_token *tokens, t_minishell *shell);
 t_token *concatenate_adjacent_strings(t_token *tokens);
 
+char	*remove_outer_quotes(char *str);
+char *expand_variables_with_quotes(char *str, t_minishell *shell);
 
 // parsing functions
 t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell);
