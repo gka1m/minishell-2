@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 14:35:22 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/01 14:35:43 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/29 16:42:59 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ int	is_valid_exit_arg(char *arg)
 void	cleanup_and_exit(t_minishell *shell, int exit_code)
 {
 	// Add any necessary cleanup here
-	free_env(shell->env_list);
+	// free_env(shell->env_list);
+	free_minishell(shell);
 	// Free other resources as needed
 	exit(exit_code);
 }

@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 11:53:42 by theophane         #+#    #+#             */
-/*   Updated: 2025/04/15 13:58:36 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/29 15:28:27 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,9 @@ t_minishell	*init_minishell(char **envp)
 	if (!minishell)
 	{
 		perror("malloc error for minishell");
-		exit(EXIT_FAILURE);
+		// exit(EXIT_FAILURE);
+		free_split(envp);
+		return (NULL);
 	}
 	init_fields(minishell, envp);
 	minishell->interactive = isatty(STDIN_FILENO);
@@ -61,6 +63,7 @@ void	init_fields(t_minishell *minishell, char **envp)
 	{
 		perror("getcwd");
 		free_env(minishell->env_list);
+		free(minishell->cwd);
 		free(minishell);
 		exit(EXIT_FAILURE);
 	}
@@ -69,13 +72,21 @@ void	init_fields(t_minishell *minishell, char **envp)
 // function to free memory after exit
 // should be a utils somewhere
 // Free the environment variables then free struct itself
-void	free_minishell(t_minishell *minishell)
+void free_minishell(t_minishell *minishell)
 {
-	if (!minishell)
-		return ;
-	if (minishell->env_list)
-		free_env(minishell->env_list);
-	free(minishell);
+    // Free any allocated members first
+    if (minishell->env_list)
+        free_env(minishell->env_list);
+    // Restore standard file descriptors if they were modified
+    if (minishell->stdio_backup[0] != -1)
+        close(minishell->stdio_backup[0]);
+    if (minishell->stdio_backup[1] != -1)
+        close(minishell->stdio_backup[1]);
+    if (minishell->stdio_backup[2] != -1)
+        close(minishell->stdio_backup[2]);
+    
+    // Finally free the minishell struct itself
+    free(minishell);
 }
 
 /* mains for testing the minishell environment*/

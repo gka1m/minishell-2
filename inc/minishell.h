@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/29 11:33:04 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/30 12:23:14 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ extern volatile sig_atomic_t	g_signal_flag; // Tracks signal events
 // minishell prototype, add on as we know
 typedef struct s_minishell
 {
-	char	**env; // Array of environment variables (similar to environ)
+	// char	**env; // Array of environment variables (similar to environ)
 	struct s_env	*env_list;
 	int stdio_backup[3];
 	int		last_exit_code; // Stores the exit code of the last executed command ($?)
@@ -222,7 +222,7 @@ char	*find_command_path(char *cmd, t_minishell *shell);
 void	execute_command(t_ast *node, t_minishell *shell);
 void error_command_not_found(char *cmd);
 void	handle_exec_error(char *cmd, char *path, char **env_array);
-void execute_pipeline(t_ast *node, t_minishell *shell);
+// void execute_pipeline(t_ast *node, t_minishell *shell);
 int	execute_redirection(t_ast *node, t_minishell *shell);
 char	**convert_env_to_array(t_env *env_list);
 char	*join_str(char const *s1, char const *s2, char const *s3);
@@ -231,6 +231,8 @@ int is_builtin(char *cmd);
 void handle_parent_process(pid_t pid, t_minishell *shell);
 int execution_logic(t_ast *ast, t_minishell *minishell);
 void	restore_standard_fds(t_minishell *shell);
+
+void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd);
 
 // void execute_pipe_segment(t_pipechild *pc);
 void wait_for_children(t_minishell *shell);
