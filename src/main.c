@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/30 12:29:10 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/30 14:35:02 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,7 +228,7 @@ int main(int argc, char **argv, char **envp)
     }
     // Final cleanup
     rl_clear_history();
-    free_minishell(shell);
+    cleanup_and_exit(shell, exit_status);
     return (exit_status);
     // return (0);
 }

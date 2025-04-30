@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 13:50:16 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/07 14:07:14 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/30 15:10:46 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,16 +26,17 @@ int	update_pwds(t_minishell *shell, t_env **env_list, char *new_path)
 	// Update PWD
 	if (!getcwd(cwd, sizeof(cwd)))
 	{
-		update_env_var(*env_list, "PWD", ft_strdup(new_path));
+		update_env_var(*env_list, "PWD", new_path);
 		ft_strlcpy(shell->cwd, new_path, PATH_MAX);
 	}
 	else
 	{
-		update_env_var(*env_list, "PWD", ft_strdup(cwd));
+		update_env_var(*env_list, "PWD", cwd);
 		ft_strlcpy(shell->cwd, cwd, PATH_MAX);
 	}
 	return (0);
 }
+
 
 int	change_directory(t_minishell *shell, t_env **env_list, char *path)
 {
@@ -56,6 +57,8 @@ int	change_directory(t_minishell *shell, t_env **env_list, char *path)
 	abs_path = getcwd(NULL, 0);
 	if (!abs_path)
 		abs_path = ft_strdup(path);
+	if (!abs_path)
+		return (1);
 	ret = update_pwds(shell, env_list, abs_path);
 	free(abs_path);
 	return (ret);

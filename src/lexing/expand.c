@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 10:57:25 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/29 14:05:34 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/30 14:22:35 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,22 +121,31 @@ char	*remove_quotes(char *str)
 	return (result);
 }
 
-char	*remove_outer_quotes(char *str)
+char *remove_outer_quotes(char *str)
 {
-	size_t	len;
-	char	*result;
+    size_t  len;
+    char    *result;
 
-	if (!str)
-		return (NULL);
-	len = ft_strlen(str);
-	if (len >= 2 && ((str[0] == '\'' && str[len - 1] == '\'') || (str[0] == '"' && str[len - 1] == '"')))
-	{
-		result = ft_substr(str, 1, len - 2);
-		if (!result)
-			return (NULL);
-		return (result);
-	}
-	return (ft_strdup(str));
+    if (!str)
+        return NULL;
+    
+    len = ft_strlen(str);
+    if (len >= 2 && 
+        ((str[0] == '\'' && str[len-1] == '\'') || 
+         (str[0] == '"' && str[len-1] == '"')))
+    {
+        result = ft_substr(str, 1, len - 2);
+    }
+    else
+    {
+        result = ft_strdup(str);
+    }
+    
+    // Ensure we never return NULL
+    if (!result)
+        result = ft_strdup("");
+    
+    return result;
 }
 
 // Fixed expand_variables
@@ -431,6 +440,7 @@ t_token *expand_all_tokens(t_token *tokens, t_minishell *shell)
 
                 unquoted = remove_outer_quotes(current->value);
                 free(current->value);
+				// free(expanded);
                 current->value = unquoted;
             }
             current = current->next;

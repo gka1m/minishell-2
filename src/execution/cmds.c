@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/24 13:31:36 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/30 14:33:57 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,20 +85,22 @@ void	execute_external(t_ast *node, t_minishell *shell)
 
 	env_array = convert_env_to_array(shell->env_list);
 	if (!env_array)
-		exit(1);
+		cleanup_and_exit(shell, 1);
 
 	full_path = find_command_path(node->args[0], shell);
 	if (!full_path)
 	{
 		free_split(env_array);
-		exit(127);
+		cleanup_and_exit(shell, 127);
+		// exit(127);
 	}
 
 	execve(full_path, node->args, env_array);
 	perror("minishell: execve");
-	free(full_path);
-	free_split(env_array);
-	exit(126);
+	// free(full_path);
+	// free_split(env_array);
+	// exit(126);
+	cleanup_and_exit(shell, 126);
 }
 
 char	*find_command_path(char *cmd, t_minishell *shell)
@@ -212,7 +214,7 @@ void	execute_command(t_ast *node, t_minishell *shell)
 		{
 			sig_reset(true);
 			if (setup_redirections(node, shell) == -1)
-				exit(1);
+				cleanup_and_exit(shell, 1);
 			execute_external(node, shell);
 			exit(shell->last_exit_code);
 		}
