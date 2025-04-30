@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 10:09:44 by zchan             #+#    #+#             */
-/*   Updated: 2025/04/24 14:23:03 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/30 12:27:22 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ int	execution_logic(t_ast *ast, t_minishell *minishell)
 	}
 	else if (ast->type == AST_PIPE)
 	{
-		execute_pipeline(ast, minishell);
+		execute_pipeline(ast, minishell, -1);
 	}
 	else
 	{
