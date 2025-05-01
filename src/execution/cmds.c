@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/30 14:33:57 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/01 15:04:13 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,19 +16,19 @@ int	execute_builtin(t_minishell *shell, char **args, int fd_out)
 {
 	if (!args[0])
 		return (0);
-	if (ft_strncmp(args[0], "cd", 2) == 0)
+	if (strcmp(args[0], "cd") == 0)
 		return (b_cd(shell, &shell->env_list, args));
-	if (ft_strncmp(args[0], "echo", 4) == 0)
+	if (strcmp(args[0], "echo") == 0)
 		return (b_echo(args));
-	if (ft_strncmp(args[0], "env", 3) == 0)
+	if (strcmp(args[0], "env") == 0)
 		return (b_env(shell->env_list));
-	if (ft_strncmp(args[0], "exit", 4) == 0)
+	if (strcmp(args[0], "exit") == 0)
 		return (b_exit(shell, args));
-	if (ft_strncmp(args[0], "export", 6) == 0)
+	if (strcmp(args[0], "export") == 0)
 		return (bi_export(shell, args, fd_out));
-	if (ft_strncmp(args[0], "unset", 5) == 0)
+	if (strcmp(args[0], "unset") == 0)
 		return (b_unset(shell->env_list, args));
-	if (ft_strncmp(args[0], "pwd", 3) == 0)
+	if (strcmp(args[0], "pwd") == 0)
 		return (b_pwd());
 	return (0);
 }
@@ -79,7 +79,11 @@ void	execute_external(t_ast *node, t_minishell *shell)
 	char	*full_path;
 
 	if (!node || !node->args || !node->args[0])
-		exit(127);
+    {
+        ft_putstr_fd("minishell: ", STDERR_FILENO);
+        ft_putstr_fd("command not found\n", STDERR_FILENO);
+        cleanup_and_exit(shell, 127);
+    }
 
 	sig_reset(true); // In case it's called directly
 
@@ -272,10 +276,10 @@ int	is_builtin(char *cmd)
 {
 	if (!cmd)
 		return (0);
-	return (ft_strncmp(cmd, "cd", 2) == 0 || ft_strncmp(cmd, "echo", 4) == 0
-		|| ft_strncmp(cmd, "env", 3) == 0 || ft_strncmp(cmd, "exit", 4) == 0
-		|| ft_strncmp(cmd, "pwd", 3) == 0 || ft_strncmp(cmd, "export", 6) == 0
-		|| ft_strncmp(cmd, "unset", 5) == 0);
+	return (strcmp(cmd, "cd") == 0 || strcmp(cmd, "echo") == 0
+		|| strcmp(cmd, "env") == 0 || strcmp(cmd, "exit") == 0
+		|| strcmp(cmd, "pwd") == 0 || strcmp(cmd, "export") == 0
+		|| strcmp(cmd, "unset") == 0);
 }
 
 void	handle_parent_process(pid_t pid, t_minishell *shell)

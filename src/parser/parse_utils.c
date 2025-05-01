@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:48:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/15 12:12:40 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/01 14:38:24 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,15 @@ void	free_ast(t_ast *node)
 		return ;
 	free_ast(node->left);
 	free_ast(node->right);
-	if (node->args)
+	if (node->type == AST_CMD && node->args)
 	{
-		while (node->args[i])
-		{
-			free(node->args[i]);
-			i++;
-		}
-		free(node->args);
+		// while (node->args[i])
+		// {
+		// 	free(node->args[i]);
+		// 	i++;
+		// }
+		// free(node->args);
+		free_split(node->args);
 	}
 	if (node->file)
 		free(node->file);

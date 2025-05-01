@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:47:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/28 17:21:40 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/30 16:26:59 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ char	**parse_arguments(t_token **tokens)
 	i = 0;
 	while (i < count && *tokens && (*tokens)->type == T_STRING)
 	{
-		args[i] = ft_strdup((*tokens)->value);
+		args[i] = (*tokens)->value;
 		if (!args[i])
 		{
 			while (i > 0)

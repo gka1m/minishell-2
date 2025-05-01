@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 11:53:42 by theophane         #+#    #+#             */
-/*   Updated: 2025/04/29 15:28:27 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/01 14:09:10 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,9 @@ void free_minishell(t_minishell *minishell)
 {
     // Free any allocated members first
     if (minishell->env_list)
+	{
         free_env(minishell->env_list);
+	}
     // Restore standard file descriptors if they were modified
     if (minishell->stdio_backup[0] != -1)
         close(minishell->stdio_backup[0]);

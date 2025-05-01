@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/30 12:23:14 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/04/30 16:45:02 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ typedef struct s_minishell
 	int		last_exit_code; // Stores the exit code of the last executed command ($?)
 	char	cwd[PATH_MAX]; // Current working directory
 	int		interactive; // Boolean: 1 for interactive mode,0 for non-interactive
+	struct s_token *tokens;
+	struct s_ast	*ast;
 }						t_minishell;
 
 // prototype, add on as we know
