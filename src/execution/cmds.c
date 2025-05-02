@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/02 15:31:48 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/02 16:37:04 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,8 +96,8 @@ void	execute_external(t_ast *node, t_minishell *shell)
 	if (!full_path)
 	{
 		free_split(env_array);
-		cleanup_and_exit(shell, 127);
-		// exit(127);
+		// cleanup_and_exit(shell, 127);
+		exit(127);
 	}
 
 	execve(full_path, node->args, env_array);

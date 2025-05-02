@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 14:35:22 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/02 15:40:42 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/02 16:35:55 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ int	b_exit(t_minishell *shell, char **args)
 	while (args[arg_count])
 		arg_count++;
 	if (arg_count == 1)
-		cleanup_and_exit(shell, shell->last_exit_code);
+		cleanup_and_exit(shell, 0);
 
 	if (!is_valid_exit_arg(args[1]))
 	{
@@ -151,11 +151,11 @@ int	b_exit(t_minishell *shell, char **args)
 		exit_code = 256 - (-exit_code % 256);
 	else if (exit_code > 255)
 		exit_code %= 256;
-	if (shell->tokens)
-		free_tokens(&shell->tokens);
-	if (shell->ast)
-		free_ast(shell->ast);
-	// cleanup_and_exit(shell, exit_code);
-	exit(exit_code);
+	// if (shell->tokens)
+	// 	free_tokens(&shell->tokens);
+	// if (shell->ast)
+	// 	free_ast(shell->ast);
+	cleanup_and_exit(shell, exit_code);
+	// exit(exit_code);
 	return (exit_code); // Unreachable
 }

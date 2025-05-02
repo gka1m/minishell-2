@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 11:59:01 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/02 11:38:35 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/02 16:07:24 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,22 +31,38 @@ t_token	*create_token(char *value, t_token_type type)
 	return (new);
 }
 
+// void	free_tokens(t_token **head)
+// {
+// 	t_token	*temp;
+
+// 	if (!head || !*head)
+// 		return ;
+// 	while (*head)
+// 	{
+// 		temp = *head;
+// 		*head = (*head)->next;
+// 		printf("FREE TOKEN %p [%s]\n", temp, temp->value);
+// 		free(temp->value);
+// 		free(temp);
+// 	}
+// 	*head = NULL;
+// }
+
 void	free_tokens(t_token **head)
 {
-	t_token	*temp;
+	t_token *tmp;
 
-	if (!head || !*head)
-		return ;
 	while (*head)
 	{
-		temp = *head;
-		*head = (*head)->next;
-		printf("FREE TOKEN %p [%s]\n", temp, temp->value);
-		free(temp->value);
-		free(temp);
+		tmp = (*head)->next;
+		if ((*head)->value)
+			free((*head)->value);
+		free(*head);
+		*head = tmp;
 	}
 	*head = NULL;
 }
+
 
 void	free_split(char **split)
 {

@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 12:01:42 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/02 13:04:48 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/02 16:33:50 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ char	*extract_string(char *input, int *i)
 t_token	*tokenize_string(char *input, int *i, t_token *current)
 {
 	char	*str;
-	t_token	*token;
+	t_token	*token = NULL;
 
 	str = extract_string(input, i);
 	// Skip empty strings (can happen with trailing spaces)
@@ -110,9 +110,9 @@ t_token	*tokenize_string(char *input, int *i, t_token *current)
 		return (current); // Return current without creating new token
 	}
 	token = create_token(str, T_STRING);
-	if (!token)
-		return (free(str), current);
 	free(str);
+	if (!token)
+		return (current);
 	if (current)
 		current->next = token;
 	token->previous = current;
