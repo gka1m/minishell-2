@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 14:35:22 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/01 14:57:04 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/02 15:40:42 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,12 +85,13 @@ void	cleanup_and_exit(t_minishell *shell, int exit_code)
 	// Add any necessary cleanup here
 	// free_env(shell->env_list);
 	if (shell->tokens)
-            free_tokens(&shell->tokens);
+		free_tokens(&shell->tokens);
 	if (shell->ast)
 		free_ast(shell->ast);
 	free_minishell(shell);
 	// Free other resources as needed
 	exit(exit_code);
+	// shell->last_exit_code = exit_code;
 }
 
 // int	b_exit(t_minishell *shell, char **args)
@@ -119,17 +120,15 @@ void	cleanup_and_exit(t_minishell *shell, int exit_code)
 
 int	b_exit(t_minishell *shell, char **args)
 {
-	int		exit_code;
-	int		arg_count;
+	int exit_code;
+	int arg_count;
 
-	ft_putstr_fd("exit\n", STDOUT_FILENO);
 	arg_count = 0;
 	while (args[arg_count])
 		arg_count++;
-	
 	if (arg_count == 1)
 		cleanup_and_exit(shell, shell->last_exit_code);
-	
+
 	if (!is_valid_exit_arg(args[1]))
 	{
 		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
@@ -137,22 +136,26 @@ int	b_exit(t_minishell *shell, char **args)
 		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
 		return (2);
 	}
-	
+
 	if (arg_count > 2)
 	{
 		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
 		return (1); // Don't exit
 	}
-	
+
 	// Handle number conversion with overflow
 	exit_code = handle_overflow(args[1]);
-	
+
 	// Convert to unsigned 8-bit (bash behavior)
 	if (exit_code < 0)
 		exit_code = 256 - (-exit_code % 256);
 	else if (exit_code > 255)
 		exit_code %= 256;
-	
-	cleanup_and_exit(shell, exit_code);
-	return (0); // Unreachable
+	if (shell->tokens)
+		free_tokens(&shell->tokens);
+	if (shell->ast)
+		free_ast(shell->ast);
+	// cleanup_and_exit(shell, exit_code);
+	exit(exit_code);
+	return (exit_code); // Unreachable
 }

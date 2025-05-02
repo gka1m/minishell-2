@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 12:01:42 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/30 14:26:57 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/02 13:04:48 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,8 @@ t_token	*tokenize_string(char *input, int *i, t_token *current)
 		return (current); // Return current without creating new token
 	}
 	token = create_token(str, T_STRING);
+	if (!token)
+		return (free(str), current);
 	free(str);
 	if (current)
 		current->next = token;
@@ -117,49 +119,92 @@ t_token	*tokenize_string(char *input, int *i, t_token *current)
 	return (token);
 }
 
+// t_token	*tokenize(char *input)
+// {
+// 	t_token	*head;
+// 	t_token	*current;
+// 	int		i;
+// 	int		len;
+
+// 	head = NULL;
+// 	current = NULL;
+// 	i = 0;
+// 	len = ft_strlen(input);
+// 	while (i < len)
+// 	{
+// 		if (ft_isspace(input[i]))
+// 			i++;
+// 		if (is_invalid_redirection_sequence(input, i))
+// 		{
+// 			printf("minishell: syntax error near unexpected token `%.3s'\n",
+// 				input + i);
+// 			return (NULL);
+// 		}
+// 		if (is_heredoc(input, i))
+// 		{
+// 			current = tokenize_hd(input, &i, current);
+// 			if (!head)
+// 				head = current;
+// 			continue ;
+// 		}
+// 		if (is_append(input, i))
+// 		{
+// 			current = tokenize_append(input, &i, current);
+// 			if (!head)
+// 				head = current;
+// 			continue ;
+// 		}
+// 		if (is_metachar(input[i]))
+// 		{
+// 			current = tokenize_metachar(input, &i, current);
+// 			if (!head)
+// 				head = current;
+// 			continue ;
+// 		}
+// 		current = tokenize_string(input, &i, current);
+// 		if (!head && current)
+// 			head = current;
+// 	}
+// 	free_tokens(&current);
+// 	return (head);
+// }
+
 t_token	*tokenize(char *input)
 {
-	t_token	*head;
-	t_token	*current;
-	int		i;
-	int		len;
+	t_token	*head = NULL;
+	t_token	*current = NULL;
+	// t_token	*new_token;
+	int		i = 0;
+	int		len = ft_strlen(input);
 
-	head = NULL;
-	current = NULL;
-	i = 0;
-	len = ft_strlen(input);
 	while (i < len)
 	{
 		if (ft_isspace(input[i]))
+		{
 			i++;
+			continue;
+		}
 		if (is_invalid_redirection_sequence(input, i))
 		{
 			printf("minishell: syntax error near unexpected token `%.3s'\n",
 				input + i);
+			free_tokens(&head); // Free the entire list before returning NULL
 			return (NULL);
 		}
 		if (is_heredoc(input, i))
-		{
 			current = tokenize_hd(input, &i, current);
-			if (!head)
-				head = current;
-			continue ;
-		}
-		if (is_append(input, i))
-		{
+		else if (is_append(input, i))
 			current = tokenize_append(input, &i, current);
-			if (!head)
-				head = current;
-			continue ;
-		}
-		if (is_metachar(input[i]))
-		{
+		else if (is_metachar(input[i]))
 			current = tokenize_metachar(input, &i, current);
-			if (!head)
-				head = current;
-			continue ;
+		else
+			current = tokenize_string(input, &i, current);
+
+		if (!current)
+		{
+			free_tokens(&head);
+			return (NULL);
 		}
-		current = tokenize_string(input, &i, current);
 		if (!head)
 			head = current;
 	}

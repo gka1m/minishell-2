@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/01 15:04:13 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/02 15:31:48 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,8 @@ void	execute_external(t_ast *node, t_minishell *shell)
     {
         ft_putstr_fd("minishell: ", STDERR_FILENO);
         ft_putstr_fd("command not found\n", STDERR_FILENO);
-        cleanup_and_exit(shell, 127);
+        // cleanup_and_exit(shell, 127);
+		exit(127);
     }
 
 	sig_reset(true); // In case it's called directly
@@ -101,9 +102,6 @@ void	execute_external(t_ast *node, t_minishell *shell)
 
 	execve(full_path, node->args, env_array);
 	perror("minishell: execve");
-	// free(full_path);
-	// free_split(env_array);
-	// exit(126);
 	cleanup_and_exit(shell, 126);
 }
 
@@ -177,39 +175,86 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 	return (NULL);
 }
 
+// void	execute_command(t_ast *node, t_minishell *shell)
+// {
+// 	pid_t	pid;
+
+// 	while (node && node->type != AST_CMD)
+// 		node = node->left;
+// 	if (!node || !node->args || !node->args[0])
+// 		return ;
+// 	sig_reset(false);
+
+// 	if (is_builtin(node->args[0]))
+// 	{
+// 		// Redirection requires fork for builtins
+// 		if (setup_redirections(node, shell) == -1)
+// 			return ;
+// 		if (node->type == AST_APPEND || node->type == AST_REDIR_IN || node->type == AST_REDIR_OUT || node->type == AST_HEREDOC)
+// 		{
+// 			pid = fork();
+// 			if (pid == 0)
+// 			{
+// 				sig_reset(true);
+// 				exit(execute_builtin(shell, node->args, STDOUT_FILENO));
+// 			}
+// 			else
+// 			{
+// 				handle_parent_process(pid, shell);
+// 				restore_standard_fds(shell);
+// 			}
+// 		}
+// 		else
+// 		{
+// 			shell->last_exit_code = execute_builtin(shell, node->args, STDOUT_FILENO);
+// 		}
+// 	}
+// 	else
+// 	{
+// 		pid = fork();
+// 		if (pid == 0)
+// 		{
+// 			sig_reset(true);
+// 			if (setup_redirections(node, shell) == -1)
+// 				cleanup_and_exit(shell, 1);
+// 			execute_external(node, shell);
+// 			exit(shell->last_exit_code);
+// 		}
+// 		else
+// 		{
+// 			handle_parent_process(pid, shell);
+// 			restore_standard_fds(shell);
+// 		}
+// 	}
+// 	sig_interactive();
+// }
+
 void	execute_command(t_ast *node, t_minishell *shell)
 {
 	pid_t	pid;
+	int		redir_applied = 0;
 
+	// Find the command node (AST_CMD)
 	while (node && node->type != AST_CMD)
 		node = node->left;
 	if (!node || !node->args || !node->args[0])
 		return ;
+
 	sig_reset(false);
 
+	// Handle builtins in parent process if no pipeline/subshell
 	if (is_builtin(node->args[0]))
 	{
-		// Redirection requires fork for builtins
+		// Setup redirections in parent and remember if applied
 		if (setup_redirections(node, shell) == -1)
-			return ;
-		if (node->type == AST_APPEND || node->type == AST_REDIR_IN || node->type == AST_REDIR_OUT || node->type == AST_HEREDOC)
-		{
-			pid = fork();
-			if (pid == 0)
-			{
-				sig_reset(true);
-				exit(execute_builtin(shell, node->args, STDOUT_FILENO));
-			}
-			else
-			{
-				handle_parent_process(pid, shell);
-				restore_standard_fds(shell);
-			}
-		}
-		else
-		{
-			shell->last_exit_code = execute_builtin(shell, node->args, STDOUT_FILENO);
-		}
+			cleanup_and_exit(shell, 1);
+		redir_applied = 1;
+
+		// Execute builtin directly in current shell
+		shell->last_exit_code = execute_builtin(shell, node->args, STDOUT_FILENO);
+
+		if (redir_applied)
+			restore_standard_fds(shell);
 	}
 	else
 	{
@@ -217,60 +262,22 @@ void	execute_command(t_ast *node, t_minishell *shell)
 		if (pid == 0)
 		{
 			sig_reset(true);
+
+			// Child applies redirections
 			if (setup_redirections(node, shell) == -1)
 				cleanup_and_exit(shell, 1);
+
 			execute_external(node, shell);
 			exit(shell->last_exit_code);
 		}
 		else
 		{
 			handle_parent_process(pid, shell);
-			restore_standard_fds(shell);
+			restore_standard_fds(shell);  // In case parent changed fds before forking
 		}
 	}
 	sig_interactive();
 }
-
-// void execute_command(t_ast *node, t_minishell *shell)
-// {
-//     pid_t pid;
-//     int status;
-
-//     if (!node || !node->args || !node->args[0])
-//         return;
-    
-//     if (is_builtin(node->args[0]))
-//     {
-//         if (setup_redirections(node, shell) == -1)
-//             return;
-//         shell->last_exit_code = execute_builtin(shell, node->args, STDOUT_FILENO);
-//     }
-//     else
-//     {
-//         if (setup_redirections(node, shell) == -1)
-//             return;
-        
-//         pid = fork();
-//         if (pid == -1)
-//         {
-//             perror("minishell: fork");
-//             shell->last_exit_code = 1;
-//             return;
-//         }
-//         else if (pid == 0) // Child process
-//         {
-//             execute_external(node, shell);
-//         }
-//         else // Parent process
-//         {
-//             waitpid(pid, &status, 0);
-//             if (WIFEXITED(status))
-//                 shell->last_exit_code = WEXITSTATUS(status);
-//         }
-//     }
-// 	sig_interactive();
-// }
-
 
 int	is_builtin(char *cmd)
 {
