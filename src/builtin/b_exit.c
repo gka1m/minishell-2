@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 14:35:22 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/02 16:35:55 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/06 13:37:32 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,29 +55,34 @@ int	is_valid_exit_arg(char *arg)
 	return (1);
 }
 
-static int	handle_overflow(const char *str)
+static int handle_overflow(const char *str)
 {
-	long long	num;
-	int			sign;
-	int			i;
+    long long num;
+    int sign;
+    int i;
 
-	num = 0;
-	sign = 1;
-	i = 0;
-	if (str[i] == '-' || str[i] == '+')
-	{
-		if (str[i] == '-')
-			sign = -1;
-		i++;
-	}
-	while (str[i] >= '0' && str[i] <= '9')
-	{
-		if (num > (LLONG_MAX - (str[i] - '0')) / 10)
-			return (sign == 1 ? 255 : 0);
-		num = num * 10 + (str[i] - '0');
-		i++;
-	}
-	return (num * sign);
+    num = 0;
+    sign = 1;
+    i = 0;
+    if (str[i] == '-' || str[i] == '+')
+    {
+        if (str[i] == '-')
+            sign = -1;
+        i++;
+    }
+    while (str[i] >= '0' && str[i] <= '9')
+    {
+        if (num > (LLONG_MAX - (str[i] - '0')) / 10)
+        {
+            if (sign == 1)
+                return (255);
+            else
+                return (0);
+        }
+        num = num * 10 + (str[i] - '0');
+        i++;
+    }
+    return (num * sign);
 }
 
 void	cleanup_and_exit(t_minishell *shell, int exit_code)
@@ -85,7 +90,7 @@ void	cleanup_and_exit(t_minishell *shell, int exit_code)
 	// Add any necessary cleanup here
 	// free_env(shell->env_list);
 	if (shell->tokens)
-		free_tokens(&shell->tokens);
+		free_tokens(shell->tokens);
 	if (shell->ast)
 		free_ast(shell->ast);
 	free_minishell(shell);
@@ -126,9 +131,8 @@ int	b_exit(t_minishell *shell, char **args)
 	arg_count = 0;
 	while (args[arg_count])
 		arg_count++;
-	if (arg_count == 1)
-		cleanup_and_exit(shell, 0);
-
+	if (arg_count == 1 && strcmp(args[0], "exit") == 0)
+		cleanup_and_exit(shell, shell->last_exit_code);
 	if (!is_valid_exit_arg(args[1]))
 	{
 		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
@@ -151,11 +155,5 @@ int	b_exit(t_minishell *shell, char **args)
 		exit_code = 256 - (-exit_code % 256);
 	else if (exit_code > 255)
 		exit_code %= 256;
-	// if (shell->tokens)
-	// 	free_tokens(&shell->tokens);
-	// if (shell->ast)
-	// 	free_ast(shell->ast);
-	cleanup_and_exit(shell, exit_code);
-	// exit(exit_code);
 	return (exit_code); // Unreachable
 }

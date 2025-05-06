@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 11:59:01 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/02 16:07:24 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/05 13:06:17 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,11 @@ t_token	*create_token(char *value, t_token_type type)
 		return (NULL);
 	new->value = ft_strdup(value);
 	if (!new->value)
-		return (free(new), NULL);
+		return (free_tokens(new), NULL);
 	new->type = type;
 	new->adjacent = false;
 	new->previous = NULL;
 	new->next = NULL;
-	printf("ALLOC TOKEN %p [%s]\n", new, value);
 	return (new);
 }
 
@@ -48,20 +47,18 @@ t_token	*create_token(char *value, t_token_type type)
 // 	*head = NULL;
 // }
 
-void	free_tokens(t_token **head)
+void	free_tokens(t_token *head)
 {
-	t_token *tmp;
-
-	while (*head)
+	t_token	*tmp;
+	while (head)
 	{
-		tmp = (*head)->next;
-		if ((*head)->value)
-			free((*head)->value);
-		free(*head);
-		*head = tmp;
+		tmp = head->next;
+		free(head->value);
+		free(head);
+		head = tmp;
 	}
-	*head = NULL;
 }
+
 
 
 void	free_split(char **split)

@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/02 16:30:48 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/06 13:09:10 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,15 +186,15 @@ int main(int argc, char **argv, char **envp)
         if (!input)
         {
             // ft_putstr_fd("exit\n", STDOUT_FILENO);
-            if (shell->tokens)
-                free_tokens(&shell->tokens);
+            // if (shell->tokens)
+            //     free_tokens(shell->tokens);
             break;
         }
 
         if (ft_strlen(input) == 0 || g_signal_flag == 1)
         {
             free(input);
-            free_tokens(&shell->tokens);
+            free_tokens(shell->tokens);
             // continue;
         }
 
@@ -212,7 +212,7 @@ int main(int argc, char **argv, char **envp)
         if (!check_grammar(shell->tokens))
         {
             shell->last_exit_code = 2;
-            free_tokens(&shell->tokens);
+            free_tokens(shell->tokens);
             // continue;
         }
 
@@ -225,10 +225,10 @@ int main(int argc, char **argv, char **envp)
         if (!shell->ast)
         {
             shell->last_exit_code = 2;
-            free_tokens(&shell->tokens);
+            free_tokens(shell->tokens);
             // continue;
         }
-        free_tokens(&shell->tokens);
+        free_tokens(shell->tokens);
         // Heredocs
         process_heredocs(shell->ast, shell);
         if (g_signal_flag == 1)
@@ -236,25 +236,21 @@ int main(int argc, char **argv, char **envp)
             shell->last_exit_code = 130;
             free_ast(shell->ast);
             shell->ast = NULL;
-            free_tokens(&shell->tokens);
+            free_tokens(shell->tokens);
             // continue;
         }
         // Execution
         print_ast(shell->ast, 0);
         
         exit_status = execution_logic(shell->ast, shell);
-
         // Cleanup after each command
+		free_tokens(shell->tokens);
         free_ast(shell->ast);
         free(input);
     }
 
     // Final cleanup
     rl_clear_history();
-    if (shell->ast)
-        free_ast(shell->ast);
-    if (shell->tokens)
-        free_tokens(&shell->tokens);
     free_minishell(shell);
     return (exit_status);
 }

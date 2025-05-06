@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 12:01:42 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/02 16:33:50 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/06 13:18:38 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ char	*extract_string(char *input, int *i)
 t_token	*tokenize_string(char *input, int *i, t_token *current)
 {
 	char	*str;
-	t_token	*token = NULL;
+	t_token	*token;
 
 	str = extract_string(input, i);
 	// Skip empty strings (can happen with trailing spaces)
@@ -110,9 +110,9 @@ t_token	*tokenize_string(char *input, int *i, t_token *current)
 		return (current); // Return current without creating new token
 	}
 	token = create_token(str, T_STRING);
-	free(str);
 	if (!token)
-		return (current);
+		return (free(str), current);
+	free(str);
 	if (current)
 		current->next = token;
 	token->previous = current;
@@ -188,7 +188,7 @@ t_token	*tokenize(char *input)
 		{
 			printf("minishell: syntax error near unexpected token `%.3s'\n",
 				input + i);
-			free_tokens(&head); // Free the entire list before returning NULL
+			free_tokens(head); // Free the entire list before returning NULL
 			return (NULL);
 		}
 		if (is_heredoc(input, i))
@@ -202,7 +202,7 @@ t_token	*tokenize(char *input)
 
 		if (!current)
 		{
-			free_tokens(&head);
+			free_tokens(head);
 			return (NULL);
 		}
 		if (!head)

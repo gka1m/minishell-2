@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/30 16:45:02 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/05 12:19:30 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,8 @@ void			toggle_quote_state(char c, int *in_dquote,
 					int *in_squote);
 void			free_split(char **split);
 t_token	*create_token(char *value, t_token_type type);
-void	free_tokens(t_token **head);
+// void	free_tokens(t_token **head);
+void	free_tokens(t_token *head);
 bool	is_metachar(char c);
 bool	is_heredoc(char *input, int i);
 bool	is_append(char *input, int i);
