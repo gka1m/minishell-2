@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 14:35:22 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/06 13:37:32 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/07 14:39:29 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,9 +131,9 @@ int	b_exit(t_minishell *shell, char **args)
 	arg_count = 0;
 	while (args[arg_count])
 		arg_count++;
-	if (arg_count == 1 && strcmp(args[0], "exit") == 0)
+	if (arg_count == 1)
 		cleanup_and_exit(shell, shell->last_exit_code);
-	if (!is_valid_exit_arg(args[1]))
+	if (args[1] && !is_valid_exit_arg(args[1]))
 	{
 		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
 		ft_putstr_fd(args[1], STDERR_FILENO);
@@ -146,14 +146,13 @@ int	b_exit(t_minishell *shell, char **args)
 		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
 		return (1); // Don't exit
 	}
-
 	// Handle number conversion with overflow
 	exit_code = handle_overflow(args[1]);
-
 	// Convert to unsigned 8-bit (bash behavior)
 	if (exit_code < 0)
 		exit_code = 256 - (-exit_code % 256);
 	else if (exit_code > 255)
 		exit_code %= 256;
+	cleanup_and_exit(shell, exit_code);
 	return (exit_code); // Unreachable
 }

@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/05 12:19:30 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/07 16:43:15 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,11 +139,11 @@ void	free_tokens(t_token *head);
 bool	is_metachar(char c);
 bool	is_heredoc(char *input, int i);
 bool	is_append(char *input, int i);
-t_token	*tokenize_hd(char *input, int *i, t_token *current);
-t_token	*tokenize_append(char *input, int *i, t_token *current);
-t_token	*tokenize_metachar(char *input, int *i, t_token *current);
+t_token	*tokenize_hd(char *input, int *i);
+t_token	*tokenize_append(char *input, int *i);
+t_token	*tokenize_metachar(char *input, int *i);
 char	*extract_string(char *input, int *i);
-t_token	*tokenize_string(char *input, int *i, t_token *current);
+t_token	*tokenize_string(char *input, int *i);
 t_token	*tokenize(char *input);
 int ft_isspace(int c);
 bool	is_redirection(t_token *token);
@@ -220,7 +220,8 @@ void    sig_reset(bool for_child);
 
 // execution functions
 int	execute_builtin(t_minishell *shell, char **args, int fd_out);
-void	execute_external(t_ast *node, t_minishell *shell);
+// void	execute_external(t_ast *node, t_minishell *shell);
+int execute_external(t_ast *node, t_minishell *shell);
 char	*find_command_path(char *cmd, t_minishell *shell);
 void	execute_command(t_ast *node, t_minishell *shell);
 void error_command_not_found(char *cmd);

@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/05 12:20:43 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/07 17:26:28 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,14 +201,14 @@ void process_heredocs(t_ast *ast, t_minishell *shell)
     pid_t pid;
     int status;
 
-    if (!ast) return;
+    if (!ast)
+		return;
     if (ast->type == AST_HEREDOC)
     {
         hd.delimiter = ast->file;
         hd.hd_quoted = ast->hd_quoted;
         if (!create_heredoc_pipe(&hd))
             return;
-
         pid = fork();
         if (pid == 0) {
             // Child process - collect heredoc content
@@ -223,17 +223,18 @@ void process_heredocs(t_ast *ast, t_minishell *shell)
             if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
                 ast->heredoc_fd = hd.pipefd[0]; // Store read end
                 
-                // If this is a simple command (not pipeline), execute immediately
-                if (ast->right == NULL && ast->left == NULL) {
-                    execute_command(ast, shell);
-                    close(hd.pipefd[0]);
-                    return;
-                }
+                // // If this is a simple command (not pipeline), execute immediately
+                // if (ast->right == NULL && ast->left == NULL) {
+                //     execute_command(ast, shell);
+                //     close(hd.pipefd[0]);
+                //     return;
+                // }
             } else {
                 close(hd.pipefd[0]);
                 if (WIFSIGNALED(status)) {
                     shell->last_exit_code = 128 + WTERMSIG(status);
                 }
+				return ;
             }
         }
     }

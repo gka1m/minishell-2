@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/06 13:37:06 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/07 14:19:40 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,36 +73,38 @@ int	execute_builtin(t_minishell *shell, char **args, int fd_out)
 // 		handle_parent_process(pid, shell);
 // }
 
-void	execute_external(t_ast *node, t_minishell *shell)
+int	execute_external(t_ast *node, t_minishell *shell)
 {
 	char	**env_array;
 	char	*full_path;
+	int		status;
 
+	env_array = NULL;
+	full_path = NULL;
+	status = 0;
 	if (!node || !node->args || !node->args[0])
-    {
-        ft_putstr_fd("minishell: ", STDERR_FILENO);
-        ft_putstr_fd("command not found\n", STDERR_FILENO);
-        // cleanup_and_exit(shell, 127);
-		exit(127);
-    }
-
-	sig_reset(true); // In case it's called directly
-
+	{
+		ft_putstr_fd("minishell: command not found\n", STDERR_FILENO);
+		return (127);
+	}
+	sig_reset(true);
 	env_array = convert_env_to_array(shell->env_list);
 	if (!env_array)
-		cleanup_and_exit(shell, 1);
-
+	{
+		return (1);
+	}
 	full_path = find_command_path(node->args[0], shell);
 	if (!full_path)
 	{
 		free_split(env_array);
-		cleanup_and_exit(shell, 127);
-		// exit(127);
+		return (127);
 	}
-
 	execve(full_path, node->args, env_array);
+	// If we get here, execve failed
 	perror("minishell: execve");
-	cleanup_and_exit(shell, 126);
+	free(full_path);
+	free_split(env_array);
+	return (126);
 }
 
 char	*find_command_path(char *cmd, t_minishell *shell)
@@ -232,26 +234,34 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 void	execute_command(t_ast *node, t_minishell *shell)
 {
 	pid_t	pid;
-	int		redir_applied = 0;
+	int		redir_applied;
+	int		status;
 
+	redir_applied = 0;
 	// Find the command node (AST_CMD)
 	while (node && node->type != AST_CMD)
 		node = node->left;
 	if (!node || !node->args || !node->args[0])
 		return ;
-
 	sig_reset(false);
-
-	// Handle builtins in parent process if no pipeline/subshell
+	// Handle builtins in parent process
 	if (is_builtin(node->args[0]))
 	{
-		// Setup redirections in parent and remember if applied
 		if (setup_redirections(node, shell) == -1)
-			cleanup_and_exit(shell, 1);
+		{
+			shell->last_exit_code = 1;
+			return ;
+		}
 		redir_applied = 1;
-		// Execute builtin directly in current shell
-		shell->last_exit_code = execute_builtin(shell, node->args, STDOUT_FILENO);
-
+		shell->last_exit_code = execute_builtin(shell, node->args,
+				STDOUT_FILENO);
+		// Special case for exit builtin
+		if (strcmp(node->args[0], "exit") == 0)
+		{
+			if (redir_applied)
+				restore_standard_fds(shell);
+			return ; // Let the main loop handle the actual exit
+		}
 		if (redir_applied)
 			restore_standard_fds(shell);
 	}
@@ -260,19 +270,23 @@ void	execute_command(t_ast *node, t_minishell *shell)
 		pid = fork();
 		if (pid == 0)
 		{
+			// Child process
 			sig_reset(true);
-
-			// Child applies redirections
 			if (setup_redirections(node, shell) == -1)
-				cleanup_and_exit(shell, 1);
-
-			execute_external(node, shell);
-			exit(shell->last_exit_code);
+				exit(1);
+			status = execute_external(node, shell);
+			exit(status);
+		}
+		else if (pid > 0)
+		{
+			// Parent process
+			handle_parent_process(pid, shell);
+			restore_standard_fds(shell);
 		}
 		else
 		{
-			handle_parent_process(pid, shell);
-			restore_standard_fds(shell);  // In case parent changed fds before forking
+			perror("minishell: fork");
+			shell->last_exit_code = 1;
 		}
 	}
 	sig_interactive();
@@ -282,10 +296,9 @@ int	is_builtin(char *cmd)
 {
 	if (!cmd)
 		return (0);
-	return (strcmp(cmd, "cd") == 0 || strcmp(cmd, "echo") == 0
-		|| strcmp(cmd, "env") == 0 || strcmp(cmd, "exit") == 0
-		|| strcmp(cmd, "pwd") == 0 || strcmp(cmd, "export") == 0
-		|| strcmp(cmd, "unset") == 0);
+	return (strcmp(cmd, "cd") == 0 || strcmp(cmd, "echo") == 0 || strcmp(cmd,
+			"env") == 0 || strcmp(cmd, "exit") == 0 || strcmp(cmd, "pwd") == 0
+		|| strcmp(cmd, "export") == 0 || strcmp(cmd, "unset") == 0);
 }
 
 void	handle_parent_process(pid_t pid, t_minishell *shell)

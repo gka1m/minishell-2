@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 13:50:16 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/30 15:10:46 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/07 14:13:56 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,11 @@ int b_cd(t_minishell *shell, t_env **env_list, char **args)
     int ret;
     t_env *env_var;
 
+	if (args[2])
+	{
+        ft_putstr_fd("minishell: cd: too many arguments\n", STDERR_FILENO);
+        return (1);
+    }
     if (!args[1] || ft_strncmp(args[1], "--", 2) == 0 || ft_strncmp(args[1], "~", 1) == 0)
     {
         env_var = find_env_var(*env_list, "HOME");

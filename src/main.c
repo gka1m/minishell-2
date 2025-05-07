@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/06 13:09:10 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/07 14:42:38 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,18 +194,17 @@ int main(int argc, char **argv, char **envp)
         if (ft_strlen(input) == 0 || g_signal_flag == 1)
         {
             free(input);
-            free_tokens(shell->tokens);
-            // continue;
+            continue;
         }
 
         add_history(input);
 
         // Tokenization
         shell->tokens = tokenize(input);
+		free(input);
         if (!shell->tokens)
         {
-            free(input); // Free input immediately after tokenization
-            // continue;
+            continue;
         }
 
         // Grammar checking
@@ -213,7 +212,7 @@ int main(int argc, char **argv, char **envp)
         {
             shell->last_exit_code = 2;
             free_tokens(shell->tokens);
-            // continue;
+            continue;
         }
 
         // Expansion
@@ -225,8 +224,7 @@ int main(int argc, char **argv, char **envp)
         if (!shell->ast)
         {
             shell->last_exit_code = 2;
-            free_tokens(shell->tokens);
-            // continue;
+            continue;
         }
         free_tokens(shell->tokens);
         // Heredocs
@@ -235,18 +233,16 @@ int main(int argc, char **argv, char **envp)
         {
             shell->last_exit_code = 130;
             free_ast(shell->ast);
-            shell->ast = NULL;
-            free_tokens(shell->tokens);
-            // continue;
+			free_tokens(shell->tokens);
+            continue;
         }
         // Execution
         print_ast(shell->ast, 0);
         
         exit_status = execution_logic(shell->ast, shell);
         // Cleanup after each command
-		free_tokens(shell->tokens);
+		// free_tokens(shell->tokens);
         free_ast(shell->ast);
-        free(input);
     }
 
     // Final cleanup
