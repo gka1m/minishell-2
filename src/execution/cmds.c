@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/06 13:37:06 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/06 17:07:58 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,17 +80,16 @@ void	execute_external(t_ast *node, t_minishell *shell)
 
 	if (!node || !node->args || !node->args[0])
     {
-        ft_putstr_fd("minishell: ", STDERR_FILENO);
-        ft_putstr_fd("command not found\n", STDERR_FILENO);
-        // cleanup_and_exit(shell, 127);
-		exit(127);
+        ft_putstr_fd("minishell: command not found\n", STDERR_FILENO);
+        cleanup_and_exit(shell, 127);
+		// exit(127);
     }
 
 	sig_reset(true); // In case it's called directly
 
 	env_array = convert_env_to_array(shell->env_list);
 	if (!env_array)
-		cleanup_and_exit(shell, 1);
+		exit(1);
 
 	full_path = find_command_path(node->args[0], shell);
 	if (!full_path)
@@ -102,7 +101,10 @@ void	execute_external(t_ast *node, t_minishell *shell)
 
 	execve(full_path, node->args, env_array);
 	perror("minishell: execve");
+	free_split(env_array);
+	free(full_path);
 	cleanup_and_exit(shell, 126);
+	// exit(126);
 }
 
 char	*find_command_path(char *cmd, t_minishell *shell)

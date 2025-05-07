@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/06 13:09:10 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/06 17:08:22 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,8 +194,8 @@ int main(int argc, char **argv, char **envp)
         if (ft_strlen(input) == 0 || g_signal_flag == 1)
         {
             free(input);
-            free_tokens(shell->tokens);
-            // continue;
+            // free_tokens(shell->tokens);
+            continue;
         }
 
         add_history(input);
@@ -246,11 +246,12 @@ int main(int argc, char **argv, char **envp)
         // Cleanup after each command
 		free_tokens(shell->tokens);
         free_ast(shell->ast);
-        free(input);
+        // free(input);
     }
 
     // Final cleanup
     rl_clear_history();
+
     free_minishell(shell);
     return (exit_status);
 }
