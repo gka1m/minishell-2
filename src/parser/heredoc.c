@@ -72,7 +72,7 @@ int	create_heredoc_pipe(t_heredoc *hd)
 void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 {
 	char	*line;
-	t_token	*temp_token;
+	t_token	*temp_token = NULL;
 
 	setup_heredoc_signals();
 	while (!g_signal_flag)
@@ -81,6 +81,9 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 		if (g_signal_flag)
 		{
 			free(line);
+			if (temp_token)
+				free_tokens(temp_token);
+			close(hd->pipefd[1]);
 			// break ;
 			exit(130);
 		}
@@ -88,7 +91,7 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 		{
 			ft_putstr_fd("minishell: warning: here-document delimited by end-of-file\n",
 				STDERR_FILENO);
-			g_signal_flag = 1;
+			// g_signal_flag = 1;
 			break ;
 		}
 		if (strcmp(line, hd->delimiter) == 0)
@@ -118,7 +121,13 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 	}
 	close(hd->pipefd[1]);
 	if (g_signal_flag)
+	{
+		free(line);
+		if (temp_token)
+			free_tokens(temp_token);
+		free_ast(hd->node);
 		exit(130);
+	}
 	// exit(0);
 	// rl_replace_line("", 0);
 	// rl_redisplay();

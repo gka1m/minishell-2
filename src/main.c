@@ -194,6 +194,7 @@ int main(int argc, char **argv, char **envp)
         if (ft_strlen(input) == 0 || g_signal_flag == 1)
         {
             free(input);
+            // free_tokens(shell->tokens);
             continue;
         }
 
@@ -246,10 +247,12 @@ int main(int argc, char **argv, char **envp)
         // Cleanup after each command
 		free_tokens(shell->tokens);
         free_ast(shell->ast);
+        // free(input);
     }
 
     // Final cleanup
     rl_clear_history();
+
     free_minishell(shell);
     return (exit_status);
 }
