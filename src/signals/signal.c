@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:45:04 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/24 13:47:20 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/08 15:56:22 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,8 @@ void	handle_heredoc_sigint(int sig)
     // rl_redisplay();
 	rl_done = 1;
 }
+
+
 
 /* handles signals during execution (running a command)
 resets signals to default handlers */

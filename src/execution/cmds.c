@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/07 14:19:40 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/08 14:44:49 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,7 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 	ft_putstr_fd("minishell: ", STDERR_FILENO);
 	ft_putstr_fd(cmd, STDERR_FILENO);
 	ft_putstr_fd(": command not found\n", STDERR_FILENO);
-	return (NULL);
+	return (free_ast(shell->ast), free_tokens(shell->tokens), NULL);
 }
 
 // void	execute_command(t_ast *node, t_minishell *shell)
@@ -255,13 +255,6 @@ void	execute_command(t_ast *node, t_minishell *shell)
 		redir_applied = 1;
 		shell->last_exit_code = execute_builtin(shell, node->args,
 				STDOUT_FILENO);
-		// Special case for exit builtin
-		if (strcmp(node->args[0], "exit") == 0)
-		{
-			if (redir_applied)
-				restore_standard_fds(shell);
-			return ; // Let the main loop handle the actual exit
-		}
 		if (redir_applied)
 			restore_standard_fds(shell);
 	}
@@ -275,6 +268,7 @@ void	execute_command(t_ast *node, t_minishell *shell)
 			if (setup_redirections(node, shell) == -1)
 				exit(1);
 			status = execute_external(node, shell);
+			free_minishell(shell);
 			exit(status);
 		}
 		else if (pid > 0)

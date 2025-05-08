@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 10:57:25 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/07 15:34:34 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/08 12:16:10 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -410,11 +410,10 @@ char *expand_variables_with_quotes(char *str, t_minishell *shell)
 // Fixed expand_all_tokens
 t_token *expand_all_tokens(t_token *tokens, t_minishell *shell)
 {
-    t_token *current;
+    t_token *current = tokens;
     char *expanded;
     char *unquoted;
 
-    current = tokens;
     while (current)
     {
         if (is_redirection(current))
@@ -427,30 +426,31 @@ t_token *expand_all_tokens(t_token *tokens, t_minishell *shell)
         {
             if (current->previous && current->previous->type == T_HEREDOC)
             {
-                // Heredoc: no variable expansion, only remove quotes
+                // Heredoc: no variable expansion, only remove outer quotes
                 unquoted = remove_outer_quotes(current->value);
                 free(current->value);
                 current->value = unquoted;
             }
             else
             {
+                // Regular string: expand variables then remove outer quotes
                 expanded = expand_variables_with_quotes(current->value, shell);
                 free(current->value);
                 current->value = expanded;
-
+                
                 unquoted = remove_outer_quotes(current->value);
                 free(current->value);
-				// free(expanded);
                 current->value = unquoted;
             }
             current = current->next;
         }
         else
+        {
             current = current->next;
+        }
     }
-    // Only AFTER expansion and unquoting
-    tokens = concatenate_adjacent_strings(tokens);
-    return (tokens);
+    // Concatenate after all expansion and quote removal
+    return concatenate_adjacent_strings(tokens);
 }
 
 
@@ -472,36 +472,31 @@ t_token	*handle_redirection_expansion(t_token *token, t_minishell *shell)
 	return (token);
 }
 
-t_token	*concatenate_adjacent_strings(t_token *tokens)
+t_token *concatenate_adjacent_strings(t_token *tokens)
 {
-	t_token	*curr;
-	t_token	*next;
-	char	*temp;
-	char	*curr_unquoted;
-	char	*next_unquoted;
+    t_token *curr;
+    t_token *next;
+    char *temp;
 
-	curr = tokens;
-	while (curr && curr->next)
-	{
-		next = curr->next;
-		// Only merge adjacent quoted strings
-		if (curr->type == T_STRING && next->type == T_STRING && next->adjacent
-			&& (curr->value[0] == '"' || curr->value[0] == '\'')
-				&& (next->value[0] == '"' || next->value[0] == '\''))
-		{
-			curr_unquoted = remove_quotes(curr->value);
-			next_unquoted = remove_quotes(next->value);
-			temp = ft_strjoin(curr_unquoted, next_unquoted);
-			free(curr->value);
-			curr->value = temp;
-			free(curr_unquoted);
-			free(next_unquoted);
-			curr->next = next->next;
-			free(next->value);
-			free(next);
-		}
-		else
-			curr = curr->next;
-	}
-	return (tokens);
+    curr = tokens;
+    while (curr && curr->next)
+    {
+        next = curr->next;
+        if (curr->type == T_STRING && next->type == T_STRING && next->adjacent)
+        {
+            temp = ft_strjoin(curr->value, next->value);
+            free(curr->value);
+            curr->value = temp;
+            curr->next = next->next;
+            if (next->next)
+                next->next->previous = curr;
+            free(next->value);
+            free(next);
+        }
+        else
+        {
+            curr = curr->next;
+        }
+    }
+    return tokens;
 }

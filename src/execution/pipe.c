@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:08:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/30 12:22:41 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/08 14:15:48 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,8 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 			exit(1);
 
 		execute_command(node->left, shell);
-		exit(shell->last_exit_code);
+		// exit(shell->last_exit_code);
+		cleanup_and_exit(shell, shell->last_exit_code);
 	}
 	close(pipe_fd[1]);
 	if (input_fd != -1)
@@ -77,7 +78,8 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 				exit(1);
 
 			execute_command(node->right, shell);
-			exit(shell->last_exit_code);
+			// exit(shell->last_exit_code);
+			cleanup_and_exit(shell, shell->last_exit_code);
 		}
 		close(pipe_fd[0]);
 	}

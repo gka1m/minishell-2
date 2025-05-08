@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/07 17:26:28 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/08 15:43:07 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,8 +213,12 @@ void process_heredocs(t_ast *ast, t_minishell *shell)
         if (pid == 0) {
             // Child process - collect heredoc content
             setup_heredoc_signals();
+			close(hd.pipefd[0]);
             process_heredoc_input(&hd, shell);
-            exit(0);
+			// free_minishell(shell);
+            // exit(0);
+			close(hd.pipefd[1]);
+			cleanup_and_exit(shell, 0);
         } else {
             // Parent process
             close(hd.pipefd[1]); // Close write end

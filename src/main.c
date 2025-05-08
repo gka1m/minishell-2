@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/07 14:42:38 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/08 14:57:57 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,7 @@ int main(int argc, char **argv, char **envp)
     if (!shell)
     {
         ft_putstr_fd("minishell: initialization failed\n", STDERR_FILENO);
-        return (1);
+        return (free(shell), 1);
     }
     rl_catch_signals = 0;
 
@@ -185,7 +185,7 @@ int main(int argc, char **argv, char **envp)
         input = readline("minishell> ");
         if (!input)
         {
-            // ft_putstr_fd("exit\n", STDOUT_FILENO);
+            ft_putstr_fd("exit\n", STDOUT_FILENO);
             // if (shell->tokens)
             //     free_tokens(shell->tokens);
             break;
@@ -204,6 +204,7 @@ int main(int argc, char **argv, char **envp)
 		free(input);
         if (!shell->tokens)
         {
+			// free_tokens(shell->tokens);
             continue;
         }
 
@@ -226,7 +227,8 @@ int main(int argc, char **argv, char **envp)
             shell->last_exit_code = 2;
             continue;
         }
-        free_tokens(shell->tokens);
+        // free_tokens(shell->tokens);
+
         // Heredocs
         process_heredocs(shell->ast, shell);
         if (g_signal_flag == 1)
@@ -234,6 +236,7 @@ int main(int argc, char **argv, char **envp)
             shell->last_exit_code = 130;
             free_ast(shell->ast);
 			free_tokens(shell->tokens);
+			// cleanup_and_exit(shell, 130);
             continue;
         }
         // Execution
@@ -241,7 +244,7 @@ int main(int argc, char **argv, char **envp)
         
         exit_status = execution_logic(shell->ast, shell);
         // Cleanup after each command
-		// free_tokens(shell->tokens);
+		free_tokens(shell->tokens);
         free_ast(shell->ast);
     }
 
