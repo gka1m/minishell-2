@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 11:53:42 by theophane         #+#    #+#             */
-/*   Updated: 2025/05/01 16:53:59 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/12 12:54:46 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	init_fields(t_minishell *minishell, char **envp)
 	{
 		perror("getcwd");
 		free_env(minishell->env_list);
-		free(minishell->cwd);
+		// free(minishell->cwd);
 		free(minishell);
 		exit(EXIT_FAILURE);
 	}

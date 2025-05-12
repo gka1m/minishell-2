@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:19:27 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/28 17:04:34 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/12 12:58:54 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,17 +77,30 @@ int	execute_redirection(t_ast *node, t_minishell *shell)
 
 void	restore_standard_fds(t_minishell *shell)
 {
-	if (shell->stdio_backup[0] != -1)
+	// if (shell->stdio_backup[0] != -1)
+	// {
+	// 	dup2(shell->stdio_backup[0], STDIN_FILENO);
+	// 	close(shell->stdio_backup[0]);
+	// 	shell->stdio_backup[0] = -1;
+	// }
+	// if (shell->stdio_backup[1] != -1)
+	// {
+	// 	dup2(shell->stdio_backup[1], STDOUT_FILENO);
+	// 	close(shell->stdio_backup[1]);
+	// 	shell->stdio_backup[1] = -1;
+	// }
+	int	i;
+
+	i = 0;
+	while (i < 3)
 	{
-		dup2(shell->stdio_backup[0], STDIN_FILENO);
-		close(shell->stdio_backup[0]);
-		shell->stdio_backup[0] = -1;
-	}
-	if (shell->stdio_backup[1] != -1)
-	{
-		dup2(shell->stdio_backup[1], STDOUT_FILENO);
-		close(shell->stdio_backup[1]);
-		shell->stdio_backup[1] = -1;
+		if (shell->stdio_backup[i] != -1)
+		{
+			dup2(shell->stdio_backup[i], i);
+			close(shell->stdio_backup[i]);
+			shell->stdio_backup[i] = -1;
+		}
+		i++;
 	}
 }
 

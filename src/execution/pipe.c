@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:08:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/08 14:15:48 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/12 13:38:03 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,8 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 			dup2(pipe_fd[0], STDIN_FILENO);
 			close(pipe_fd[0]);
 
-			if (setup_redirections(node->right, shell) == -1)
-				exit(1);
+			// if (setup_redirections(node->right, shell) == -1)
+			// 	exit(1);
 
 			execute_command(node->right, shell);
 			// exit(shell->last_exit_code);

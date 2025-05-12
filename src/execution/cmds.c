@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/08 14:44:49 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/12 13:31:25 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,11 +77,11 @@ int	execute_external(t_ast *node, t_minishell *shell)
 {
 	char	**env_array;
 	char	*full_path;
-	int		status;
+	// int		status;
 
 	env_array = NULL;
 	full_path = NULL;
-	status = 0;
+	// status = 0;
 	if (!node || !node->args || !node->args[0])
 	{
 		ft_putstr_fd("minishell: command not found\n", STDERR_FILENO);
@@ -269,7 +269,7 @@ void	execute_command(t_ast *node, t_minishell *shell)
 				exit(1);
 			status = execute_external(node, shell);
 			free_minishell(shell);
-			exit(status);
+			// exit(status);
 		}
 		else if (pid > 0)
 		{
