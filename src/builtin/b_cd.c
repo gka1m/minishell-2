@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 13:50:16 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/12 14:32:04 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/14 15:57:42 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,8 @@ int	update_pwds(t_minishell *shell, t_env **env_list, char *new_path)
 	oldpwd = ft_strdup(shell->cwd);
 	if (!oldpwd)
 		return (1);
-	// Update OLDPWD
 	update_env_var(*env_list, "OLDPWD", oldpwd);
 	free(oldpwd);
-	// Update PWD
 	if (!getcwd(cwd, sizeof(cwd)))
 	{
 		update_env_var(*env_list, "PWD", new_path);
@@ -37,7 +35,6 @@ int	update_pwds(t_minishell *shell, t_env **env_list, char *new_path)
 	return (0);
 }
 
-
 int	change_directory(t_minishell *shell, t_env **env_list, char *path)
 {
 	char	*abs_path;
@@ -46,12 +43,11 @@ int	change_directory(t_minishell *shell, t_env **env_list, char *path)
 	if (chdir(path) != 0)
 	{
 		if (errno == EACCES)
-			ft_putstr_fd("minishell: cd: Permission denied\n", STDERR_FILENO);
+			ft_putstr_fd("minishell: cd: Permission denied\n", 2);
 		else if (errno == ENOENT)
-			ft_putstr_fd("minishell: cd: No such file or directory\n",
-				STDERR_FILENO);
+			ft_putstr_fd("minishell: cd: No such file or directory\n", 2);
 		else if (errno == ENOTDIR)
-			ft_putstr_fd("minishell: cd: Not a directory\n", STDERR_FILENO);
+			ft_putstr_fd("minishell: cd: Not a directory\n", 2);
 		return (1);
 	}
 	abs_path = getcwd(NULL, 0);
@@ -75,7 +71,7 @@ char	*expand_path(t_minishell *shell, t_env **env_list, char *path)
 		home = find_env_var(*env_list, "HOME");
 		if (!home || !home->value)
 		{
-			ft_putstr_fd("minishell: cd: HOME not set\n", STDERR_FILENO);
+			ft_putstr_fd("minishell: cd: HOME not set\n", 2);
 			return (NULL);
 		}
 		expanded = ft_strjoin(home->value, path + 1);
@@ -84,35 +80,32 @@ char	*expand_path(t_minishell *shell, t_env **env_list, char *path)
 	return (ft_strdup(path));
 }
 
-int b_cd(t_minishell *shell, t_env **env_list, char **args)
+int	b_cd(t_minishell *shell, t_env **env_list, char **args)
 {
-    char *expanded_path;
-    int ret;
-    t_env *env_var;
+	int		ret;
+	t_env	*env_var;
+	// char	*expanded_path;
 
-	if (args[2])
+	if (args[1] && args[2])
+		return (ft_putstr_fd("minishell: cd: too many arguments\n", 2), 1);
+	if (!args[1] || strcmp(args[1], "--") == 0 || strcmp(args[1], "~") == 0)
 	{
-        ft_putstr_fd("minishell: cd: too many arguments\n", STDERR_FILENO);
-        return (1);
-    }
-    if (!args[1] || strcmp(args[1], "--") == 0 || strcmp(args[1], "~") == 0)
-    {
-        env_var = find_env_var(*env_list, "HOME");
-        if (!env_var || !env_var->value)
-            return (ft_putstr_fd("cd: HOME not set\n", STDERR_FILENO), 1);
-        return (change_directory(shell, env_list, env_var->value));
-    }
-    if (strcmp(args[1], "-") == 0)
-    {
-        env_var = find_env_var(*env_list, "OLDPWD");
-        if (!env_var || !env_var->value)
-            return (ft_putstr_fd("cd: OLDPWD not set\n", STDERR_FILENO), 1);
-        ft_putendl_fd(env_var->value, STDOUT_FILENO);
-        return (change_directory(shell, env_list, env_var->value));
-    }
-    expanded_path = expand_path(shell, env_list, args[1]);
-    if (!expanded_path)
-        return (1);
-    ret = change_directory(shell, env_list, expanded_path);
-    return (free(expanded_path), ret);
+		env_var = find_env_var(*env_list, "HOME");
+		if (!env_var || !env_var->value)
+			return (ft_putstr_fd("cd: HOME not set\n", 2), 1);
+		return (change_directory(shell, env_list, env_var->value));
+	}
+	if (strcmp(args[1], "-") == 0)
+	{
+		env_var = find_env_var(*env_list, "OLDPWD");
+		if (!env_var || !env_var->value)
+			return (ft_putstr_fd("cd: OLDPWD not set\n", 2), 1);
+		ft_putendl_fd(env_var->value, 1);
+		return (change_directory(shell, env_list, env_var->value));
+	}
+	// expanded_path = expand_path(shell, env_list, args[1]);
+	// if (!expanded_path)
+	// 	return (1);
+	ret = change_directory(shell, env_list, args[1]);
+	return (ret);
 }

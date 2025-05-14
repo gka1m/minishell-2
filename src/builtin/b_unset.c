@@ -6,23 +6,23 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 14:33:47 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/07 14:07:25 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/14 15:57:06 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-int b_unset(t_env *env, char **args)
+int	b_unset(t_env *env, char **args)
 {
-    int i;
+	int	i;
 
-    i = 1;
-    if (!args[1])
-        return (0);
-    while (args[i])
-    {
-        delete_env_var(&env, args[i]);
-        i++;
-    }
-    return (0);
+	i = 1;
+	if (!args[1])
+		return (0);
+	while (args[i])
+	{
+		delete_env_var(&env, args[i]);
+		i++;
+	}
+	return (0);
 }

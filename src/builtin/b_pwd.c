@@ -6,17 +6,17 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 13:15:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/31 15:07:19 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/14 15:57:01 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-int b_pwd(void)
+int	b_pwd(void)
 {
-    char    *output;
+	char	*output;
 
-    output = getcwd(NULL, 0);
-    printf("%s\n", output);
-    return (free(output), 0);
+	output = getcwd(NULL, 0);
+	printf("%s\n", output);
+	return (free(output), 0);
 }

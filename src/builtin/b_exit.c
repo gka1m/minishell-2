@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 14:35:22 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/13 14:24:08 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/14 15:40:37 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,8 @@ int	is_valid_exit_arg(char *arg)
 
 	i = 0;
 	digits = 0;
-	// Optional sign
 	if (arg[i] == '-' || arg[i] == '+')
 		i++;
-	// Check each digit
 	while (arg[i])
 	{
 		if (!ft_isdigit(arg[i]))
@@ -46,58 +44,51 @@ int	is_valid_exit_arg(char *arg)
 		digits++;
 		i++;
 	}
-	// Empty string or just a sign isn't valid
 	if (digits == 0)
 		return (0);
-	// Check if number exceeds LONG_MIN/LONG_MAX
-	if (digits > 20) // Max digits for 64-bit long
+	if (digits > 20)
 		return (0);
 	return (1);
 }
 
-static int handle_overflow(const char *str)
+int	handle_overflow(const char *str)
 {
-    long long num;
-    int sign;
-    int i;
+	long long	num;
+	int			sign;
+	int			i;
 
-    num = 0;
-    sign = 1;
-    i = 0;
-    if (str[i] == '-' || str[i] == '+')
-    {
-        if (str[i] == '-')
-            sign = -1;
-        i++;
-    }
-    while (str[i] >= '0' && str[i] <= '9')
-    {
-        if (num > (LLONG_MAX - (str[i] - '0')) / 10)
-        {
-            if (sign == 1)
-                return (255);
-            else
-                return (0);
-        }
-        num = num * 10 + (str[i] - '0');
-        i++;
-    }
-    return (num * sign);
+	num = 0;
+	sign = 1;
+	i = -1;
+	if (str[++i] == '-' || str[++i] == '+')
+	{
+		if (str[i] == '-')
+			sign = -1;
+	}
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		if (num > (LLONG_MAX - (str[i] - '0')) / 10)
+		{
+			if (sign == 1)
+				return (255);
+			else
+				return (0);
+		}
+		num = num * 10 + (str[i] - '0');
+		i++;
+	}
+	return (num * sign);
 }
 
 void	cleanup_and_exit(t_minishell *shell, int exit_code)
 {
-	// Add any necessary cleanup here
-	// free_env(shell->env_list);
 	if (shell->tokens)
 		free_tokens(shell->tokens);
 	if (shell->ast)
 		free_ast(shell->ast);
 	restore_standard_fds(shell);
 	free_minishell(shell);
-	// Free other resources as needed
 	exit(exit_code);
-	// shell->last_exit_code = exit_code;
 }
 
 // int	b_exit(t_minishell *shell, char **args)
@@ -126,8 +117,8 @@ void	cleanup_and_exit(t_minishell *shell, int exit_code)
 
 int	b_exit(t_minishell *shell, char **args)
 {
-	int exit_code;
-	int arg_count;
+	int	exit_code;
+	int	arg_count;
 
 	arg_count = 0;
 	while (args[arg_count])
@@ -136,24 +127,18 @@ int	b_exit(t_minishell *shell, char **args)
 		cleanup_and_exit(shell, shell->last_exit_code);
 	if (args[1] && !is_valid_exit_arg(args[1]))
 	{
-		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
-		ft_putstr_fd(args[1], STDERR_FILENO);
-		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
+		ft_putstr_fd("minishell: exit: ", 2);
+		ft_putstr_fd(args[1], 2);
+		ft_putstr_fd(": numeric argument required\n", 2);
 		return (2);
 	}
-
 	if (arg_count > 2)
-	{
-		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
-		return (1); // Don't exit
-	}
-	// Handle number conversion with overflow
+		return (ft_putstr_fd("minishell: exit: too many arguments\n", 2), 1);
 	exit_code = handle_overflow(args[1]);
-	// Convert to unsigned 8-bit (bash behavior)
 	if (exit_code < 0)
 		exit_code = 256 - (-exit_code % 256);
 	else if (exit_code > 255)
 		exit_code %= 256;
 	cleanup_and_exit(shell, exit_code);
-	return (exit_code); // Unreachable
+	return (exit_code);
 }

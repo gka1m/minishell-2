@@ -6,14 +6,14 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 13:12:30 by kagoh             #+#    #+#             */
-/*   Updated: 2025/03/31 15:07:24 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/14 15:16:54 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-int b_env(t_env *env_list)
+int	b_env(t_env *env_list)
 {
-    print_env_vars(env_list);
-    return (0);
+	print_env_vars(env_list);
+	return (0);
 }
