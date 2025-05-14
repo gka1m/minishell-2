@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/14 12:38:29 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/14 13:50:31 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,7 @@ int	execute_external(t_ast *node, t_minishell *shell)
 		return (127);
 	}
 	close(shell->stdio_backup[1]);
+	close(shell->stdio_backup[0]);
 	execve(full_path, node->args, env_array);
 	// If we get here, execve failed
 	perror("minishell: execve");
@@ -267,7 +268,10 @@ void	execute_command(t_ast *node, t_minishell *shell)
 			// Child process
 			sig_reset(true);
 			if (setup_redirections(node, shell) == -1)
-				exit(1);
+			{
+				shell->last_exit_code = 1;
+				return ;
+			}
 			redir_applied = 1;
 			status = execute_external(node, shell);
 			if (redir_applied)
