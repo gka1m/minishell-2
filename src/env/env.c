@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 11:53:42 by theophane         #+#    #+#             */
-/*   Updated: 2025/05/12 12:54:46 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/14 12:37:14 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ t_minishell	*init_minishell(char **envp)
 	minishell->interactive = isatty(STDIN_FILENO);
 	minishell->stdio_backup[0] = -1;
     minishell->stdio_backup[1] = -1;
-    minishell->stdio_backup[2] = -1;
+    // minishell->stdio_backup[2] = -1;
 	return (minishell);
 }
 
@@ -84,8 +84,8 @@ void free_minishell(t_minishell *minishell)
         close(minishell->stdio_backup[0]);
     if (minishell->stdio_backup[1] != -1)
         close(minishell->stdio_backup[1]);
-    if (minishell->stdio_backup[2] != -1)
-        close(minishell->stdio_backup[2]);
+    // if (minishell->stdio_backup[2] != -1)
+    //     close(minishell->stdio_backup[2]);
     
     // Finally free the minishell struct itself
     free(minishell);

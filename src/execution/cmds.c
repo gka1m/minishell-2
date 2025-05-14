@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/12 13:31:25 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/14 12:38:29 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ int	execute_external(t_ast *node, t_minishell *shell)
 		free_split(env_array);
 		return (127);
 	}
+	close(shell->stdio_backup[1]);
 	execve(full_path, node->args, env_array);
 	// If we get here, execve failed
 	perror("minishell: execve");
@@ -170,11 +171,11 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 		}
 		free(full_path);
 	}
-	free_split(dirs);
 	ft_putstr_fd("minishell: ", STDERR_FILENO);
 	ft_putstr_fd(cmd, STDERR_FILENO);
 	ft_putstr_fd(": command not found\n", STDERR_FILENO);
-	return (free_ast(shell->ast), free_tokens(shell->tokens), NULL);
+	free_split(dirs);
+	return (NULL);
 }
 
 // void	execute_command(t_ast *node, t_minishell *shell)
@@ -267,9 +268,12 @@ void	execute_command(t_ast *node, t_minishell *shell)
 			sig_reset(true);
 			if (setup_redirections(node, shell) == -1)
 				exit(1);
+			redir_applied = 1;
 			status = execute_external(node, shell);
-			free_minishell(shell);
-			// exit(status);
+			if (redir_applied)
+				restore_standard_fds(shell);
+			// free_minishell(shell);
+			cleanup_and_exit(shell, status);
 		}
 		else if (pid > 0)
 		{

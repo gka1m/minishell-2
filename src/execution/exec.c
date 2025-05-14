@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 10:09:44 by zchan             #+#    #+#             */
-/*   Updated: 2025/05/12 13:40:46 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/13 16:02:59 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,8 @@ int	execution_logic(t_ast *ast, t_minishell *minishell)
 	if (ast->type == AST_PIPE) {
         execute_pipeline(ast, minishell, -1);
     }
-    else {
+    else 
+	{
         // For non-piped commands, setup redirections then execute
         if (setup_redirections(ast, minishell) == -1)
             return (-1);
@@ -79,9 +80,9 @@ int	execution_logic(t_ast *ast, t_minishell *minishell)
     }
 	// else
 	// {
-	// 	ft_putstr_fd("minishell: unknown node type\n", STDERR_FILENO);
-	// 	return (-1);
-	// }
+		// 	ft_putstr_fd("minishell: unknown node type\n", STDERR_FILENO);
+		// 	return (-1);
+		// }
 	restore_standard_fds(minishell);
 	return (0);
 }

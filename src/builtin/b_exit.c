@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 14:35:22 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/08 13:28:48 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/13 14:24:08 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ void	cleanup_and_exit(t_minishell *shell, int exit_code)
 		free_tokens(shell->tokens);
 	if (shell->ast)
 		free_ast(shell->ast);
+	restore_standard_fds(shell);
 	free_minishell(shell);
 	// Free other resources as needed
 	exit(exit_code);

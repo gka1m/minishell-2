@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/08 14:57:57 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/13 15:22:15 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,9 +167,10 @@ int main(int argc, char **argv, char **envp)
     char *input;
     int exit_status = 0;
 
-    (void)argc;
+    // (void)argc;
     (void)argv;
-
+	if (argc > 1)
+		return (1);
     shell = init_minishell(envp);
     if (!shell)
     {
