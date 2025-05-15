@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:45:04 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/08 15:56:22 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/15 15:24:33 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,21 @@ void	sig_interactive(void)
 /* handle_sigint function (interactive input handling) */
 void	handle_signal(int sig)
 {
-	if (sig == SIGINT)
-	{
-		g_signal_flag = 1;
-		write(STDERR_FILENO, "\n", 1);
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-        rl_done= 1;
-	}
+	// if (sig == SIGINT)
+	// {
+	// 	g_signal_flag = 1;
+	// 	write(STDERR_FILENO, "\n", 1);
+	// 	rl_on_new_line();
+	// 	rl_replace_line("", 0);
+	// 	rl_redisplay();
+    //     // rl_done= 1;
+	// }
+	(void)sig;
+	// g_signal_flag = 1;
+	write(STDERR_FILENO, "\n", 1);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
 
 // void	sig_reset(bool for_child)
@@ -93,7 +99,7 @@ void setup_heredoc_signals(void)
     sa.sa_handler = SIG_IGN;
     sigaction(SIGQUIT, &sa, NULL);
     
-    rl_catch_signals = 0;
+    // rl_catch_signals = 0;
 }
 
 void	handle_heredoc_sigint(int sig)

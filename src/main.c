@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/14 12:53:59 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/15 15:22:05 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,13 +177,20 @@ int main(int argc, char **argv, char **envp)
         ft_putstr_fd("minishell: initialization failed\n", STDERR_FILENO);
         return (free(shell), 1);
     }
-    rl_catch_signals = 0;
+    // rl_catch_signals = 0;
 
     while (1)
     {
-        sig_interactive();
-        g_signal_flag = 0;
+		g_signal_flag = 0;
+		sig_interactive();
         input = readline("minishell> ");
+		if (g_signal_flag == 1)
+		{
+			free(input);
+			exit_status = 130;
+			g_signal_flag = 0;
+			continue;
+		}
         if (!input)
         {
             ft_putstr_fd("exit\n", STDOUT_FILENO);
@@ -192,11 +199,6 @@ int main(int argc, char **argv, char **envp)
             break;
         }
 
-        if (ft_strlen(input) == 0 || g_signal_flag == 1)
-        {
-            free(input);
-            continue;
-        }
 
         add_history(input);
 

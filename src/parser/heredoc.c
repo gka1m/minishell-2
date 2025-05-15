@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/15 11:20:43 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/15 13:53:57 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,19 +81,25 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 		if (g_signal_flag)
 		{
 			free(line);
-			// break ;
-			exit(130);
+			close(hd->pipefd[1]);
+			close(hd->pipefd[0]);
+			cleanup_and_exit(shell, 130);
 		}
 		if (!line)
 		{
 			ft_putstr_fd("minishell: warning: here-document delimited by end-of-file\n",
 				STDERR_FILENO);
 			g_signal_flag = 1;
-			break ;
+			close(hd->pipefd[0]);
+			close(hd->pipefd[1]);
+			cleanup_and_exit(shell, shell->last_exit_code);
+			// break ;
 		}
 		if (strcmp(line, hd->delimiter) == 0)
 		{
 			free(line);
+			close(hd->pipefd[0]);
+			close(hd->pipefd[1]);
 			break ;
 		}
 		// Write to pipe only
@@ -117,9 +123,8 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 		free(line);
 	}
 	close(hd->pipefd[1]);
-	close(hd->pipefd[0]);
-	if (g_signal_flag)
-		exit(130);
+	// if (g_signal_flag)
+	// 	exit(130);
 	// exit(0);
 	// rl_replace_line("", 0);
 	// rl_redisplay();
@@ -214,11 +219,11 @@ void process_heredocs(t_ast *ast, t_minishell *shell)
         if (pid == 0) {
             // Child process - collect heredoc content
             setup_heredoc_signals();
-			close(hd.pipefd[0]);
+			// close(hd.pipefd[0]);
             process_heredoc_input(&hd, shell);
 			// free_minishell(shell);
             // exit(0);
-			close(hd.pipefd[1]);
+			// close(hd.pipefd[1]);
 			cleanup_and_exit(shell, 0);
         } else {
             // Parent process
@@ -227,7 +232,7 @@ void process_heredocs(t_ast *ast, t_minishell *shell)
             
             if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
                 ast->heredoc_fd = hd.pipefd[0]; // Store read end
-                
+                close(hd.pipefd[1]);
                 // // If this is a simple command (not pipeline), execute immediately
                 // if (ast->right == NULL && ast->left == NULL) {
                 //     execute_command(ast, shell);
@@ -237,12 +242,14 @@ void process_heredocs(t_ast *ast, t_minishell *shell)
             } else {
                 close(hd.pipefd[0]);
                 if (WIFSIGNALED(status)) {
-                    shell->last_exit_code = 128 + WTERMSIG(status);
+					shell->last_exit_code = 128 + WTERMSIG(status);
                 }
+				close(hd.pipefd[1]);
 				return ;
             }
         }
     }
+	// close(hd.pipefd[1]);
     process_heredocs(ast->left, shell);
     process_heredocs(ast->right, shell);
 }
