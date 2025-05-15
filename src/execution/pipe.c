@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:08:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/13 16:11:11 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/15 11:13:28 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 		shell->last_exit_code = 1;
 		return ;
 	}
-
+	backup_fds(shell);
 	// Left child
 	pid = fork();
 	if (pid == 0)
@@ -95,7 +95,7 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 				ft_putstr_fd("\n", STDERR_FILENO);
 		}
 	}
-	restore_standard_fds(shell);
+	// restore_standard_fds(shell);
 	sig_interactive();
 }
 

@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/14 13:50:31 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/14 17:43:44 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,11 +254,10 @@ void	execute_command(t_ast *node, t_minishell *shell)
 			shell->last_exit_code = 1;
 			return ;
 		}
-		redir_applied = 1;
-		shell->last_exit_code = execute_builtin(shell, node->args,
-				STDOUT_FILENO);
-		if (redir_applied)
-			restore_standard_fds(shell);
+		// redir_applied = 1;
+		shell->last_exit_code = execute_builtin(shell, node->args, 1);
+		// if (redir_applied)
+		// 	restore_standard_fds(shell);
 	}
 	else
 	{
@@ -272,10 +271,10 @@ void	execute_command(t_ast *node, t_minishell *shell)
 				shell->last_exit_code = 1;
 				return ;
 			}
-			redir_applied = 1;
+			// redir_applied = 1;
 			status = execute_external(node, shell);
-			if (redir_applied)
-				restore_standard_fds(shell);
+			// if (redir_applied)
+			// 	restore_standard_fds(shell);
 			// free_minishell(shell);
 			cleanup_and_exit(shell, status);
 		}

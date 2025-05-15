@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:19:27 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/14 13:51:43 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/15 11:10:00 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ int	execute_redirection(t_ast *node, t_minishell *shell)
 	if (dup2(fd, original_fd) == -1)
 	{
 		perror("minishell: dup2 failed");
-		close(fd);
+		// close(fd);
 		// if (backup != -1)
 		// {
 		// 	close(backup);
@@ -133,6 +133,24 @@ void	restore_standard_fds(t_minishell *shell)
 	}
 }
 
+void	backup_fds(t_minishell *shell)
+{
+	if (shell->stdio_backup[0] == -1) 
+	{
+		shell->stdio_backup[0] = dup(STDIN_FILENO);
+		if (shell->stdio_backup[0] == -1) 
+			return ;
+	}
+	if (shell->stdio_backup[1] == -1) 
+	{
+		shell->stdio_backup[1] = dup(STDOUT_FILENO);
+		if (shell->stdio_backup[1] == -1) 
+		{
+			close(shell->stdio_backup[0]);
+			return ;
+		}
+	}
+}
 
 int	setup_redirections(t_ast *node, t_minishell *shell)
 {

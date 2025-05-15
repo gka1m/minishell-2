@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/14 16:23:51 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/15 11:10:20 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -238,7 +238,7 @@ int execution_logic(t_ast *ast, t_minishell *minishell);
 void	restore_standard_fds(t_minishell *shell);
 
 void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd);
-
+void	backup_fds(t_minishell *shell);
 // void execute_pipe_segment(t_pipechild *pc);
 void wait_for_children(t_minishell *shell);
 
