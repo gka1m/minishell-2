@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:08:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/15 11:33:05 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/16 15:48:06 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 		shell->last_exit_code = 1;
 		return ;
 	}
-	backup_fds(shell);
+	// backup_fds(shell);
 	// Left child
 	pid = fork();
 	if (pid == 0)
@@ -61,15 +61,21 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 		close(input_fd);
 
 	// Recursive or final
+	// if (node->right->type == AST_PIPE)
+	// 	execute_pipeline(node->right, shell, pipe_fd[0]);
 	if (node->right->type == AST_PIPE)
+	{
+		close(pipe_fd[1]); // Important!
 		execute_pipeline(node->right, shell, pipe_fd[0]);
+		close(pipe_fd[0]); // Done using
+	}
 	else
 	{
 		pid = fork();
 		if (pid == 0)
 		{
 			sig_reset(true);
-
+			close(pipe_fd[1]);
 			// Redirect stdin from previous pipe
 			dup2(pipe_fd[0], STDIN_FILENO);
 			close(pipe_fd[0]);
@@ -82,8 +88,8 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 			cleanup_and_exit(shell, shell->last_exit_code);
 		}
 		close(pipe_fd[0]);
+		close(pipe_fd[1]);
 	}
-
 	while (wait(&status) > 0)
 	{
 		if (WIFEXITED(status))
@@ -96,6 +102,8 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 		}
 	}
 	// restore_standard_fds(shell);
+	// close(pipe_fd[0]);
+	// close(pipe_fd[1]);
 	sig_interactive();
 }
 

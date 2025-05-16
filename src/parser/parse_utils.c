@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:48:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/01 14:38:24 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/16 16:07:24 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,11 @@ void	free_ast(t_ast *node)
 	}
 	if (node->file)
 		free(node->file);
+	if (node->heredoc_fd != -1)
+	{
+		close(node->heredoc_fd);
+		node->heredoc_fd = -1;
+	}
 	free(node);
 }
 
