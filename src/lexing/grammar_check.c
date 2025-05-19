@@ -6,11 +6,52 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 14:59:23 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/05 12:08:44 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/19 13:15:38 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
+
+// int	check_pipe(t_token *head)
+// {
+// 	t_token	*temp;
+
+// 	temp = head;
+// 	while (temp)
+// 	{
+// 		if (temp->type == T_PIPE)
+// 		{
+// 			if (!temp->previous || !temp->next)
+// 			{
+// 				printf("Pipe cannot be first or last token\n");
+// 				return (0);
+// 			}
+// 			if (temp->previous->type != T_STRING
+// 				|| temp->next->type != T_STRING)
+// 			{
+// 				printf("Pipe must have commands on both sides.\n");
+// 				return (0);
+// 			}
+// 		}
+// 		temp = temp->next;
+// 	}
+// 	return (1);
+// }
+int	is_valid_pipe_side(t_token *token, int direction)
+{
+	while (token)
+	{
+		if (token->type == T_STRING)
+			return (1);
+		if (token->type == T_PIPE)
+			break ;
+		if (direction == -1)
+			token = token->previous;
+		else
+			token = token->next;
+	}
+	return (0);
+}
 
 int	check_pipe(t_token *head)
 {
@@ -21,15 +62,15 @@ int	check_pipe(t_token *head)
 	{
 		if (temp->type == T_PIPE)
 		{
-			if (!temp->previous || !temp->next)
+			if (!temp->previous || !temp->next || temp->next->type == T_PIPE)
 			{
-				printf("Pipe cannot be first or last token\n");
+				printf("minishell: syntax error near unexpected token `|'\n");
 				return (0);
 			}
-			if (temp->previous->type != T_STRING
-				|| temp->next->type != T_STRING)
+			if (!is_valid_pipe_side(temp->previous, -1)
+				|| !is_valid_pipe_side(temp->next, 1))
 			{
-				printf("Pipe must have commands on both sides.\n");
+				printf("minishell: invalid null command\n");
 				return (0);
 			}
 		}
@@ -118,77 +159,3 @@ int	check_redirects(t_token *token)
 // 	}
 // 	return (1);
 // }
-
-int	check_heredoc(t_token *head)
-{
-	t_token	*temp;
-
-	temp = head;
-	while (temp)
-	{
-		if (temp->type == T_HEREDOC)
-		{
-			// Heredoc must be followed by a delimiter
-			if (!temp->next || temp->next->type != T_STRING
-				|| !temp->next->value[0])
-			{
-				printf("Heredoc must be followed by a delimiter.\n");
-				return (0);
-			}
-		}
-		temp = temp->next;
-	}
-	return (1);
-}
-
-int	check_grammar(t_token *head)
-{
-	t_token	*temp;
-
-	temp = head;
-	if (!check_quotes(head))
-		return (0);
-	if (!check_pipe(head))
-		return (0);
-	while (temp)
-	{
-		if (temp->type == T_REDIR_IN || temp->type == T_REDIR_OUT || 
-			temp->type == T_APPEND || temp->type == T_HEREDOC)
-		{
-			if (!check_redirects(temp))
-				return (0);
-		}
-		temp = temp->next;
-	}
-	if (!check_heredoc(head))
-		return (0);
-	return (1);
-}
-
-int	check_quotes(t_token *tokens)
-{
-	t_token	*tmp;
-	int		in_dquote;
-	int		in_squote;
-	char	*value;
-
-	tmp = tokens;
-	in_dquote = 0;
-	in_squote = 0;
-	while (tmp)
-	{
-		value = tmp->value;
-		if (tmp->type == T_STRING)
-		{
-			while (*value)
-			{
-				toggle_quote_state(*value, &in_dquote, &in_squote);
-				value++;
-			}
-		}
-		tmp = tmp->next;
-	}
-	if (in_dquote || in_squote)
-		return (printf("syntax error: unmatched quotes\n"), 0);
-	return (1);
-}

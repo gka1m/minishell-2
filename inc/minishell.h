@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/16 13:13:15 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/19 16:38:36 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ typedef struct s_heredoc
 {
 	char				*delimiter;
 	bool	hd_quoted;
-	int					pipefd[2];
+	// int					pipefd[2];
 	t_ast				*node; // this is from kagoh AST
 	struct s_heredoc	*next;
 }						t_heredoc;
@@ -156,6 +156,9 @@ t_token *concatenate_adjacent_strings(t_token *tokens);
 
 char	*remove_outer_quotes(char *str);
 char *expand_variables_with_quotes(char *str, t_minishell *shell);
+int	is_valid_pipe_side(t_token *token, int direction);
+t_token	*classify_token(char *input, int *i);
+void	link_tokens(t_token **head, t_token **current, t_token *new_token);
 
 // parsing functions
 t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell);
@@ -172,7 +175,6 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell);
 // int	create_heredoc_pipe(t_heredoc *hd);
 
 int	create_heredoc_tempfile(t_minishell *shell);
-
 // env functions
 t_minishell		*init_minishell(char **envp);
 void			init_fields(t_minishell *minishell, char **envp);
@@ -212,6 +214,7 @@ int	bi_export(t_minishell *shell, char **args, int fd_out);
 
 bool	is_empty_assignment(const char *arg);
 int handle_overflow(const char *str);
+void	invalid_identifier(char *arg);
 // signals
 void    sig_interactive(void);
 void    handle_signal(int sig_num);

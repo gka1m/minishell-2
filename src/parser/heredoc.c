@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/16 15:53:58 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/19 16:42:02 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,17 +210,17 @@ int	create_heredoc_tempfile(t_minishell *shell)
 	return fd;
 }
 
-
 void process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 {
     char *line;
     t_token *temp_token;
-    int fd = create_heredoc_tempfile(shell);
+    // int fd = create_heredoc_tempfile(shell);
 
-    if (fd == -1)
-        cleanup_and_exit(shell, 1);
-	else
-		hd->node->heredoc_fd = fd; // Store FD in AST
+    // if (fd == -1)
+    //     cleanup_and_exit(shell, 1);
+	// else
+	// 	hd->node->heredoc_fd = fd; // Store FD in AST
+	// hd->node->heredoc_fd = create_heredoc_tempfile(shell);
     setup_heredoc_signals();
     while (!g_signal_flag)
     {
@@ -268,11 +268,10 @@ void process_heredoc_input(t_heredoc *hd, t_minishell *shell)
         free(line);
     }
     lseek(hd->node->heredoc_fd, 0, SEEK_SET); // Rewind for reading
-    
 	// close(fd);
 }
 
-void process_heredocs(t_ast *ast, t_minishell *shell)
+void  process_heredocs(t_ast *ast, t_minishell *shell)
 {
     t_heredoc hd;
 
@@ -284,13 +283,16 @@ void process_heredocs(t_ast *ast, t_minishell *shell)
         hd.delimiter = ast->file;
         hd.hd_quoted = ast->hd_quoted;
         hd.node = ast;
-        
+        hd.node->heredoc_fd = create_heredoc_tempfile(shell);
         // Process directly in parent (no fork)
         process_heredoc_input(&hd, shell);
     }
-    else
-    {
-        process_heredocs(ast->left, shell);
-        process_heredocs(ast->right, shell);
-    }
+	// close(hd.node->heredoc_fd);
+    // else
+    // {
+    //     process_heredocs(ast->left, shell);
+    //     process_heredocs(ast->right, shell);
+	// }
+	process_heredocs(ast->left, shell);
+	process_heredocs(ast->right, shell);
 }

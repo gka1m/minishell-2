@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 17:08:13 by kagoh             #+#    #+#             */
-/*   Updated: 2025/04/01 12:30:38 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/19 11:38:48 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ t_env	*init_env(char **envp)
 		sep = ft_strchr(envp[i], '=');
 		if (sep)
 		{
-			// key = strndup(envp[i], sep - envp[i]);
 			key = malloc(sep - envp[i] + 1);
 			if (!key)
 				return (free_env(env), NULL);
@@ -51,7 +50,7 @@ void	update_shlvl(t_env *env)
 	char	*new_value;
 
 	shlvl = find_env_var(env, "SHLVL");
-	level = 1; // Default if SHLVL doesn't exist
+	level = 1;
 	if (shlvl && shlvl->value)
 		level = ft_atoi(shlvl->value) + 1;
 	new_value = ft_itoa(level);
@@ -65,7 +64,7 @@ void	update_shlvl(t_env *env)
 	else
 	{
 		add_env_var(&env, "SHLVL", new_value);
-		free(new_value); // add_env_var makes its own copy
+		free(new_value);
 	}
 }
 

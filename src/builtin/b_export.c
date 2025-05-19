@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 15:49:27 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/14 16:59:07 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/19 13:02:52 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,9 +186,7 @@ int	bi_export(t_minishell *shell, char **args, int fd_out)
 			key = ft_strdup(args[i]);
 		if (!is_valid_env_name(key))
 		{
-			ft_putstr_fd("minishell: export: `", 2);
-			ft_putstr_fd(args[i], 2);
-			ft_putstr_fd("': not a valid identifier\n", 2);
+			invalid_identifier(args[i]);
 			ret = 1;
 		}
 		else if (process_export_arg(&shell->env_list, args[i]))
@@ -196,4 +194,11 @@ int	bi_export(t_minishell *shell, char **args, int fd_out)
 		free(key);
 	}
 	return (ret);
+}
+
+void	invalid_identifier(char *arg)
+{
+	ft_putstr_fd("minishell: export: `", 2);
+	ft_putstr_fd(arg, 2);
+	ft_putstr_fd("': not a valid identifier\n", 2);
 }

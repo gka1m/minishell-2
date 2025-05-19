@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 11:59:01 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/08 12:22:01 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/19 13:17:47 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,17 +49,16 @@ t_token	*create_token(char *value, t_token_type type)
 
 void	free_tokens(t_token *head)
 {
-	t_token *tmp;
+	t_token	*tmp;
 
 	while (head)
 	{
-		tmp = head->next;      // Save the next token
-		free(head->value);     // Free the value string
-		free(head);            // Free the token struct
-		head = tmp;            // Move to the next token
+		tmp = head->next;
+		free(head->value);
+		free(head);
+		head = tmp;
 	}
 }
-
 
 void	free_split(char **split)
 {
@@ -75,15 +74,12 @@ bool	is_invalid_redirection_sequence(char *input, int i)
 {
 	if (!input[i])
 		return (false);
-	// Reject >>> or <<< (triple)
 	if ((input[i] == '>' && input[i + 1] == '>' && input[i + 2] == '>')
 		|| (input[i] == '<' && input[i + 1] == '<' && input[i + 2] == '<'))
 		return (true);
-	// Reject combinations like << <, >> >, > >>, < << etc.
 	if ((input[i] == '<' || input[i] == '>') && (input[i + 1] == '<' || input[i
-			+ 1] == '>') && (input[i + 2] == '<' || input[i + 2] == '>')
+				+ 1] == '>') && (input[i + 2] == '<' || input[i + 2] == '>')
 		&& !(input[i] == input[i + 1] && input[i + 1] == input[i + 2]))
-		// allow << or >> only
 		return (true);
 	return (false);
 }

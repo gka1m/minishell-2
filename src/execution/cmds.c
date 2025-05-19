@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/16 15:50:14 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/19 11:30:02 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,10 +236,10 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 void	execute_command(t_ast *node, t_minishell *shell)
 {
 	pid_t	pid;
-	int		redir_applied;
+	// int		redir_applied;
 	int		status;
 
-	redir_applied = 0;
+	// redir_applied = 0;
 	// Find the command node (AST_CMD)
 	while (node && node->type != AST_CMD)
 		node = node->left;

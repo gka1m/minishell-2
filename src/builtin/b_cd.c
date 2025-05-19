@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 13:50:16 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/14 15:57:42 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/19 12:24:30 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,6 @@ int	b_cd(t_minishell *shell, t_env **env_list, char **args)
 {
 	int		ret;
 	t_env	*env_var;
-	// char	*expanded_path;
 
 	if (args[1] && args[2])
 		return (ft_putstr_fd("minishell: cd: too many arguments\n", 2), 1);
@@ -103,9 +102,6 @@ int	b_cd(t_minishell *shell, t_env **env_list, char **args)
 		ft_putendl_fd(env_var->value, 1);
 		return (change_directory(shell, env_list, env_var->value));
 	}
-	// expanded_path = expand_path(shell, env_list, args[1]);
-	// if (!expanded_path)
-	// 	return (1);
 	ret = change_directory(shell, env_list, args[1]);
 	return (ret);
 }

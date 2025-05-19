@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:19:27 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/16 16:01:04 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/19 16:32:30 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,6 +177,9 @@ int	setup_redirections(t_ast *node, t_minishell *shell)
 		{
 			perror("minishell: dup2 heredoc");
 			close(node->heredoc_fd);
+			free_ast(shell->ast);
+			free_tokens(shell->tokens);
+			free_minishell(shell);
 			return (-1);
 		}
 		close(node->heredoc_fd);
