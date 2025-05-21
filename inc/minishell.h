@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/21 11:49:03 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/21 12:27:00 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,7 +215,8 @@ int	bi_export(t_minishell *shell, char **args, int fd_out);
 
 bool	is_empty_assignment(const char *arg);
 int handle_overflow(const char *str);
-void	invalid_identifier(char *arg);
+int	invalid_identifier(char *arg);
+int	have_equals(t_env **env, char *arg, char *equal_sign);
 // signals
 void    sig_interactive(void);
 void    handle_signal(int sig_num);

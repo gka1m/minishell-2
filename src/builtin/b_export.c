@@ -6,20 +6,11 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 15:49:27 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/19 13:02:52 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/21 12:27:21 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
-
-bool	is_empty_assignment(const char *arg)
-{
-	const char	*eq;
-
-	eq = ft_strchr(arg, '=');
-	return (eq && (*(eq + 1) == '\0' || (*(eq + 1) == '"' && *(eq
-					+ 2) == '"')));
-}
 
 /* Processes a single export argument (VAR or VAR=value) */
 // int	process_export_arg(t_env **env, char *arg)
@@ -75,35 +66,13 @@ int	process_export_arg(t_env **env, char *arg)
 {
 	char	*equal_sign;
 	char	*key;
-	char	*value;
 	t_env	*existing;
 
 	if (!arg)
 		return (1);
 	equal_sign = ft_strchr(arg, '=');
 	if (equal_sign)
-	{
-		key = ft_strndup(arg, equal_sign - arg);
-		if (!key)
-			return (1);
-		if (is_empty_assignment(arg))
-			value = ft_strdup("");
-		else
-			value = ft_strdup(equal_sign + 1);
-		if (!value)
-			return (free(key), 1);
-		existing = find_env_var(*env, key);
-		if (existing)
-		{
-			(free(existing->value), free(key));
-			existing->value = value;
-		}
-		else
-		{
-			add_env_var(env, key, value);
-			(free(key), free(value));
-		}
-	}
+		return (have_equals(env, arg, equal_sign));
 	else
 	{
 		key = ft_strdup(arg);
@@ -113,6 +82,35 @@ int	process_export_arg(t_env **env, char *arg)
 		if (!existing)
 			add_env_var(env, key, "##NO_VALUE##");
 		free(key);
+	}
+	return (0);
+}
+
+int	have_equals(t_env **env, char *arg, char *equal_sign)
+{
+	char	*key;
+	char	*value;
+	t_env	*existing;
+
+	key = ft_strndup(arg, equal_sign - arg);
+	if (!key)
+		return (1);
+	if (is_empty_assignment(arg))
+		value = ft_strdup("");
+	else
+		value = ft_strdup(equal_sign + 1);
+	if (!value)
+		return (free(key), 1);
+	existing = find_env_var(*env, key);
+	if (existing)
+	{
+		(free(existing->value), free(key));
+		existing->value = value;
+	}
+	else
+	{
+		add_env_var(env, key, value);
+		(free(key), free(value));
 	}
 	return (0);
 }
@@ -185,20 +183,10 @@ int	bi_export(t_minishell *shell, char **args, int fd_out)
 		else
 			key = ft_strdup(args[i]);
 		if (!is_valid_env_name(key))
-		{
-			invalid_identifier(args[i]);
-			ret = 1;
-		}
+			ret = invalid_identifier(args[i]);
 		else if (process_export_arg(&shell->env_list, args[i]))
 			ret = 1;
 		free(key);
 	}
 	return (ret);
-}
-
-void	invalid_identifier(char *arg)
-{
-	ft_putstr_fd("minishell: export: `", 2);
-	ft_putstr_fd(arg, 2);
-	ft_putstr_fd("': not a valid identifier\n", 2);
 }

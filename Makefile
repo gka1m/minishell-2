@@ -29,7 +29,7 @@ SRC = $(LEXER)lex_utils.c $(LEXER)lexer.c $(LEXER)grammar_check.c \
       $(EXEC)pipe.c $(EXEC)redir.c \
       $(BUILTIN)b_cd.c $(BUILTIN)b_echo.c $(BUILTIN)b_env.c \
       $(BUILTIN)b_exit.c $(BUILTIN)b_export.c $(BUILTIN)b_pwd.c \
-      $(BUILTIN)b_unset.c \
+      $(BUILTIN)b_unset.c $(BUILTIN)b_export_utils.c \
       $(PARSE)parser.c $(PARSE)parse_utils.c $(PARSE)heredoc.c
 
 # Object files
