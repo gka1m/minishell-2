@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/19 16:42:02 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/21 11:48:55 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,4 +295,19 @@ void  process_heredocs(t_ast *ast, t_minishell *shell)
 	// }
 	process_heredocs(ast->left, shell);
 	process_heredocs(ast->right, shell);
+}
+
+void close_unused_heredocs(t_ast *root, t_ast *current_node)
+{
+    if (!root) return;
+
+    // Close heredocs that aren't needed for current command
+    if (root != current_node && root->heredoc_fd != -1) {
+        close(root->heredoc_fd);
+        root->heredoc_fd = -1;
+    }
+
+    // Recursively check left and right subtrees
+    close_unused_heredocs(root->left, current_node);
+    close_unused_heredocs(root->right, current_node);
 }

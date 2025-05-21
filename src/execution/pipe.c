@@ -6,113 +6,16 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:08:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/19 16:40:31 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/21 11:56:35 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
-{
-	int pipe_fd[2];
-	pid_t pid;
-	int status;
-
-	if (!node || node->type != AST_PIPE)
-		return ;
-
-	sig_reset(false);
-
-	if (pipe(pipe_fd) == -1)
-	{
-		perror("minishell: pipe");
-		shell->last_exit_code = 1;
-		return ;
-	}
-	// backup_fds(shell);
-	// Left child
-	pid = fork();
-	if (pid == 0)
-	{
-		sig_reset(true);
-		close(pipe_fd[0]);
-
-		// Redirect stdout to pipe
-		if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
-			exit(1);
-		close(pipe_fd[1]);
-
-		// Redirect input if needed
-		if (input_fd != -1)
-		{
-			dup2(input_fd, STDIN_FILENO);
-			close(input_fd);
-		}
-
-		if (setup_redirections(node->left, shell) == -1)
-			exit(1);
-
-		execute_command(node->left, shell);
-		// exit(shell->last_exit_code);
-		cleanup_and_exit(shell, shell->last_exit_code);
-	}
-	close(pipe_fd[1]);
-	if (input_fd != -1)
-		close(input_fd);
-
-	// Recursive or final
-	// if (node->right->type == AST_PIPE)
-	// 	execute_pipeline(node->right, shell, pipe_fd[0]);
-	if (node->right->type == AST_PIPE)
-	{
-		close(pipe_fd[1]); // Important!
-		execute_pipeline(node->right, shell, pipe_fd[0]);
-		close(pipe_fd[0]); // Done using
-	}
-	else
-	{
-		pid = fork();
-		if (pid == 0)
-		{
-			sig_reset(true);
-			close(pipe_fd[1]);
-			// Redirect stdin from previous pipe
-			dup2(pipe_fd[0], STDIN_FILENO);
-			close(pipe_fd[0]);
-
-			if (setup_redirections(node->right, shell) == -1)
-				exit(1);
-
-			execute_command(node->right, shell);
-			// exit(shell->last_exit_code);
-			cleanup_and_exit(shell, shell->last_exit_code);
-		}
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-	}
-	while (wait(&status) > 0)
-	{
-		if (WIFEXITED(status))
-			shell->last_exit_code = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status))
-		{
-			shell->last_exit_code = 128 + WTERMSIG(status);
-			if (WTERMSIG(status) == SIGINT)
-				ft_putstr_fd("\n", STDERR_FILENO);
-		}
-	}
-	// restore_standard_fds(shell);
-	// close(pipe_fd[0]);
-	// close(pipe_fd[1]);
-	sig_interactive();
-}
-
-
-// void	execute_pipeline(t_ast *node, t_minishell *shell)
+// void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 // {
 // 	int pipe_fd[2];
 // 	pid_t pid;
-// 	int left_fd;
 // 	int status;
 
 // 	if (!node || node->type != AST_PIPE)
@@ -124,11 +27,10 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 // 	{
 // 		perror("minishell: pipe");
 // 		shell->last_exit_code = 1;
-// 		// sig_interactive();
 // 		return ;
 // 	}
-
-// 	// Left command (writes to pipe)
+// 	// backup_fds(shell);
+// 	// Left child
 // 	pid = fork();
 // 	if (pid == 0)
 // 	{
@@ -137,36 +39,35 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 
 // 		// Redirect stdout to pipe
 // 		if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
-// 		{
-// 			perror("minishell: dup2");
 // 			exit(1);
-// 		}
 // 		close(pipe_fd[1]);
+
+// 		// Redirect input if needed
+// 		if (input_fd != -1)
+// 		{
+// 			dup2(input_fd, STDIN_FILENO);
+// 			close(input_fd);
+// 		}
 
 // 		if (setup_redirections(node->left, shell) == -1)
 // 			exit(1);
 
 // 		execute_command(node->left, shell);
-// 		exit(shell->last_exit_code);
+// 		// exit(shell->last_exit_code);
+// 		cleanup_and_exit(shell, shell->last_exit_code);
 // 	}
-// 	else if (pid < 0)
-// 	{
-// 		perror("minishell: fork");
-// 		close(pipe_fd[0]);
-// 		close(pipe_fd[1]);
-// 		shell->last_exit_code = 1;
-// 		// sig_interactive();
-// 		return ;
-// 	}
-
-// 	// Right side preparation
 // 	close(pipe_fd[1]);
-// 	left_fd = pipe_fd[0];
+// 	if (input_fd != -1)
+// 		close(input_fd);
 
-// 	// Handle right side
+// 	// Recursive or final
+// 	// if (node->right->type == AST_PIPE)
+// 	// 	execute_pipeline(node->right, shell, pipe_fd[0]);
 // 	if (node->right->type == AST_PIPE)
 // 	{
-// 		execute_pipeline(node->right, shell);
+// 		close(pipe_fd[1]); // Important!
+// 		execute_pipeline(node->right, shell, pipe_fd[0]);
+// 		close(pipe_fd[0]); // Done using
 // 	}
 // 	else
 // 	{
@@ -174,36 +75,21 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 // 		if (pid == 0)
 // 		{
 // 			sig_reset(true);
-
-// 			// Redirect stdin from pipe
-// 			if (dup2(left_fd, STDIN_FILENO) == -1)
-// 			{
-// 				perror("minishell: dup2");
-// 				exit(1);
-// 			}
-// 			close(left_fd);
+// 			close(pipe_fd[1]);
+// 			// Redirect stdin from previous pipe
+// 			dup2(pipe_fd[0], STDIN_FILENO);
+// 			close(pipe_fd[0]);
 
 // 			if (setup_redirections(node->right, shell) == -1)
 // 				exit(1);
 
 // 			execute_command(node->right, shell);
-// 			exit(shell->last_exit_code);
+// 			// exit(shell->last_exit_code);
+// 			cleanup_and_exit(shell, shell->last_exit_code);
 // 		}
-// 		else if (pid < 0)
-// 		{
-// 			perror("minishell: fork");
-// 			close(left_fd);
-// 			shell->last_exit_code = 1;
-// 			// sig_interactive();
-// 			return ;
-// 		}
+// 		close(pipe_fd[0]);
+// 		close(pipe_fd[1]);
 // 	}
-
-// 	// Cleanup in parent
-// 	close(left_fd);
-	
-
-// 	// Wait for pipeline completion
 // 	while (wait(&status) > 0)
 // 	{
 // 		if (WIFEXITED(status))
@@ -215,6 +101,113 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 // 				ft_putstr_fd("\n", STDERR_FILENO);
 // 		}
 // 	}
-// 	restore_standard_fds(shell);
+// 	// restore_standard_fds(shell);
+// 	// close(pipe_fd[0]);
+// 	// close(pipe_fd[1]);
 // 	sig_interactive();
 // }
+
+void execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
+{
+    int pipe_fd[2];
+    pid_t l_pid, r_pid;
+    int status;
+
+    if (!node || node->type != AST_PIPE)
+        return;
+
+    sig_reset(false);
+
+    if (pipe(pipe_fd) == -1)
+    {
+        perror("minishell: pipe");
+        shell->last_exit_code = 1;
+        return;
+    }
+
+    // Left child process (first command in pipeline)
+    l_pid = fork();
+    if (l_pid == 0)
+    {
+        sig_reset(true);
+        close(pipe_fd[0]); // Close read end
+
+        // Redirect stdout to pipe
+        if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
+            exit(1);
+        close(pipe_fd[1]);
+
+        // Redirect input if provided (for nested pipelines)
+        if (input_fd != -1)
+        {
+            if (dup2(input_fd, STDIN_FILENO) == -1)
+                exit(1);
+            close(input_fd);
+        }
+		close_unused_heredocs(shell->ast, node->left);
+        if (setup_redirections(node->left, shell) == -1)
+            exit(1);
+
+        execute_command(node->left, shell);
+        cleanup_and_exit(shell, shell->last_exit_code);
+    }
+    close(pipe_fd[1]); // Parent closes write end
+    if (input_fd != -1)
+        close(input_fd); // Close previous pipe input if it existed
+
+    // Right child process (next command or rest of pipeline)
+    if (node->right->type == AST_PIPE)
+    {
+        // Recursive case: more pipes in the chain
+        execute_pipeline(node->right, shell, pipe_fd[0]);
+        close(pipe_fd[0]); // Close our pipe read end after recursion
+    }
+    else
+    {
+        // Base case: last command in pipeline
+        r_pid = fork();
+        if (r_pid == 0)
+        {
+            sig_reset(true);
+            close(pipe_fd[1]); // Close unused write end
+
+            // Redirect stdin from pipe
+            if (dup2(pipe_fd[0], STDIN_FILENO) == -1)
+                exit(1);
+            close(pipe_fd[0]);
+			close_unused_heredocs(shell->ast, node->right);
+            if (setup_redirections(node->right, shell) == -1)
+                exit(1);
+
+            execute_command(node->right, shell);
+            cleanup_and_exit(shell, shell->last_exit_code);
+        }
+        close(pipe_fd[0]); // Parent closes read end
+    }
+
+    // Wait for both children (if we forked a right child)
+    if (node->right->type != AST_PIPE)
+    {
+        waitpid(l_pid, &status, 0);
+        if (WIFEXITED(status))
+            shell->last_exit_code = WEXITSTATUS(status);
+        else if (WIFSIGNALED(status))
+        {
+            shell->last_exit_code = 128 + WTERMSIG(status);
+            if (WTERMSIG(status) == SIGINT)
+                ft_putstr_fd("\n", STDERR_FILENO);
+        }
+
+        waitpid(r_pid, &status, 0);
+        if (WIFEXITED(status))
+            shell->last_exit_code = WEXITSTATUS(status);
+        else if (WIFSIGNALED(status))
+        {
+            shell->last_exit_code = 128 + WTERMSIG(status);
+            if (WTERMSIG(status) == SIGINT)
+                ft_putstr_fd("\n", STDERR_FILENO);
+        }
+    }
+
+    sig_interactive();
+}

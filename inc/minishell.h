@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/19 16:38:36 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/21 11:49:03 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,7 @@ t_ast_type classify_redir(t_token_type token_type);
 void	process_heredocs(t_ast *ast, t_minishell *shell);
 void	process_heredoc_input(t_heredoc *hd, t_minishell *shell);
 // int	create_heredoc_pipe(t_heredoc *hd);
+void close_unused_heredocs(t_ast *root, t_ast *current_node);
 
 int	create_heredoc_tempfile(t_minishell *shell);
 // env functions
