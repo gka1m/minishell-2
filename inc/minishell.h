@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/21 12:27:00 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/21 16:07:54 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,6 +174,9 @@ void	process_heredocs(t_ast *ast, t_minishell *shell);
 void	process_heredoc_input(t_heredoc *hd, t_minishell *shell);
 // int	create_heredoc_pipe(t_heredoc *hd);
 void close_unused_heredocs(t_ast *root, t_ast *current_node);
+void	ft_strcat(char *dst, const char *src);
+void	ft_strcpy(char *dst, const char *src);
+void	ft_itoa_into(char *buf, int n);
 
 int	create_heredoc_tempfile(t_minishell *shell);
 // env functions
@@ -232,8 +235,13 @@ int	execute_builtin(t_minishell *shell, char **args, int fd_out);
 int execute_external(t_ast *node, t_minishell *shell);
 char	*find_command_path(char *cmd, t_minishell *shell);
 void	execute_command(t_ast *node, t_minishell *shell);
-void error_command_not_found(char *cmd);
-void	handle_exec_error(char *cmd, char *path, char **env_array);
+// void error_command_not_found(char *cmd);
+// void	handle_exec_error(char *cmd, char *path, char **env_array);
+void	cmd_not_found(char *cmd);
+void	permission_denied(char *cmd);
+void	no_file(char *cmd);
+void	path_not_set(char *cmd);
+
 // void execute_pipeline(t_ast *node, t_minishell *shell);
 int	execute_redirection(t_ast *node, t_minishell *shell);
 char	**convert_env_to_array(t_env *env_list);

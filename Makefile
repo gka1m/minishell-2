@@ -30,7 +30,8 @@ SRC = $(LEXER)lex_utils.c $(LEXER)lexer.c $(LEXER)grammar_check.c \
       $(BUILTIN)b_cd.c $(BUILTIN)b_echo.c $(BUILTIN)b_env.c \
       $(BUILTIN)b_exit.c $(BUILTIN)b_export.c $(BUILTIN)b_pwd.c \
       $(BUILTIN)b_unset.c $(BUILTIN)b_export_utils.c \
-      $(PARSE)parser.c $(PARSE)parse_utils.c $(PARSE)heredoc.c
+      $(PARSE)parser.c $(PARSE)parse_utils.c $(PARSE)heredoc.c \
+	  $(PARSE)heredoc_utils.c \
 
 # Object files
 OBJ = $(SRC:.c=.o)

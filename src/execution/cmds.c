@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/19 11:30:02 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/21 16:33:35 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,32 +77,21 @@ int	execute_external(t_ast *node, t_minishell *shell)
 {
 	char	**env_array;
 	char	*full_path;
-	// int		status;
 
 	env_array = NULL;
 	full_path = NULL;
-	// status = 0;
 	if (!node || !node->args || !node->args[0])
-	{
-		ft_putstr_fd("minishell: command not found\n", STDERR_FILENO);
-		return (127);
-	}
+		return (ft_putstr_fd("minishell: command not found\n", 2), 127);
 	sig_reset(true);
 	env_array = convert_env_to_array(shell->env_list);
 	if (!env_array)
-	{
 		return (1);
-	}
 	full_path = find_command_path(node->args[0], shell);
 	if (!full_path)
-	{
-		free_split(env_array);
-		return (127);
-	}
+		return (free_split(env_array), 127);
 	close(shell->stdio_backup[1]);
 	close(shell->stdio_backup[0]);
 	execve(full_path, node->args, env_array);
-	// If we get here, execve failed
 	perror("minishell: execve");
 	free(full_path);
 	free_split(env_array);
@@ -110,49 +99,35 @@ int	execute_external(t_ast *node, t_minishell *shell)
 }
 
 char	*find_command_path(char *cmd, t_minishell *shell)
-// Add shell parameter for error reporting
 {
 	t_env *path_node;
 	char **dirs;
 	char *full_path;
+	int	i;
 
 	if (!cmd || !shell || !shell->env_list)
 		return (NULL);
-	// Handle absolute/relative paths
 	if (ft_strchr(cmd, '/'))
 	{
 		if (access(cmd, F_OK) == 0)
 		{
 			if (access(cmd, X_OK) == 0)
 				return (ft_strdup(cmd));
-			ft_putstr_fd("minishell: ", STDERR_FILENO);
-			ft_putstr_fd(cmd, STDERR_FILENO);
-			ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+			cmd_not_found(cmd);
 		}
 		else
-		{
-			ft_putstr_fd("minishell: ", STDERR_FILENO);
-			ft_putstr_fd(cmd, STDERR_FILENO);
-			ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
-		}
+			no_file(cmd);
 		return (NULL);
 	}
-	// Get PATH from environment
 	path_node = find_env_var(shell->env_list, "PATH");
 	if (!path_node || !path_node->value)
-	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
-		ft_putstr_fd(cmd, STDERR_FILENO);
-		ft_putstr_fd(": PATH not set\n", STDERR_FILENO);
-		return (NULL);
-	}
-	// Split PATH into directories
+		return (path_not_set(cmd), NULL);
 	dirs = ft_split(path_node->value, ':');
 	if (!dirs)
 		return (NULL);
-	// Search each directory
 	full_path = NULL;
-	for (int i = 0; dirs[i]; i++)
+	i = 0;
+	while(dirs[i])
 	{
 		full_path = join_str(dirs[i], "/", cmd);
 		if (!full_path)
@@ -160,23 +135,15 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 		if (access(full_path, F_OK) == 0)
 		{
 			if (access(full_path, X_OK) == 0)
-			{
-				free_split(dirs);
-				return (full_path);
-			}
+				return (free_split(dirs), full_path);
 			free(full_path);
-			ft_putstr_fd("minishell: ", STDERR_FILENO);
-			ft_putstr_fd(cmd, STDERR_FILENO);
-			ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+			permission_denied(cmd);
 			break ;
 		}
 		free(full_path);
+		i++;
 	}
-	ft_putstr_fd("minishell: ", STDERR_FILENO);
-	ft_putstr_fd(cmd, STDERR_FILENO);
-	ft_putstr_fd(": command not found\n", STDERR_FILENO);
-	free_split(dirs);
-	return (NULL);
+	return (cmd_not_found(cmd), free_split(dirs), NULL);
 }
 
 // void	execute_command(t_ast *node, t_minishell *shell)
@@ -250,10 +217,11 @@ void	execute_command(t_ast *node, t_minishell *shell)
 	if (is_builtin(node->args[0]))
 	{
 		if (setup_redirections(node, shell) == -1)
-		{
-			shell->last_exit_code = 1;
-			return ;
-		}
+		// {
+		// 	shell->last_exit_code = 1;
+		// 	return ;
+		// }
+			exit(1);
 		// redir_applied = 1;
 		shell->last_exit_code = execute_builtin(shell, node->args, 1);
 		// if (redir_applied)
@@ -267,10 +235,11 @@ void	execute_command(t_ast *node, t_minishell *shell)
 			// Child process
 			sig_reset(true);
 			if (setup_redirections(node, shell) == -1)
-			{
-				shell->last_exit_code = 1;
-				return ;
-			}
+			// {
+			// 	shell->last_exit_code = 1;
+			// 	return ;
+			// }
+				exit(1);
 			// redir_applied = 1;
 			status = execute_external(node, shell);
 			// if (redir_applied)
@@ -307,7 +276,6 @@ void	handle_parent_process(pid_t pid, t_minishell *shell)
 	int		status;
 	pid_t	waited_pid;
 
-	// Wait for the child process to complete
 	waited_pid = waitpid(pid, &status, 0);
 	if (waited_pid == -1)
 	{
@@ -315,12 +283,10 @@ void	handle_parent_process(pid_t pid, t_minishell *shell)
 		shell->last_exit_code = 1;
 		return ;
 	}
-	// Set exit status based on how the child terminated
 	if (WIFEXITED(status))
 		shell->last_exit_code = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
 	{
-		// Terminated by signal
 		shell->last_exit_code = 128 + WTERMSIG(status);
 		if (WTERMSIG(status) == SIGINT)
 			write(STDERR_FILENO, "\n", 1);

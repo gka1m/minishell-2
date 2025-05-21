@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:08:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/21 11:56:35 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/21 13:18:16 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,7 @@ void execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
     {
         // Recursive case: more pipes in the chain
         execute_pipeline(node->right, shell, pipe_fd[0]);
-        close(pipe_fd[0]); // Close our pipe read end after recursion
+        // close(pipe_fd[0]); // Close our pipe read end after recursion
     }
     else
     {
@@ -208,6 +208,5 @@ void execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
                 ft_putstr_fd("\n", STDERR_FILENO);
         }
     }
-
     sig_interactive();
 }
