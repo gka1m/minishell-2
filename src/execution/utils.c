@@ -6,11 +6,24 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 15:34:55 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/21 16:19:28 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/22 16:11:47 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
+
+int	count_env(t_env *env_list)
+{
+	int	count;
+
+	count = 0;
+	while (env_list)
+	{
+		count++;
+		env_list = env_list->next;
+	}
+	return (count);
+}
 
 char	**convert_env_to_array(t_env *env_list)
 {
@@ -19,19 +32,16 @@ char	**convert_env_to_array(t_env *env_list)
 	int		count;
 	int		i;
 
-	// Count environment variables
-	count = 0;
+	count = count_env(env_list);
 	current = env_list;
-	while (current)
-	{
-		count++;
-		current = current->next;
-	}
-	// Allocate array (+1 for NULL terminator)
+	// while (current)
+	// {
+	// 	count++;
+	// 	current = current->next;
+	// }
 	env_array = malloc(sizeof(char *) * (count + 1));
 	if (!env_array)
 		return (NULL);
-	// Fill array
 	i = 0;
 	current = env_list;
 	while (current)
@@ -48,9 +58,9 @@ char	**convert_env_to_array(t_env *env_list)
 
 char	*join_str(char const *s1, char const *s2, char const *s3)
 {
-	char    *result;
-	size_t  len;
-	size_t  pos;
+	char	*result;
+	size_t	len;
+	size_t	pos;
 
 	if (!s1 || !s2 || !s3)
 		return (NULL);
@@ -65,15 +75,15 @@ char	*join_str(char const *s1, char const *s2, char const *s3)
 	return (result);
 }
 
-void wait_for_children(t_minishell *shell)
-{
-    int status;
-    pid_t pid;
+// void wait_for_children(t_minishell *shell)
+// {
+//     int status;
+//     pid_t pid;
 
-    while ((pid = waitpid(-1, &status, 0)) > 0) {
-        if (WIFEXITED(status))
-            shell->last_exit_code = WEXITSTATUS(status);
-        else if (WIFSIGNALED(status))
-            shell->last_exit_code = 128 + WTERMSIG(status);
-    }
-}
+//     while ((pid = waitpid(-1, &status, 0)) > 0) {
+//         if (WIFEXITED(status))
+//             shell->last_exit_code = WEXITSTATUS(status);
+//         else if (WIFSIGNALED(status))
+//             shell->last_exit_code = 128 + WTERMSIG(status);
+//     }
+// }

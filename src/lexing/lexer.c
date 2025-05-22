@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 12:01:42 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/19 13:23:44 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/22 16:31:53 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,53 @@ t_token	*tokenize_metachar(char *input, int *i)
 		type = T_PIPE;
 	token = create_token(op, type);
 	(*i)++;
+	return (token);
+}
+
+char	*extract_string(char *input, int *i)
+{
+	int		start;
+	bool	in_single;
+	bool	in_double;
+	char	*str;
+
+	in_single = false;
+	in_double = false;
+	start = *i;
+	while (input[*i])
+	{
+		if (input[*i] == '\'' && !in_double)
+			in_single = !in_single;
+		else if (input[*i] == '"' && !in_single)
+			in_double = !in_double;
+		else if (!in_single && !in_double && (ft_isspace(input[*i])
+				|| is_metachar(input[*i])))
+			break ;
+		(*i)++;
+	}
+	str = malloc(*i - start + 1);
+	if (!str)
+		return (NULL);
+	ft_strlcpy(str, input + start, *i - start + 1);
+	str[*i - start] = '\0';
+	return (str);
+}
+
+t_token	*tokenize_string(char *input, int *i)
+{
+	char	*str;
+	t_token	*token;
+
+	str = extract_string(input, i);
+	if (!str || str[0] == '\0')
+	{
+		free(str);
+		return (NULL);
+	}
+	token = create_token(str, T_STRING);
+	if (!token)
+		return (NULL);
+	free(str);
 	return (token);
 }
 

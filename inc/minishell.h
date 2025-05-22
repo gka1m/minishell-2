@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/21 16:07:54 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/22 16:31:20 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,6 +159,7 @@ char *expand_variables_with_quotes(char *str, t_minishell *shell);
 int	is_valid_pipe_side(t_token *token, int direction);
 t_token	*classify_token(char *input, int *i);
 void	link_tokens(t_token **head, t_token **current, t_token *new_token);
+int	precheck(char *input, int *i, t_token **head);
 
 // parsing functions
 t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell);
@@ -179,6 +180,7 @@ void	ft_strcpy(char *dst, const char *src);
 void	ft_itoa_into(char *buf, int n);
 
 int	create_heredoc_tempfile(t_minishell *shell);
+
 // env functions
 t_minishell		*init_minishell(char **envp);
 void			init_fields(t_minishell *minishell, char **envp);
@@ -255,6 +257,14 @@ void	restore_standard_fds(t_minishell *shell);
 void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd);
 void	backup_fds(t_minishell *shell);
 // void execute_pipe_segment(t_pipechild *pc);
-void wait_for_children(t_minishell *shell);
+// void wait_for_children(t_minishell *shell);
+char	*check_direct_path(char *cmd);
+char	*search_in_path(char **dirs, char *cmd);
+void	not_bi(t_ast *node, t_minishell *shell);
+int	get_redirection_info(t_ast *node, int *flags, int *original_fd);
+pid_t	exec_left(t_ast *node, t_minishell *shell, int input_fd, int pipe_fd[2]);
+pid_t	exec_right(t_ast *node, t_minishell *shell, int pipe_fd[2]);
+void	go_to_sleep(pid_t l_pid, pid_t r_pid, t_minishell *shell);
+int	count_env(t_env *env_list);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/21 16:33:35 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/22 14:11:41 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,40 +98,29 @@ int	execute_external(t_ast *node, t_minishell *shell)
 	return (126);
 }
 
-char	*find_command_path(char *cmd, t_minishell *shell)
+char	*check_direct_path(char *cmd)
 {
-	t_env *path_node;
-	char **dirs;
-	char *full_path;
-	int	i;
+	if (access(cmd, F_OK) != 0)
+		return (no_file(cmd), NULL);
+	if (access(cmd, X_OK) != 0)
+		return (cmd_not_found(cmd), NULL);
+	return (ft_strdup(cmd));
+}
 
-	if (!cmd || !shell || !shell->env_list)
-		return (NULL);
-	if (ft_strchr(cmd, '/'))
-	{
-		if (access(cmd, F_OK) == 0)
-		{
-			if (access(cmd, X_OK) == 0)
-				return (ft_strdup(cmd));
-			cmd_not_found(cmd);
-		}
-		else
-			no_file(cmd);
-		return (NULL);
-	}
-	path_node = find_env_var(shell->env_list, "PATH");
-	if (!path_node || !path_node->value)
-		return (path_not_set(cmd), NULL);
-	dirs = ft_split(path_node->value, ':');
-	if (!dirs)
-		return (NULL);
-	full_path = NULL;
+char	*search_in_path(char **dirs, char *cmd)
+{
+	char	*full_path;
+	int		i;
+
 	i = 0;
-	while(dirs[i])
+	while (dirs[i])
 	{
 		full_path = join_str(dirs[i], "/", cmd);
 		if (!full_path)
+		{
+			i++;
 			continue ;
+		}
 		if (access(full_path, F_OK) == 0)
 		{
 			if (access(full_path, X_OK) == 0)
@@ -143,7 +132,57 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 		free(full_path);
 		i++;
 	}
-	return (cmd_not_found(cmd), free_split(dirs), NULL);
+	return (free_split(dirs), cmd_not_found(cmd), NULL);
+}
+
+char	*find_command_path(char *cmd, t_minishell *shell)
+{
+	t_env	*path_node;
+	char	**dirs;
+
+	// char *full_path;
+	// int	i;
+	if (!cmd || !shell || !shell->env_list)
+		return (NULL);
+	if (ft_strchr(cmd, '/'))
+	{
+		// if (access(cmd, F_OK) == 0)
+		// {
+		// 	if (access(cmd, X_OK) == 0)
+		// 		return (ft_strdup(cmd));
+		// 	cmd_not_found(cmd);
+		// }
+		// else
+		// 	no_file(cmd);
+		// return (NULL);
+		return (check_direct_path(cmd));
+	}
+	path_node = find_env_var(shell->env_list, "PATH");
+	if (!path_node || !path_node->value)
+		return (path_not_set(cmd), NULL);
+	dirs = ft_split(path_node->value, ':');
+	if (!dirs)
+		return (NULL);
+	// full_path = NULL;
+	// i = 0;
+	// while(dirs[i])
+	// {
+	// 	full_path = join_str(dirs[i], "/", cmd);
+	// 	if (!full_path)
+	// 		continue ;
+	// 	if (access(full_path, F_OK) == 0)
+	// 	{
+	// 		if (access(full_path, X_OK) == 0)
+	// 			return (free_split(dirs), full_path);
+	// 		free(full_path);
+	// 		permission_denied(cmd);
+	// 		break ;
+	// 	}
+	// 	free(full_path);
+	// 	i++;
+	// }
+	// return (cmd_not_found(cmd), free_split(dirs), NULL);
+	return (search_in_path(dirs, cmd));
 }
 
 // void	execute_command(t_ast *node, t_minishell *shell)
@@ -161,7 +200,8 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 // 		// Redirection requires fork for builtins
 // 		if (setup_redirections(node, shell) == -1)
 // 			return ;
-// 		if (node->type == AST_APPEND || node->type == AST_REDIR_IN || node->type == AST_REDIR_OUT || node->type == AST_HEREDOC)
+// 		if (node->type == AST_APPEND || node->type == AST_REDIR_IN
+			// || node->type == AST_REDIR_OUT || node->type == AST_HEREDOC)
 // 		{
 // 			pid = fork();
 // 			if (pid == 0)
@@ -177,7 +217,8 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 // 		}
 // 		else
 // 		{
-// 			shell->last_exit_code = execute_builtin(shell, node->args, STDOUT_FILENO);
+// 			shell->last_exit_code = execute_builtin(shell, node->args,
+					// STDOUT_FILENO);
 // 		}
 // 	}
 // 	else
@@ -199,98 +240,3 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 // 	}
 // 	sig_interactive();
 // }
-
-void	execute_command(t_ast *node, t_minishell *shell)
-{
-	pid_t	pid;
-	// int		redir_applied;
-	int		status;
-
-	// redir_applied = 0;
-	// Find the command node (AST_CMD)
-	while (node && node->type != AST_CMD)
-		node = node->left;
-	if (!node || !node->args || !node->args[0])
-		return ;
-	sig_reset(false);
-	// Handle builtins in parent process
-	if (is_builtin(node->args[0]))
-	{
-		if (setup_redirections(node, shell) == -1)
-		// {
-		// 	shell->last_exit_code = 1;
-		// 	return ;
-		// }
-			exit(1);
-		// redir_applied = 1;
-		shell->last_exit_code = execute_builtin(shell, node->args, 1);
-		// if (redir_applied)
-		// 	restore_standard_fds(shell);
-	}
-	else
-	{
-		pid = fork();
-		if (pid == 0)
-		{
-			// Child process
-			sig_reset(true);
-			if (setup_redirections(node, shell) == -1)
-			// {
-			// 	shell->last_exit_code = 1;
-			// 	return ;
-			// }
-				exit(1);
-			// redir_applied = 1;
-			status = execute_external(node, shell);
-			// if (redir_applied)
-			// 	restore_standard_fds(shell);
-			// free_minishell(shell);
-			cleanup_and_exit(shell, status);
-		}
-		else if (pid > 0)
-		{
-			// Parent process
-			handle_parent_process(pid, shell);
-			restore_standard_fds(shell);
-		}
-		else
-		{
-			perror("minishell: fork");
-			shell->last_exit_code = 1;
-		}
-	}
-	sig_interactive();
-}
-
-int	is_builtin(char *cmd)
-{
-	if (!cmd)
-		return (0);
-	return (strcmp(cmd, "cd") == 0 || strcmp(cmd, "echo") == 0 || strcmp(cmd,
-			"env") == 0 || strcmp(cmd, "exit") == 0 || strcmp(cmd, "pwd") == 0
-		|| strcmp(cmd, "export") == 0 || strcmp(cmd, "unset") == 0);
-}
-
-void	handle_parent_process(pid_t pid, t_minishell *shell)
-{
-	int		status;
-	pid_t	waited_pid;
-
-	waited_pid = waitpid(pid, &status, 0);
-	if (waited_pid == -1)
-	{
-		perror("minishell: waitpid");
-		shell->last_exit_code = 1;
-		return ;
-	}
-	if (WIFEXITED(status))
-		shell->last_exit_code = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
-	{
-		shell->last_exit_code = 128 + WTERMSIG(status);
-		if (WTERMSIG(status) == SIGINT)
-			write(STDERR_FILENO, "\n", 1);
-		else if (WTERMSIG(status) == SIGQUIT)
-			write(STDERR_FILENO, "Quit: Core dumped\n", 18);
-	}
-}

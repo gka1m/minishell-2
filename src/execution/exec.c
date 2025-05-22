@@ -6,83 +6,24 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 10:09:44 by zchan             #+#    #+#             */
-/*   Updated: 2025/05/16 16:00:42 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/22 14:16:38 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-/* We prob need a folder for all errors as well to dump all error handling there*/
-
-// Main logic for executing
-// See below for LONG full version to refactor
-// int	execution_logic(t_ast *ast, t_minishell *minishell)
-// {
-// 	if (ast == NULL)
-// 		return (-1);
-// 	// Handle commands and their redirections first
-// 	if (ast->type == AST_CMD)
-// 	{
-// 		if (setup_redirections(ast, minishell) == -1)
-// 			return (-1);
-// 		execute_command(ast, minishell);
-// 	}
-// 	// Handle pipe nodes (right-recursive structure)
-// 	else if (ast->type == AST_PIPE)
-// 	{
-// 		execute_pipeline(ast, minishell);
-// 	}
-// 	// Handle standalone redirections
-// 	else if (ast->type == AST_REDIR_IN || ast->type == AST_REDIR_OUT
-// 		|| ast->type == AST_APPEND || ast->type == AST_HEREDOC)
-// 		// Helper macro/function
-// 	{
-// 		if (setup_redirections(ast, minishell) == -1)
-// 			return (-1);
-// 		if (ast->left)
-// 			return (execution_logic(ast->left, minishell));
-// 	}
-// 	else
-// 	{
-// 		ft_putstr_fd("minishell: unknown node type\n", STDERR_FILENO);
-// 		return (-1);
-// 	}
-// 	return (0);
-// }
-
 int	execution_logic(t_ast *ast, t_minishell *minishell)
 {
 	if (!ast)
 		return (-1);
-
-	// Apply redirections FIRST (from the root down)
-	// if (setup_redirections(ast, minishell) == -1)
-	// 	return (-1);
-
-	// if (ast->type == AST_CMD || ast->type == AST_REDIR_IN || ast->type == AST_REDIR_OUT
-	// 	|| ast->type == AST_APPEND || ast->type == AST_HEREDOC)
-	// {
-	// 	execute_command(ast, minishell); // no need to check type again
-	// }
-	// else if (ast->type == AST_PIPE)
-	// {
-	// 	execute_pipeline(ast, minishell, -1);
-	// }
-	if (ast->type == AST_PIPE) {
-        execute_pipeline(ast, minishell, -1);
-    }
-    else 
+	if (ast->type == AST_PIPE)
+		execute_pipeline(ast, minishell, -1);
+	else
 	{
-        // For non-piped commands, setup redirections then execute
-        if (setup_redirections(ast, minishell) == -1)
-            return (-1);
-        execute_command(ast, minishell);
-    }
-	// else
-	// {
-		// 	ft_putstr_fd("minishell: unknown node type\n", STDERR_FILENO);
-		// 	return (-1);
-		// }
+		if (setup_redirections(ast, minishell) == -1)
+			return (-1);
+		execute_command(ast, minishell);
+	}
 	restore_standard_fds(minishell);
 	return (0);
 }
@@ -92,7 +33,8 @@ int	execution_logic(t_ast *ast, t_minishell *minishell)
 // Split logic by PIPE, REDIRECTION, and COMMAND
 // Redirection logic is extracted into handle_redirection
 // Check for built-ins to avoid unnecessary fork.
-// Recursive: Execution logic traverses the AST recursively for PIPE and REDIRECTION.
+// Recursive: Execution logic traverses the AST recursively for PIPE and
+REDIRECTION.
 int	execution_logic(t_node *ast, t_minishell *minishell)
 {
 		int pipe_fd[2];
