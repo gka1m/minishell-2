@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/22 16:31:20 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/22 17:38:35 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,7 +179,9 @@ void	ft_strcat(char *dst, const char *src);
 void	ft_strcpy(char *dst, const char *src);
 void	ft_itoa_into(char *buf, int n);
 
-int	create_heredoc_tempfile(t_minishell *shell);
+// int	create_heredoc_tempfile(t_minishell *shell);
+int	create_heredoc_tempfile(char *out_path);
+int	handle_heredoc_logic(t_heredoc *hd, t_minishell *shell, char *line);
 
 // env functions
 t_minishell		*init_minishell(char **envp);

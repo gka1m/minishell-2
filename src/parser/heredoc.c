@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/22 13:38:53 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/23 11:59:23 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,74 +130,165 @@
 //     process_heredocs(ast->right, shell);
 // }
 
-int	create_heredoc_tempfile(t_minishell *shell)
+// int	create_heredoc_tempfile(t_minishell *shell)
+// {
+// 	char		temp_path[64];
+// 	char		pid_str[16];
+// 	char		count_str[16];
+// 	static int	counter;
+// 	int			fd;
+
+// 	(void)shell;
+// 	counter = 0;
+// 	ft_itoa_into(pid_str, getpid());
+// 	ft_itoa_into(count_str, counter++);
+// 	ft_strcpy(temp_path, "/tmp/minishell_heredoc_");
+// 	ft_strcat(temp_path, pid_str);
+// 	ft_strcat(temp_path, "_");
+// 	ft_strcat(temp_path, count_str);
+// 	fd = open(temp_path, O_CREAT | O_RDWR | O_EXCL, 0600);
+// 	if (fd == -1)
+// 	{
+// 		perror("minishell: heredoc tempfile");
+// 		return (-1);
+// 	}
+// 	unlink(temp_path);
+// 	return (fd);
+// }
+
+int	create_heredoc_tempfile(char *out_path)
 {
-	char		temp_path[64];
-	char		pid_str[16];
 	char		count_str[16];
-	static int	counter;
+	static int	counter = 0;
 	int			fd;
 
-	(void)shell;
-	counter = 0;
-	ft_itoa_into(pid_str, getpid());
+	ft_strcpy(out_path, "/tmp/minishell_heredoc_");
 	ft_itoa_into(count_str, counter++);
-	ft_strcpy(temp_path, "/tmp/minishell_heredoc_");
-	ft_strcat(temp_path, pid_str);
-	ft_strcat(temp_path, "_");
-	ft_strcat(temp_path, count_str);
-	fd = open(temp_path, O_CREAT | O_RDWR | O_EXCL, 0600);
+	ft_strcat(out_path, count_str);
+	fd = open(out_path, O_CREAT | O_RDWR | O_EXCL, 0600);
 	if (fd == -1)
 	{
 		perror("minishell: heredoc tempfile");
 		return (-1);
 	}
-	unlink(temp_path);
 	return (fd);
+}
+
+int	handle_heredoc_logic(t_heredoc *hd, t_minishell *shell, char *line)
+{
+	t_token	*temp_token;
+
+	if (!line)
+	{
+		ft_putstr_fd("minishell: warning: ", 2);
+		ft_putstr_fd("here-document delimited by end-of-file\n", 2);
+		g_signal_flag = 1;
+		return (1);
+	}
+	if (strcmp(line, hd->delimiter) == 0)
+		return (free(line), 1);
+	if (!hd->hd_quoted)
+	{
+		temp_token = create_token(line, T_STRING);
+		if (temp_token)
+		{
+			expand_variables(temp_token, shell);
+			write(hd->node->heredoc_fd, temp_token->value,
+				ft_strlen(temp_token->value));
+			write(hd->node->heredoc_fd, "\n", 1);
+			free_tokens(temp_token);
+		}
+		return (0);
+	}
+	return (0);
 }
 
 void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 {
 	char	*line;
-	t_token	*temp_token;
+	// t_token	*temp_token;
 
 	setup_heredoc_signals();
 	while (!g_signal_flag)
 	{
 		line = readline("> ");
-		if (!line)
-		{
-			ft_putstr_fd("minishell: warning: ", 2);
-			ft_putstr_fd("here-document delimited by end-of-file\n", 2);
-			g_signal_flag = 1;
+		// if (!line)
+		// {
+		// 	ft_putstr_fd("minishell: warning: ", 2);
+		// 	ft_putstr_fd("here-document delimited by end-of-file\n", 2);
+		// 	g_signal_flag = 1;
+		// 	break ;
+		// }
+		// if (strcmp(line, hd->delimiter) == 0)
+		// {
+		// 	free(line);
+		// 	break ;
+		// }
+		// if (!hd->hd_quoted)
+		// {
+		// 	temp_token = create_token(line, T_STRING);
+		// 	if (temp_token)
+		// 	{
+		// 		expand_variables(temp_token, shell);
+		// 		write(hd->node->heredoc_fd, temp_token->value,
+		// 			ft_strlen(temp_token->value));
+		// 		write(hd->node->heredoc_fd, "\n", 1);
+		// 		free_tokens(temp_token);
+		// 	}
+		// }
+		if (handle_heredoc_logic(hd, shell, line))
 			break ;
-		}
-		if (strcmp(line, hd->delimiter) == 0)
-		{
-			free(line);
-			break ;
-		}
-		if (!hd->hd_quoted)
-		{
-			temp_token = create_token(line, T_STRING);
-			if (temp_token)
-			{
-				expand_variables(temp_token, shell);
-				write(hd->node->heredoc_fd, temp_token->value,
-					ft_strlen(temp_token->value));
-				write(hd->node->heredoc_fd, "\n", 1);
-				free_tokens(temp_token);
-			}
-		}
-		else
-		{
-			write(hd->node->heredoc_fd, line, strlen(line));
-			write(hd->node->heredoc_fd, "\n", 1);
-		}
+		// else
+		// {
+		// 	write(hd->node->heredoc_fd, line, ft_strlen(line));
+		// 	write(hd->node->heredoc_fd, "\n", 1);
+		// }
 		free(line);
 	}
-	lseek(hd->node->heredoc_fd, 0, SEEK_SET);
 }
+
+// void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
+// {
+// 	char	*line;
+// 	t_token	*temp_token;
+
+// 	setup_heredoc_signals();
+// 	while (!g_signal_flag)
+// 	{
+// 		line = readline("> ");
+// 		if (!line)
+// 		{
+// 			ft_putstr_fd("minishell: warning: ", 2);
+// 			ft_putstr_fd("here-document delimited by end-of-file\n", 2);
+// 			g_signal_flag = 1;
+// 			break ;
+// 		}
+// 		if (strcmp(line, hd->delimiter) == 0)
+// 		{
+// 			free(line);
+// 			break ;
+// 		}
+// 		if (!hd->hd_quoted)
+// 		{
+// 			temp_token = create_token(line, T_STRING);
+// 			if (temp_token)
+// 			{
+// 				expand_variables(temp_token, shell);
+// 				write(hd->node->heredoc_fd, temp_token->value,
+// 					ft_strlen(temp_token->value));
+// 				write(hd->node->heredoc_fd, "\n", 1);
+// 				free_tokens(temp_token);
+// 			}
+// 		}
+// 		else
+// 		{
+// 			write(hd->node->heredoc_fd, line, ft_strlen(line));
+// 			write(hd->node->heredoc_fd, "\n", 1);
+// 		}
+// 		free(line);
+// 	}
+// 	lseek(hd->node->heredoc_fd, 0, SEEK_SET);
+// }
 
 // void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 // {
@@ -235,7 +326,8 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 // 			if (temp_token)
 // 			{
 // 				expand_variables(temp_token, shell);
-// 				write(write_fd, temp_token->value, ft_strlen(temp_token->value));
+// 				write(write_fd, temp_token->value,
+					// ft_strlen(temp_token->value));
 // 				write(write_fd, "\n", 1);
 // 				free_tokens(temp_token);
 // 			}
@@ -271,13 +363,13 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 //             ft_putstr_fd("minishell: warning: ", 2);
 //             ft_putstr_fd("here-document delimited by end-of-file\n", 2);
 //             g_signal_flag = 1;
-//             break;
+//             break ;
 //         }
 
 //         if (strcmp(line, hd->delimiter) == 0)
 //         {
 //             free(line);
-//             break;
+//             break ;
 //         }
 
 //         if (!hd->hd_quoted)
@@ -286,7 +378,8 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 //             if (temp_token)
 //             {
 //                 expand_variables(temp_token, shell);
-//                 write(pipefd[1], temp_token->value, ft_strlen(temp_token->value));
+//                 write(pipefd[1], temp_token->value,
+	// ft_strlen(temp_token->value));
 //                 write(pipefd[1], "\n", 1);
 //                 free_tokens(temp_token);
 //             }
@@ -302,9 +395,29 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 //     hd->node->heredoc_fd = pipefd[0];  /* Store read end for command */
 // }
 
+// void	process_heredocs(t_ast *ast, t_minishell *shell)
+// {
+// 	t_heredoc	hd;
+
+// 	if (!ast)
+// 		return ;
+// 	if (ast->type == AST_HEREDOC)
+// 	{
+// 		hd.delimiter = ast->file;
+// 		hd.hd_quoted = ast->hd_quoted;
+// 		hd.node = ast;
+// 		hd.node->heredoc_fd = create_heredoc_tempfile(shell);
+// 		process_heredoc_input(&hd, shell);
+// 	}
+// 	process_heredocs(ast->left, shell);
+// 	process_heredocs(ast->right, shell);
+// }
+
 void	process_heredocs(t_ast *ast, t_minishell *shell)
 {
 	t_heredoc	hd;
+	char		path[64];
+	int			fd;
 
 	if (!ast)
 		return ;
@@ -313,8 +426,17 @@ void	process_heredocs(t_ast *ast, t_minishell *shell)
 		hd.delimiter = ast->file;
 		hd.hd_quoted = ast->hd_quoted;
 		hd.node = ast;
-		hd.node->heredoc_fd = create_heredoc_tempfile(shell);
+		fd = create_heredoc_tempfile(path);
+		if (fd == -1)
+			return ;
+		hd.node->heredoc_fd = fd;
 		process_heredoc_input(&hd, shell);
+		close(fd);
+		fd = open(path, O_RDONLY);
+		if (fd == -1)
+			perror("minishell: reopen heredoc");
+		hd.node->heredoc_fd = fd;
+		unlink(path);
 	}
 	process_heredocs(ast->left, shell);
 	process_heredocs(ast->right, shell);
