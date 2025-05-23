@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/22 17:38:35 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/23 13:21:41 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,6 +160,7 @@ int	is_valid_pipe_side(t_token *token, int direction);
 t_token	*classify_token(char *input, int *i);
 void	link_tokens(t_token **head, t_token **current, t_token *new_token);
 int	precheck(char *input, int *i, t_token **head);
+int	process_char(char c, int *in_squote, int *in_dquote, char **result);
 
 // parsing functions
 t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell);
