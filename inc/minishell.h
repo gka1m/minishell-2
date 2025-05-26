@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/23 13:21:41 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/26 13:35:56 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,13 @@ typedef struct s_token
 	struct s_token		*previous;
 	struct s_token		*next;
 }						t_token;
+
+typedef struct s_exp_context 
+{
+	t_minishell	*shell;
+	int			*in_squote;
+	int			*in_dquote;
+}	t_exp_context;
 
 // struct for the ast node
 typedef enum e_ast_type
@@ -161,6 +168,20 @@ t_token	*classify_token(char *input, int *i);
 void	link_tokens(t_token **head, t_token **current, t_token *new_token);
 int	precheck(char *input, int *i, t_token **head);
 int	process_char(char c, int *in_squote, int *in_dquote, char **result);
+
+void	append_char(char **result, char *ch);
+void	append_str(char **result, char *str);
+void	process_expansion_char(char *str, int *i, char **result, t_exp_context ctx);
+void	handle_single_quote(int *i, char **result, int *in_squote);
+void	handle_double_quote(int *i, char **result, int *in_dquote);
+void	handle_variable_expansion(char *str, int *i, char **result, t_minishell *shell);
+char	*extract_variable_name(char *str, int *i);
+char	*get_variable_value(t_minishell *shell, char *var_name);
+// void	append_char_to_result(char **result, char c);
+// void	handle_exit_status(char **result, t_minishell *shell);
+// void	handle_variable_name(char *str, size_t *i, char **result, t_minishell *shell);
+// void	handle_variable_expansion_in_str(char *str, size_t *i, char **result, t_minishell *shell);
+
 
 // parsing functions
 t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell);
@@ -269,5 +290,10 @@ pid_t	exec_left(t_ast *node, t_minishell *shell, int input_fd, int pipe_fd[2]);
 pid_t	exec_right(t_ast *node, t_minishell *shell, int pipe_fd[2]);
 void	go_to_sleep(pid_t l_pid, pid_t r_pid, t_minishell *shell);
 int	count_env(t_env *env_list);
+
+//main functions
+char	*pre_token(int *exit_status);
+int	lex_and_expand(t_minishell *shell, char *input);
+int	parse_and_exec(t_minishell *shell, int *exit_status);
 
 #endif

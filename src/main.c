@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/19 16:02:36 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/26 13:38:16 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,198 +63,193 @@ void	print_tokens(t_token *tokens)
 	}
 }
 
+char	*pre_token(int *exit_status)
+{
+	char	*input;
+
+	g_signal_flag = 0;
+	sig_interactive();
+	input = readline("minishell> ");
+	if (g_signal_flag == 1)
+	{
+		free(input);
+		*exit_status = 130;
+		g_signal_flag = 0;
+		return (NULL);
+	}
+	if (!input)
+	{
+		ft_putstr_fd("exit\n", STDOUT_FILENO);
+		return (NULL);
+	}
+	add_history(input);
+	return (input);
+}
+
+int	lex_and_expand(t_minishell *shell, char *input)
+{
+	shell->tokens = tokenize(input);
+	free(input);
+	if (!shell->tokens)
+		return (0);
+	if (!check_grammar(shell->tokens))
+	{
+		shell->last_exit_code = 2;
+		free_tokens(shell->tokens);
+		return (0);
+	}
+	expand_all_tokens(shell->tokens, shell);
+	print_tokens(shell->tokens);
+	return (1);
+}
+
+int	parse_and_exec(t_minishell *shell, int *exit_status)
+{
+	shell->ast = parse_pipeline(&shell->tokens, shell);
+	if (!shell->ast)
+	{
+		shell->last_exit_code = 2;
+		return (0);
+	}
+	process_heredocs(shell->ast, shell);
+	if (g_signal_flag == 1)
+	{
+		shell->last_exit_code = 130;
+		g_signal_flag = 0;
+		free_ast(shell->ast);
+		free_tokens(shell->tokens);
+		return (0);
+	}
+	print_ast(shell->ast, 0);
+	*exit_status = execution_logic(shell->ast, shell);
+	free_tokens(shell->tokens);
+	free_ast(shell->ast);
+	return (1);
+}
+
+int	main(int argc, char **argv, char **envp)
+{
+	t_minishell	*shell;
+	char		*input;
+	int			exit_status;
+
+	if (argc > 1)
+		return (1);
+	(void)argv;
+	shell = init_minishell(envp);
+	if (!shell)
+	{
+		ft_putstr_fd("minishell: initialization failed\n", STDERR_FILENO);
+		return (free(shell), 1);
+	}
+	while (1)
+	{
+		input = pre_token(&exit_status);
+		if (!input)
+			break ;
+		if (!lex_and_expand(shell, input))
+			continue ;
+		if (!parse_and_exec(shell, &exit_status))
+			continue ;
+	}
+	rl_clear_history();
+	return (free_minishell(shell), exit_status);
+}
+
 // int main(int argc, char **argv, char **envp)
 // {
 //     t_minishell *shell;
 //     char *input;
-//     t_token *tokens;
-//     t_token *current;
-//     t_ast *ast;
 //     int exit_status = 0;
 
-//     (void)argc;
+//     // (void)argc;
 //     (void)argv;
-
-//     // Initialize the shell
+// 	if (argc > 1)
+// 		return (1);
 //     shell = init_minishell(envp);
 //     if (!shell)
 //     {
 //         ft_putstr_fd("minishell: initialization failed\n", STDERR_FILENO);
-//         return (1);
+//         return (free(shell), 1);
 //     }
-//     rl_catch_signals = 0;
-//     // Main loop
+//     // rl_catch_signals = 0;
+
 //     while (1)
 //     {
-//         sig_interactive();
-//         // Reset signal flag and get input
-//         g_signal_flag = 0;
+// 		g_signal_flag = 0;
+// 		sig_interactive();
 //         input = readline("minishell> ");
-//         if (!input)  // Handle Ctrl+D
+// 		if (g_signal_flag == 1)
+// 		{
+// 			free(input);
+// 			exit_status = 130;
+// 			g_signal_flag = 0;
+// 			continue;
+// 		}
+//         if (!input)
 //         {
 //             ft_putstr_fd("exit\n", STDOUT_FILENO);
-//             // exit(0);
-//             break ;
-//         }
-//         // Skip empty input
-//         if (ft_strlen(input) == 0 || g_signal_flag == 1)
-//         {
-//             free(input);
-//             continue;
+//             // if (shell->tokens)
+//             //     free_tokens(shell->tokens);
+//             break;
 //         }
 
-//         // Add to history if not empty
+
 //         add_history(input);
 
 //         // Tokenization
-//         tokens = tokenize(input);
-//         if (!tokens)
+//         shell->tokens = tokenize(input);
+// 		free(input);
+//         if (!shell->tokens)
 //         {
-//             free(input);
+// 			// free_tokens(shell->tokens);
 //             continue;
 //         }
 
 //         // Grammar checking
-//         if (!check_grammar(tokens))
-//         {
-//             shell->last_exit_code = 2;  // Syntax error code
-//             free_tokens(&tokens);
-//             free(input);
-//             continue;
-//         }
-//         current = expand_all_tokens(tokens, shell);
-// 		print_tokens(tokens);
-//         // Parsing
-//         ast = parse_pipeline(&tokens, shell);
-//         if (!ast)
+//         if (!check_grammar(shell->tokens))
 //         {
 //             shell->last_exit_code = 2;
-//             free(input);
-//             free_tokens(&shell->tokens);  // Tokens are no longer needed after parsing
+//             free_tokens(shell->tokens);
 //             continue;
 //         }
-// 		// print_ast(ast, 0);
-//         process_heredocs(ast, shell);
-//         if (g_signal_flag)
+
+//         // Expansion
+//         expand_all_tokens(shell->tokens, shell);
+//         print_tokens(shell->tokens);
+
+//         // Parsing
+//         shell->ast = parse_pipeline(&shell->tokens, shell);
+//         if (!shell->ast)
+//         {
+//             shell->last_exit_code = 2;
+//             continue;
+//         }
+//         // free_tokens(shell->tokens);
+
+//         // Heredocs
+//         process_heredocs(shell->ast, shell);
+//         if (g_signal_flag == 1)
 //         {
 //             shell->last_exit_code = 130;
 //             free_ast(shell->ast);
-//             free_tokens(&shell->tokens);
-//             free(input);
+// 			free_tokens(shell->tokens);
+// 			g_signal_flag = 0;
+// 			// cleanup_and_exit(shell, 130);
 //             continue;
 //         }
 //         // Execution
-//         print_ast(ast, 0);
-//         free(input);
-//         exit_status = execution_logic(ast, shell);
-//         // Cleanup for this iteration
-//         if (shell->tokens)
-//             free_tokens(&shell->tokens);
-//         if (shell->ast)
-//             free_ast(shell->ast);
+//         print_ast(shell->ast, 0);
+        
+//         exit_status = execution_logic(shell->ast, shell);
+//         // Cleanup after each command
+// 		// close(shell->ast->heredoc_fd);
+// 		free_tokens(shell->tokens);
+//         free_ast(shell->ast);
 //     }
+
 //     // Final cleanup
 //     rl_clear_history();
-//     // cleanup_and_exit(shell, exit_status);
 //     free_minishell(shell);
 //     return (exit_status);
-//     // return (0);
 // }
-
-int main(int argc, char **argv, char **envp)
-{
-    t_minishell *shell;
-    char *input;
-    int exit_status = 0;
-
-    // (void)argc;
-    (void)argv;
-	if (argc > 1)
-		return (1);
-    shell = init_minishell(envp);
-    if (!shell)
-    {
-        ft_putstr_fd("minishell: initialization failed\n", STDERR_FILENO);
-        return (free(shell), 1);
-    }
-    // rl_catch_signals = 0;
-
-    while (1)
-    {
-		g_signal_flag = 0;
-		sig_interactive();
-        input = readline("minishell> ");
-		if (g_signal_flag == 1)
-		{
-			free(input);
-			exit_status = 130;
-			g_signal_flag = 0;
-			continue;
-		}
-        if (!input)
-        {
-            ft_putstr_fd("exit\n", STDOUT_FILENO);
-            // if (shell->tokens)
-            //     free_tokens(shell->tokens);
-            break;
-        }
-
-
-        add_history(input);
-
-        // Tokenization
-        shell->tokens = tokenize(input);
-		free(input);
-        if (!shell->tokens)
-        {
-			// free_tokens(shell->tokens);
-            continue;
-        }
-
-        // Grammar checking
-        if (!check_grammar(shell->tokens))
-        {
-            shell->last_exit_code = 2;
-            free_tokens(shell->tokens);
-            continue;
-        }
-
-        // Expansion
-        expand_all_tokens(shell->tokens, shell);
-        print_tokens(shell->tokens);
-
-        // Parsing
-        shell->ast = parse_pipeline(&shell->tokens, shell);
-        if (!shell->ast)
-        {
-            shell->last_exit_code = 2;
-            continue;
-        }
-        // free_tokens(shell->tokens);
-
-        // Heredocs
-        process_heredocs(shell->ast, shell);
-        if (g_signal_flag == 1)
-        {
-            shell->last_exit_code = 130;
-            free_ast(shell->ast);
-			free_tokens(shell->tokens);
-			g_signal_flag = 0;
-			// cleanup_and_exit(shell, 130);
-            continue;
-        }
-        // Execution
-        print_ast(shell->ast, 0);
-        
-        exit_status = execution_logic(shell->ast, shell);
-        // Cleanup after each command
-		// close(shell->ast->heredoc_fd);
-		free_tokens(shell->tokens);
-        free_ast(shell->ast);
-    }
-
-    // Final cleanup
-    rl_clear_history();
-    free_minishell(shell);
-    return (exit_status);
-}
