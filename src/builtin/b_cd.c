@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 13:50:16 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/19 12:24:30 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/29 11:15:44 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,14 +87,15 @@ int	b_cd(t_minishell *shell, t_env **env_list, char **args)
 
 	if (args[1] && args[2])
 		return (ft_putstr_fd("minishell: cd: too many arguments\n", 2), 1);
-	if (!args[1] || strcmp(args[1], "--") == 0 || strcmp(args[1], "~") == 0)
+	if (!args[1] || ft_strcmp(args[1], "--") == 0 || ft_strcmp(args[1],
+			"~") == 0)
 	{
 		env_var = find_env_var(*env_list, "HOME");
 		if (!env_var || !env_var->value)
 			return (ft_putstr_fd("cd: HOME not set\n", 2), 1);
 		return (change_directory(shell, env_list, env_var->value));
 	}
-	if (strcmp(args[1], "-") == 0)
+	if (ft_strcmp(args[1], "-") == 0)
 	{
 		env_var = find_env_var(*env_list, "OLDPWD");
 		if (!env_var || !env_var->value)

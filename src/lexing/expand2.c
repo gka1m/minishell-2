@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 11:21:39 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/26 13:37:39 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/29 09:36:13 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,12 @@ void	handle_variable_expansion(char *str, int *i, char **result, t_minishell *sh
 	var_name = extract_variable_name(str, i);
 	if (!var_name)
 		return ;
+	if (var_name[0] == '\0')
+	{
+		append_char(result, "$");
+		free(var_name);
+		return;
+	}
 	var_value = get_variable_value(shell, var_name);
 	if (!var_value)
 		var_value = ft_strdup("");
@@ -77,6 +83,34 @@ void	handle_variable_expansion(char *str, int *i, char **result, t_minishell *sh
 	free(var_name);
 	free(var_value);
 }
+
+// void	handle_variable_expansion(char *str, int *i, char **result, t_minishell *shell)
+// {
+// 	char	*var_name;
+// 	char	*var_value;
+// 	int		start = *i;
+
+// 	var_name = extract_variable_name(str, i);
+// 	if (!var_name)
+// 	{
+// 		append_char(result, "$");
+// 		return;
+// 	}
+	
+// 	var_value = get_variable_value(shell, var_name);
+// 	if (!var_value)
+// 	{
+// 		// If variable is empty/undefined, we still want to keep the original $VAR
+// 		// So we append the original text including the $ and variable name
+// 		append_str(result, ft_substr(str, start, *i - start));
+// 	}
+// 	else
+// 	{
+// 		append_str(result, var_value);
+// 		free(var_value);
+// 	}
+// 	free(var_name);
+// }
 
 char	*extract_variable_name(char *str, int *i)
 {
@@ -98,7 +132,7 @@ char	*get_variable_value(t_minishell *shell, char *var_name)
 {
 	t_env	*env_var;
 
-	if (strcmp(var_name, "?") == 0)
+	if (ft_strcmp(var_name, "?") == 0)
 		return (ft_itoa(shell->last_exit_code));
 	env_var = find_env_var(shell->env_list, var_name);
 	if (env_var && env_var->value)
@@ -315,74 +349,74 @@ void	expand_variables(t_token *token, t_minishell *shell)
 // 	return (result);
 // }
 
-// char *expand_variables_with_quotes(char *str, t_minishell *shell)
-// {
-//     size_t i = 0;
-//     char *result = ft_strdup("");
-//     char *temp;
-//     char var_name[1024];
-//     t_env *var;
-//     int in_squote = 0;
-//     int in_dquote = 0;
+char *expand_variables_with_quotes(char *str, t_minishell *shell)
+{
+    size_t i = 0;
+    char *result = ft_strdup("");
+    char *temp;
+    char var_name[1024];
+    t_env *var;
+    int in_squote = 0;
+    int in_dquote = 0;
 
-//     if (!str)
-//         return (NULL);
+    if (!str)
+        return (NULL);
 
-//     while (str[i])
-//     {
-//         if (str[i] == '\'' && !in_dquote)
-//         {
-//             in_squote = !in_squote;
-//             i++;
-//         }
-//         else if (str[i] == '"' && !in_squote)
-//         {
-//             in_dquote = !in_dquote;
-//             i++;
-//         }
-//         else if (str[i] == '$' && !in_squote) // Only expand $ outside single quotes
-//         {
-//             size_t j = 0;
-//             i++;
-//             if (str[i] == '?') // Special case: $?
-//             {
-//                 char *exit_status = ft_itoa(shell->last_exit_code);
-//                 temp = ft_strjoin(result, exit_status);
-//                 free(result);
-//                 result = temp;
-//                 free(exit_status);
-//                 i++;
-//             }
-//             else if (ft_isalpha(str[i]) || str[i] == '_') // Valid variable start
-//             {
-//                 while ((ft_isalnum(str[i]) || str[i] == '_') && j < sizeof(var_name) - 1)
-//                     var_name[j++] = str[i++];
-//                 var_name[j] = '\0';
-//                 var = find_env_var(shell->env_list, var_name);
-//                 if (var && var->value)
-//                 {
-//                     temp = ft_strjoin(result, var->value);
-//                     free(result);
-//                     result = temp;
-//                 }
-//             }
-//             else
-//             {
-//                 // Just a standalone $, keep it
-//                 temp = ft_strjoin(result, "$");
-//                 free(result);
-//                 result = temp;
-//             }
-//         }
-//         else
-//         {
-//             // Normal character, append
-//             char ch[2] = {str[i], '\0'};
-//             temp = ft_strjoin(result, ch);
-//             free(result);
-//             result = temp;
-//             i++;
-//         }
-//     }
-//     return (result);
-// }
+    while (str[i])
+    {
+        if (str[i] == '\'' && !in_dquote)
+        {
+            in_squote = !in_squote;
+            i++;
+        }
+        else if (str[i] == '"' && !in_squote)
+        {
+            in_dquote = !in_dquote;
+            i++;
+        }
+        else if (str[i] == '$' && !in_squote) // Only expand $ outside single quotes
+        {
+            size_t j = 0;
+            i++;
+            if (str[i] == '?') // Special case: $?
+            {
+                char *exit_status = ft_itoa(shell->last_exit_code);
+                temp = ft_strjoin(result, exit_status);
+                free(result);
+                result = temp;
+                free(exit_status);
+                i++;
+            }
+            else if (ft_isalpha(str[i]) || str[i] == '_') // Valid variable start
+            {
+                while ((ft_isalnum(str[i]) || str[i] == '_') && j < sizeof(var_name) - 1)
+                    var_name[j++] = str[i++];
+                var_name[j] = '\0';
+                var = find_env_var(shell->env_list, var_name);
+                if (var && var->value)
+                {
+                    temp = ft_strjoin(result, var->value);
+                    free(result);
+                    result = temp;
+                }
+            }
+            else
+            {
+                // Just a standalone $, keep it
+                temp = ft_strjoin(result, "$");
+                free(result);
+                result = temp;
+            }
+        }
+        else
+        {
+            // Normal character, append
+            char ch[2] = {str[i], '\0'};
+            temp = ft_strjoin(result, ch);
+            free(result);
+            result = temp;
+            i++;
+        }
+    }
+    return (result);
+}

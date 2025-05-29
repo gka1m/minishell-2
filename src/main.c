@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/26 13:38:16 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/29 11:19:01 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,16 @@ void	print_tokens(t_token *tokens)
 	}
 }
 
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	while (*s1 && (*s1 == *s2))
+	{
+		s1++;
+		s2++;
+	}
+	return ((unsigned char)*s1 - (unsigned char)*s2);
+}
+
 char	*pre_token(int *exit_status)
 {
 	char	*input;
@@ -99,7 +109,7 @@ int	lex_and_expand(t_minishell *shell, char *input)
 		return (0);
 	}
 	expand_all_tokens(shell->tokens, shell);
-	print_tokens(shell->tokens);
+	// print_tokens(shell->tokens);
 	return (1);
 }
 
@@ -120,7 +130,7 @@ int	parse_and_exec(t_minishell *shell, int *exit_status)
 		free_tokens(shell->tokens);
 		return (0);
 	}
-	print_ast(shell->ast, 0);
+	// print_ast(shell->ast, 0);
 	*exit_status = execution_logic(shell->ast, shell);
 	free_tokens(shell->tokens);
 	free_ast(shell->ast);
@@ -193,7 +203,6 @@ int	main(int argc, char **argv, char **envp)
 //             //     free_tokens(shell->tokens);
 //             break;
 //         }
-
 
 //         add_history(input);
 

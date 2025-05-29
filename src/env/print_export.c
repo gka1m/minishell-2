@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 15:57:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/19 11:43:03 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/29 09:36:13 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	print_export_var(t_env *var, int fd_out)
 {
 	ft_putstr_fd("declare -x ", fd_out);
 	ft_putstr_fd(var->key, fd_out);
-	if (var->value && strcmp(var->value, "##NO_VALUE##") == 0)
+	if (var->value && ft_strcmp(var->value, "##NO_VALUE##") == 0)
 	{
 		ft_putstr_fd("\n", fd_out);
 		return ;

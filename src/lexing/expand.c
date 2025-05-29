@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 10:57:25 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/26 12:47:54 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/28 17:43:48 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,27 +92,28 @@ char	*remove_outer_quotes(char *str)
 
 void	process_str(t_token *token, t_minishell *shell)
 {
-	char	*unquoted;
-	// char	*expanded;
+	// char	*unquoted;
+	char	*expanded;
 
-	if (token->previous && token->previous->type == T_HEREDOC)
-	{
-		// Heredoc: no variable expansion, only remove outer quotes
-		unquoted = remove_outer_quotes(token->value);
-		free(token->value);
-		token->value = unquoted;
-	}
-	else
-	{
+	// if (token->previous && token->previous->type == T_HEREDOC)
+	// {
+	// 	// Heredoc: no variable expansion, only remove outer quotes
+	// 	// unquoted = remove_quotes(token->value);
+	// 	// free(token->value);
+	// 	// token->value = unquoted;
+	// 	token = token->next;
+	// }
+	// else
+	// {
 		// Regular string: expand variables then remove outer quotes
-		expand_variables(token, shell);
-		// expanded = expand_variables_with_quotes(token->value, shell);
-		// free(token->value);
-		// token->value = expanded;
-		unquoted = remove_quotes(token->value);
+		// expand_variables(token, shell);
+		expanded = expand_variables_with_quotes(token->value, shell);
 		free(token->value);
-		token->value = unquoted;
-	}
+		token->value = expanded;
+		// unquoted = remove_quotes(token->value);
+		// free(token->value);
+		// token->value = unquoted;
+	// }
 }
 
 // Fixed expand_all_tokens
@@ -151,6 +152,13 @@ t_token *expand_all_tokens(t_token *tokens, t_minishell *shell)
             //     free(current->value);
             //     current->value = unquoted;
             // }
+			if (current->previous && current->previous->type == T_HEREDOC)
+			{
+				// ❌ DO NOTHING — leave the token.value as-is
+				// So that parse_heredoc() can inspect quotes properly
+				current = current->next;
+				continue;
+			}
 			process_str(current, shell);
             current = current->next;
         }

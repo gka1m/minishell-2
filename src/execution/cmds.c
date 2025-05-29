@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/22 14:11:41 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/29 09:36:13 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,19 +16,19 @@ int	execute_builtin(t_minishell *shell, char **args, int fd_out)
 {
 	if (!args[0])
 		return (0);
-	if (strcmp(args[0], "cd") == 0)
+	if (ft_strcmp(args[0], "cd") == 0)
 		return (b_cd(shell, &shell->env_list, args));
-	if (strcmp(args[0], "echo") == 0)
+	if (ft_strcmp(args[0], "echo") == 0)
 		return (b_echo(args));
-	if (strcmp(args[0], "env") == 0)
+	if (ft_strcmp(args[0], "env") == 0)
 		return (b_env(shell->env_list));
-	if (strcmp(args[0], "exit") == 0)
+	if (ft_strcmp(args[0], "exit") == 0)
 		return (b_exit(shell, args));
-	if (strcmp(args[0], "export") == 0)
+	if (ft_strcmp(args[0], "export") == 0)
 		return (bi_export(shell, args, fd_out));
-	if (strcmp(args[0], "unset") == 0)
+	if (ft_strcmp(args[0], "unset") == 0)
 		return (b_unset(shell->env_list, args));
-	if (strcmp(args[0], "pwd") == 0)
+	if (ft_strcmp(args[0], "pwd") == 0)
 		return (b_pwd());
 	return (0);
 }
@@ -88,26 +88,64 @@ int	execute_external(t_ast *node, t_minishell *shell)
 		return (1);
 	full_path = find_command_path(node->args[0], shell);
 	if (!full_path)
-		return (free_split(env_array), 127);
-	close(shell->stdio_backup[1]);
-	close(shell->stdio_backup[0]);
+		return (free_split(env_array), shell->last_exit_code);
+	if (shell->stdio_backup[1] != -1)
+		close(shell->stdio_backup[1]);
+	if (shell->stdio_backup[0] != -1)
+		close(shell->stdio_backup[0]);
 	execve(full_path, node->args, env_array);
-	perror("minishell: execve");
+	// perror("minishell: execve");
 	free(full_path);
 	free_split(env_array);
-	return (126);
+	return (0);
 }
 
-char	*check_direct_path(char *cmd)
+// char	*check_direct_path(char *cmd)
+// {
+// 	struct stat	sb;
+
+// 	if (stat(cmd, &sb) == 0 && S_ISDIR(sb.st_mode))
+// 	{
+// 		ft_putstr_fd("minishell: ", 2);
+// 		ft_putstr_fd(cmd, 2);
+// 		ft_putstr_fd(": Is a directory\n", 2);
+// 		return (NULL); // exit code 126 (command found but not executable)
+// 	}
+// 	if (access(cmd, F_OK) != 0)
+// 		return (no_file(cmd), NULL);
+// 	if (access(cmd, X_OK) != 0)
+// 		return (cmd_not_found(cmd), NULL);
+// 	return (ft_strdup(cmd));
+// }
+
+char	*check_direct_path(char *cmd, t_minishell *shell)
 {
+	struct stat	sb;
+
+	if (stat(cmd, &sb) == 0 && S_ISDIR(sb.st_mode))
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(cmd, 2);
+		ft_putstr_fd(": Is a directory\n", 2);
+		shell->last_exit_code = 126;
+		return (NULL);
+	}
 	if (access(cmd, F_OK) != 0)
-		return (no_file(cmd), NULL);
+	{
+		no_file(cmd);
+		shell->last_exit_code = 127;
+		return (NULL);
+	}
 	if (access(cmd, X_OK) != 0)
-		return (cmd_not_found(cmd), NULL);
+	{
+		permission_denied(cmd);
+		shell->last_exit_code = 126;
+		return (NULL);
+	}
 	return (ft_strdup(cmd));
 }
 
-char	*search_in_path(char **dirs, char *cmd)
+char	*search_in_path(char **dirs, char *cmd, t_minishell *shell)
 {
 	char	*full_path;
 	int		i;
@@ -127,13 +165,44 @@ char	*search_in_path(char **dirs, char *cmd)
 				return (free_split(dirs), full_path);
 			free(full_path);
 			permission_denied(cmd);
-			break ;
+			shell->last_exit_code = 126;
+			return (free_split(dirs), NULL);
 		}
 		free(full_path);
 		i++;
 	}
-	return (free_split(dirs), cmd_not_found(cmd), NULL);
+	cmd_not_found(cmd);
+	shell->last_exit_code = 127;
+	return (free_split(dirs), NULL);
 }
+
+// char	*search_in_path(char **dirs, char *cmd)
+// {
+// 	char	*full_path;
+// 	int		i;
+
+// 	i = 0;
+// 	while (dirs[i])
+// 	{
+// 		full_path = join_str(dirs[i], "/", cmd);
+// 		if (!full_path)
+// 		{
+// 			i++;
+// 			continue ;
+// 		}
+// 		if (access(full_path, F_OK) == 0)
+// 		{
+// 			if (access(full_path, X_OK) == 0)
+// 				return (free_split(dirs), full_path);
+// 			free(full_path);
+// 			permission_denied(cmd);
+// 			// break ;
+// 		}
+// 		free(full_path);
+// 		i++;
+// 	}
+// 	return (free_split(dirs), cmd_not_found(cmd), NULL);
+// }
 
 char	*find_command_path(char *cmd, t_minishell *shell)
 {
@@ -155,7 +224,7 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 		// else
 		// 	no_file(cmd);
 		// return (NULL);
-		return (check_direct_path(cmd));
+		return (check_direct_path(cmd, shell));
 	}
 	path_node = find_env_var(shell->env_list, "PATH");
 	if (!path_node || !path_node->value)
@@ -182,7 +251,7 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 	// 	i++;
 	// }
 	// return (cmd_not_found(cmd), free_split(dirs), NULL);
-	return (search_in_path(dirs, cmd));
+	return (search_in_path(dirs, cmd, shell));
 }
 
 // void	execute_command(t_ast *node, t_minishell *shell)

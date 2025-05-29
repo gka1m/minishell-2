@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/23 11:59:23 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/29 09:36:13 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@
 // 			cleanup_and_exit(shell, shell->last_exit_code);
 // 			// break ;
 // 		}
-// 		if (strcmp(line, hd->delimiter) == 0)
+// 		if (ft_strcmp(line, hd->delimiter) == 0)
 // 		{
 // 			free(line);
 // 			close(hd->pipefd[0]);
@@ -165,6 +165,7 @@ int	create_heredoc_tempfile(char *out_path)
 	ft_strcpy(out_path, "/tmp/minishell_heredoc_");
 	ft_itoa_into(count_str, counter++);
 	ft_strcat(out_path, count_str);
+	unlink(out_path);
 	fd = open(out_path, O_CREAT | O_RDWR | O_EXCL, 0600);
 	if (fd == -1)
 	{
@@ -182,12 +183,12 @@ int	handle_heredoc_logic(t_heredoc *hd, t_minishell *shell, char *line)
 	{
 		ft_putstr_fd("minishell: warning: ", 2);
 		ft_putstr_fd("here-document delimited by end-of-file\n", 2);
-		g_signal_flag = 1;
+		// g_signal_flag = 1;
 		return (1);
 	}
-	if (strcmp(line, hd->delimiter) == 0)
+	if (ft_strcmp(line, hd->delimiter) == 0)
 		return (free(line), 1);
-	if (!hd->hd_quoted)
+	if (hd->hd_quoted == false)
 	{
 		temp_token = create_token(line, T_STRING);
 		if (temp_token)
@@ -198,7 +199,14 @@ int	handle_heredoc_logic(t_heredoc *hd, t_minishell *shell, char *line)
 			write(hd->node->heredoc_fd, "\n", 1);
 			free_tokens(temp_token);
 		}
-		return (0);
+	}
+	else
+	{
+		temp_token = create_token(line, T_STRING);
+		write(hd->node->heredoc_fd, temp_token->value,
+			ft_strlen(temp_token->value));
+		write(hd->node->heredoc_fd, "\n", 1);
+		free_tokens(temp_token);
 	}
 	return (0);
 }
@@ -219,7 +227,7 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 		// 	g_signal_flag = 1;
 		// 	break ;
 		// }
-		// if (strcmp(line, hd->delimiter) == 0)
+		// if (ft_strcmp(line, hd->delimiter) == 0)
 		// {
 		// 	free(line);
 		// 	break ;
@@ -263,7 +271,7 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 // 			g_signal_flag = 1;
 // 			break ;
 // 		}
-// 		if (strcmp(line, hd->delimiter) == 0)
+// 		if (ft_strcmp(line, hd->delimiter) == 0)
 // 		{
 // 			free(line);
 // 			break ;
@@ -315,7 +323,7 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 // 			g_signal_flag = 1;
 // 			break ;
 // 		}
-// 		if (strcmp(line, hd->delimiter) == 0)
+// 		if (ft_strcmp(line, hd->delimiter) == 0)
 // 		{
 // 			free(line);
 // 			break ;
@@ -366,7 +374,7 @@ void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 //             break ;
 //         }
 
-//         if (strcmp(line, hd->delimiter) == 0)
+//         if (ft_strcmp(line, hd->delimiter) == 0)
 //         {
 //             free(line);
 //             break ;
@@ -421,6 +429,8 @@ void	process_heredocs(t_ast *ast, t_minishell *shell)
 
 	if (!ast)
 		return ;
+	process_heredocs(ast->right, shell);
+	process_heredocs(ast->left, shell);
 	if (ast->type == AST_HEREDOC)
 	{
 		hd.delimiter = ast->file;
@@ -438,8 +448,6 @@ void	process_heredocs(t_ast *ast, t_minishell *shell)
 		hd.node->heredoc_fd = fd;
 		unlink(path);
 	}
-	process_heredocs(ast->left, shell);
-	process_heredocs(ast->right, shell);
 }
 
 void	close_unused_heredocs(t_ast *root, t_ast *current_node)

@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/17 11:53:42 by theophane         #+#    #+#             */
-/*   Updated: 2025/05/19 11:38:07 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/29 09:36:13 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ void	free_minishell(t_minishell *minishell)
 
 //         // Process the input (parse, execute, etc.)
 //         // For now, simulate an exit command
-//         if (strcmp(input, "exit\n") == 0) break ;
+//         if (ft_strcmp(input, "exit\n") == 0) break ;
 
 //         // Example: Update last_exit_code (to mimic a successful command)
 //         minishell->last_exit_code = 0;

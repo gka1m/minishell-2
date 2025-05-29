@@ -6,24 +6,24 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:22:17 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/22 16:31:45 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/29 11:12:53 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-int	precheck(char *input, int *i, t_token **head)
+t_token	*extract_token(char *input, int *i, t_token **head, t_token **current)
 {
-	while (ft_isspace(input[*i]))
-		(*i)++;
-	if (is_invalid_redirection_sequence(input, *i))
+	t_token	*new_token;
+
+	new_token = classify_token(input, i);
+	if (!new_token)
 	{
-		printf("minishell: syntax error near unexpected token `%.3s'\n", input
-			+ *i);
 		free_tokens(*head);
-		return (1);
+		return (NULL);
 	}
-	return (0);
+	link_tokens(head, current, new_token);
+	return (new_token);
 }
 
 t_token	*tokenize(char *input)
@@ -41,23 +41,25 @@ t_token	*tokenize(char *input)
 	len = ft_strlen(input);
 	while (i < len)
 	{
-		// if (ft_isspace(input[i]))
-		// {
-		// 	i++;
-		// 	continue ;
-		// }
-		// if (is_invalid_redirection_sequence(input, i))
-		// {
-		// 	printf("minishell: syntax error near unexpected token `%.3s'\n",
-		// 		input + i);
-		// 	return (free_tokens(head), NULL);
-		// }
-		if (precheck(input, &i, &head))
-			return (NULL);
-		new_token = classify_token(input, &i);
-		if (!new_token)
+		if (ft_isspace(input[i]))
+		{
+			i++;
+			continue ;
+		}
+		if (is_invalid_redirection_sequence(input, i))
+		{
+			printf("minishell: syntax error near unexpected token `%.3s'\n",
+				input + i);
 			return (free_tokens(head), NULL);
-		link_tokens(&head, &current, new_token);
+		}
+		// if (precheck(input, &i, &head))
+		// 	return (NULL);
+		// new_token = classify_token(input, &i);
+		// if (!new_token)
+		// 	return (free_tokens(head), NULL);
+		// link_tokens(&head, &current, new_token);
+		if (!extract_token(input, &i, &head, &current))
+			return (NULL);
 	}
 	return (head);
 }

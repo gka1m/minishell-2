@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:19:27 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/22 14:59:03 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/29 10:07:32 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,14 @@ int	execute_redirection(t_ast *node, t_minishell *shell)
 		return (-1);
 	fd = open(node->file, flags, 0644);
 	if (fd == -1)
-		return (perror("minishell: redirection failed"), -1);
+	{
+		perror("minishell: redirection failed");
+		// free_tokens(shell->tokens);
+		// free_ast(shell->ast);
+		restore_standard_fds(shell);
+		// free_minishell(shell);
+		return (-1);
+	}
 	if (dup2(fd, original_fd) == -1)
 		return (perror("minishell: dup2 failed"), -1);
 	return (close(fd), 0);

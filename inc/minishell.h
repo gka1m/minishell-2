@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/26 13:35:56 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/29 11:13:04 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,7 +166,6 @@ char *expand_variables_with_quotes(char *str, t_minishell *shell);
 int	is_valid_pipe_side(t_token *token, int direction);
 t_token	*classify_token(char *input, int *i);
 void	link_tokens(t_token **head, t_token **current, t_token *new_token);
-int	precheck(char *input, int *i, t_token **head);
 int	process_char(char c, int *in_squote, int *in_dquote, char **result);
 
 void	append_char(char **result, char *ch);
@@ -182,7 +181,7 @@ char	*get_variable_value(t_minishell *shell, char *var_name);
 // void	handle_variable_name(char *str, size_t *i, char **result, t_minishell *shell);
 // void	handle_variable_expansion_in_str(char *str, size_t *i, char **result, t_minishell *shell);
 
-
+t_token	*extract_token(char *input, int *i, t_token **head, t_token **current);
 // parsing functions
 t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell);
 t_ast	*parse_command(t_token **tokens, t_minishell *shell);
@@ -204,6 +203,7 @@ void	ft_itoa_into(char *buf, int n);
 // int	create_heredoc_tempfile(t_minishell *shell);
 int	create_heredoc_tempfile(char *out_path);
 int	handle_heredoc_logic(t_heredoc *hd, t_minishell *shell, char *line);
+char	**append_arg(char **args, char *new_arg);
 
 // env functions
 t_minishell		*init_minishell(char **envp);
@@ -225,6 +225,8 @@ void	print_sorted_env(t_env *env, int fd_out);
 void	swap_strings(char **a, char **b);
 void	sort_keys(char **tab);
 char	*ft_strndup(const char *s, size_t n);
+
+t_env	*init_minimal_env(void);
 
 // builtin functions
 int	update_pwds(t_minishell *shell, t_env **env_list, char *new_path);
@@ -282,18 +284,23 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd);
 void	backup_fds(t_minishell *shell);
 // void execute_pipe_segment(t_pipechild *pc);
 // void wait_for_children(t_minishell *shell);
-char	*check_direct_path(char *cmd);
-char	*search_in_path(char **dirs, char *cmd);
+// char	*check_direct_path(char *cmd);
+char	*check_direct_path(char *cmd, t_minishell *shell);
+// char	*search_in_path(char **dirs, char *cmd);
+char	*search_in_path(char **dirs, char *cmd, t_minishell *shell);
 void	not_bi(t_ast *node, t_minishell *shell);
 int	get_redirection_info(t_ast *node, int *flags, int *original_fd);
 pid_t	exec_left(t_ast *node, t_minishell *shell, int input_fd, int pipe_fd[2]);
 pid_t	exec_right(t_ast *node, t_minishell *shell, int pipe_fd[2]);
-void	go_to_sleep(pid_t l_pid, pid_t r_pid, t_minishell *shell);
+// void	go_to_sleep(pid_t l_pid, pid_t r_pid, t_minishell *shell);
+void	go_to_sleep(pid_t last_pid, t_minishell *shell);
 int	count_env(t_env *env_list);
 
 //main functions
 char	*pre_token(int *exit_status);
 int	lex_and_expand(t_minishell *shell, char *input);
 int	parse_and_exec(t_minishell *shell, int *exit_status);
+// int ft_strcmp(char *s1, char *s2);
+int	ft_strcmp(const char *s1, const char *s2);
 
 #endif

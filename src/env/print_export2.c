@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 11:41:18 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/19 11:44:03 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/29 09:36:13 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	sort_keys(char **tab)
 		j = 0;
 		while (j < size - i - 1)
 		{
-			if (strcmp(tab[j], tab[j + 1]) > 0)
+			if (ft_strcmp(tab[j], tab[j + 1]) > 0)
 				swap_strings(&tab[j], &tab[j + 1]);
 			j++;
 		}

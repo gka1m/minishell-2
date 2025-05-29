@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 17:08:13 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/19 11:38:48 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/29 11:20:14 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ t_env	*init_env(char **envp)
 	char	*value;
 	char	*sep;
 
+	if (!envp || !*envp)
+		return (init_minimal_env());
 	env = NULL;
 	i = 0;
 	while (envp[i])
@@ -68,6 +70,24 @@ void	update_shlvl(t_env *env)
 	}
 }
 
+t_env	*init_minimal_env(void)
+{
+	t_env	*env;
+	char	cwd[PATH_MAX];
+
+	env = NULL;
+	if (!getcwd(cwd, sizeof(cwd)))
+	{
+		perror("getcwd");
+		return (NULL);
+	}
+	add_env_var(&env, "PWD", cwd);
+	add_env_var(&env, "SHLVL", "1");
+	add_env_var(&env, "PATH", "/usr/local/bin:/usr/bin:/bin");
+	return (env);
+}
+
+
 // // Update an existing environment variable
 // void	update_env_var(t_env *env, const char *key, const char *new_value)
 // {
@@ -76,7 +96,7 @@ void	update_shlvl(t_env *env)
 // 	var = env;
 // 	while (var)
 // 	{
-// 		if (strcmp(var->key, key) == 0)
+// 		if (ft_strcmp(var->key, key) == 0)
 // 		{
 // 			free(var->value);
 // 			var->value = strdup(new_value);

@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:08:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/22 15:13:28 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/27 17:04:38 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,12 +111,12 @@ pid_t	exec_left(t_ast *node, t_minishell *shell, int input_fd, int pipe_fd[2])
 		if (input_fd != -1)
 		{
 			if (dup2(input_fd, STDIN_FILENO) == -1)
-				exit(1);
+				shell->last_exit_code = 1;
 			close(input_fd);
 		}
 		close_unused_heredocs(shell->ast, node->left);
 		if (setup_redirections(node->left, shell) == -1)
-			exit(1);
+			cleanup_and_exit(shell, 1);
 		execute_command(node->left, shell);
 		cleanup_and_exit(shell, shell->last_exit_code);
 	}
@@ -137,7 +137,7 @@ pid_t	exec_right(t_ast *node, t_minishell *shell, int pipe_fd[2])
 		close(pipe_fd[0]);
 		close_unused_heredocs(shell->ast, node->right);
 		if (setup_redirections(node->right, shell) == -1)
-			exit(1);
+			cleanup_and_exit(shell, 1);
 		execute_command(node->right, shell);
 		cleanup_and_exit(shell, shell->last_exit_code);
 	}
@@ -145,29 +145,51 @@ pid_t	exec_right(t_ast *node, t_minishell *shell, int pipe_fd[2])
 	return (r_pid);
 }
 
-void	go_to_sleep(pid_t l_pid, pid_t r_pid, t_minishell *shell)
-{
-	int	status;
+// void	go_to_sleep(pid_t l_pid, pid_t r_pid, t_minishell *shell)
+// {
+// 	int	status;
 
-	waitpid(l_pid, &status, 0);
-	if (WIFEXITED(status))
-		shell->last_exit_code = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
+// 	waitpid(l_pid, &status, 0);
+// 	if (WIFEXITED(status))
+// 		shell->last_exit_code = WEXITSTATUS(status);
+// 	else if (WIFSIGNALED(status))
+// 	{
+// 		shell->last_exit_code = 128 + WTERMSIG(status);
+// 		if (WTERMSIG(status) == SIGINT)
+// 			ft_putstr_fd("\n", STDERR_FILENO);
+// 	}
+// 	waitpid(r_pid, &status, 0);
+// 	if (WIFEXITED(status))
+// 		shell->last_exit_code = WEXITSTATUS(status);
+// 	else if (WIFSIGNALED(status))
+// 	{
+// 		shell->last_exit_code = 128 + WTERMSIG(status);
+// 		if (WTERMSIG(status) == SIGINT)
+// 			ft_putstr_fd("\n", STDERR_FILENO);
+// 	}
+// }
+
+void	go_to_sleep(pid_t last_pid, t_minishell *shell)
+{
+	int		status;
+	pid_t	pid;
+
+	while ((pid = wait(&status)) > 0)
 	{
-		shell->last_exit_code = 128 + WTERMSIG(status);
-		if (WTERMSIG(status) == SIGINT)
-			ft_putstr_fd("\n", STDERR_FILENO);
-	}
-	waitpid(r_pid, &status, 0);
-	if (WIFEXITED(status))
-		shell->last_exit_code = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
-	{
-		shell->last_exit_code = 128 + WTERMSIG(status);
-		if (WTERMSIG(status) == SIGINT)
-			ft_putstr_fd("\n", STDERR_FILENO);
+		if (pid == last_pid)
+		{
+			if (WIFEXITED(status))
+				shell->last_exit_code = WEXITSTATUS(status);
+			else if (WIFSIGNALED(status))
+			{
+				shell->last_exit_code = 128 + WTERMSIG(status);
+				// if (WTERMSIG(status) == SIGINT)
+				// 	ft_putstr_fd("\n", STDERR_FILENO);
+			}
+		}
 	}
 }
+
 
 void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 {
@@ -194,6 +216,6 @@ void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 	else
 		r_pid = exec_right(node, shell, pipe_fd);
 	if (node->right->type != AST_PIPE)
-		go_to_sleep(l_pid, r_pid, shell);
+		go_to_sleep(r_pid, shell);
 	sig_interactive();
 }
