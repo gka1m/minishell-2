@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/29 09:36:13 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/30 15:45:56 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,7 +228,10 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 	}
 	path_node = find_env_var(shell->env_list, "PATH");
 	if (!path_node || !path_node->value)
+	{
+		shell->last_exit_code = 127;
 		return (path_not_set(cmd), NULL);
+	}
 	dirs = ft_split(path_node->value, ':');
 	if (!dirs)
 		return (NULL);

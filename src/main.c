@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/29 11:19:01 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/30 15:57:51 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return ((unsigned char)*s1 - (unsigned char)*s2);
 }
 
-char	*pre_token(int *exit_status)
+char	*pre_token(int *exit_status, t_minishell *shell)
 {
 	char	*input;
 
@@ -82,14 +82,16 @@ char	*pre_token(int *exit_status)
 	input = readline("minishell> ");
 	if (g_signal_flag == 1)
 	{
+		shell->last_exit_code = 130;
 		free(input);
 		*exit_status = 130;
-		g_signal_flag = 0;
-		return (NULL);
+		// g_signal_flag = 0;
+		return (ft_strdup(""));
 	}
 	if (!input)
 	{
 		ft_putstr_fd("exit\n", STDOUT_FILENO);
+		*exit_status = shell->last_exit_code;
 		return (NULL);
 	}
 	add_history(input);
@@ -146,6 +148,7 @@ int	main(int argc, char **argv, char **envp)
 	if (argc > 1)
 		return (1);
 	(void)argv;
+	exit_status = 0;
 	shell = init_minishell(envp);
 	if (!shell)
 	{
@@ -154,7 +157,7 @@ int	main(int argc, char **argv, char **envp)
 	}
 	while (1)
 	{
-		input = pre_token(&exit_status);
+		input = pre_token(&exit_status, shell);
 		if (!input)
 			break ;
 		if (!lex_and_expand(shell, input))
@@ -162,8 +165,7 @@ int	main(int argc, char **argv, char **envp)
 		if (!parse_and_exec(shell, &exit_status))
 			continue ;
 	}
-	rl_clear_history();
-	return (free_minishell(shell), exit_status);
+	return (rl_clear_history(), free_minishell(shell), exit_status);
 }
 
 // int main(int argc, char **argv, char **envp)

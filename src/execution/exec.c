@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 10:09:44 by zchan             #+#    #+#             */
-/*   Updated: 2025/05/28 12:11:50 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/30 15:54:53 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	execution_logic(t_ast *ast, t_minishell *minishell)
 		execute_command(ast, minishell);
 	}
 	restore_standard_fds(minishell);
-	return (0);
+	return (minishell->last_exit_code);
 }
 
 /* LONG VERSION

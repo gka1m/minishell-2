@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/29 11:13:04 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/30 12:36:50 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,6 +204,7 @@ void	ft_itoa_into(char *buf, int n);
 int	create_heredoc_tempfile(char *out_path);
 int	handle_heredoc_logic(t_heredoc *hd, t_minishell *shell, char *line);
 char	**append_arg(char **args, char *new_arg);
+void	expand_heredoc_line(t_token *token, t_minishell *shell);
 
 // env functions
 t_minishell		*init_minishell(char **envp);
@@ -245,7 +246,9 @@ int	process_export_arg(t_env **env, char *arg);
 int	bi_export(t_minishell *shell, char **args, int fd_out);
 
 bool	is_empty_assignment(const char *arg);
-int handle_overflow(const char *str);
+// int handle_overflow(const char *str);
+long long	ft_atoll(const char *str);
+// long long handle_overflow(const char *str);
 int	invalid_identifier(char *arg);
 int	have_equals(t_env **env, char *arg, char *equal_sign);
 // signals
@@ -254,6 +257,7 @@ void    handle_signal(int sig_num);
 void handle_heredoc_sigint(int sig);
 void setup_heredoc_signals(void);
 void    sig_reset(bool for_child);
+int	rl_heredoc(void);
 // void    sig_ignore(void);
 // void    sig_cmd(int sig_num);
 
@@ -297,7 +301,7 @@ void	go_to_sleep(pid_t last_pid, t_minishell *shell);
 int	count_env(t_env *env_list);
 
 //main functions
-char	*pre_token(int *exit_status);
+char	*pre_token(int *exit_status, t_minishell *shell);
 int	lex_and_expand(t_minishell *shell, char *input);
 int	parse_and_exec(t_minishell *shell, int *exit_status);
 // int ft_strcmp(char *s1, char *s2);
