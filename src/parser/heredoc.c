@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 11:24:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/31 15:22:15 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 16:44:49 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,40 +31,40 @@ int	create_heredoc_tempfile(char *out_path)
 	return (fd);
 }
 
-int	handle_heredoc_logic(t_heredoc *hd, t_minishell *shell, char *line)
-{
-	t_token	*temp_token;
+// int	handle_heredoc_logic(t_heredoc *hd, t_minishell *shell, char *line)
+// {
+// 	t_token	*temp_token;
 
-	if (!line)
-	{
-		ft_putstr_fd("minishell: warning: ", 2);
-		ft_putstr_fd("here-document delimited by end-of-file\n", 2);
-		return (1);
-	}
-	if (ft_strcmp(line, hd->delimiter) == 0)
-		return (free(line), 1);
-	if (hd->hd_quoted == false)
-	{
-		temp_token = create_token(line, T_STRING);
-		if (temp_token)
-		{
-			expand_heredoc_line(temp_token, shell);
-			write(hd->node->heredoc_fd, temp_token->value,
-				ft_strlen(temp_token->value));
-			write(hd->node->heredoc_fd, "\n", 1);
-			free_tokens(temp_token);
-		}
-	}
-	else
-	{
-		temp_token = create_token(line, T_STRING);
-		write(hd->node->heredoc_fd, temp_token->value,
-			ft_strlen(temp_token->value));
-		write(hd->node->heredoc_fd, "\n", 1);
-		free_tokens(temp_token);
-	}
-	return (0);
-}
+// 	if (!line)
+// 	{
+// 		ft_putstr_fd("minishell: warning: ", 2);
+// 		ft_putstr_fd("here-document delimited by end-of-file\n", 2);
+// 		return (1);
+// 	}
+// 	if (ft_strcmp(line, hd->delimiter) == 0)
+// 		return (free(line), 1);
+// 	if (hd->hd_quoted == false)
+// 	{
+// 		temp_token = create_token(line, T_STRING);
+// 		if (temp_token)
+// 		{
+// 			expand_heredoc_line(temp_token, shell);
+// 			write(hd->node->heredoc_fd, temp_token->value,
+// 				ft_strlen(temp_token->value));
+// 			write(hd->node->heredoc_fd, "\n", 1);
+// 			free_tokens(temp_token);
+// 		}
+// 	}
+// 	else
+// 	{
+// 		temp_token = create_token(line, T_STRING);
+// 		write(hd->node->heredoc_fd, temp_token->value,
+// 			ft_strlen(temp_token->value));
+// 		write(hd->node->heredoc_fd, "\n", 1);
+// 		free_tokens(temp_token);
+// 	}
+// 	return (0);
+// }
 
 void	process_heredoc_input(t_heredoc *hd, t_minishell *shell)
 {

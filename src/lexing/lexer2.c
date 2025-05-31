@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:22:17 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/31 15:01:48 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 18:10:15 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,25 @@ t_token	*extract_token(char *input, int *i, t_token **head, t_token **current)
 	return (new_token);
 }
 
+int	token_loop(char *input, int *i, t_token **head, t_token **current)
+{
+	if (ft_isspace(input[*i]))
+	{
+		(*i)++;
+		return (1);
+	}
+	if (is_invalid_redirection_sequence(input, *i))
+	{
+		printf("minishell: syntax error near unexpected token `%.3s'\n", input
+			+ *i);
+		free_tokens(*head);
+		return (0);
+	}
+	if (!extract_token(input, i, head, current))
+		return (0);
+	return (1);
+}
+
 t_token	*tokenize(char *input)
 {
 	t_token	*head;
@@ -41,18 +60,20 @@ t_token	*tokenize(char *input)
 	len = ft_strlen(input);
 	while (i < len)
 	{
-		if (ft_isspace(input[i]))
-		{
-			i++;
-			continue ;
-		}
-		if (is_invalid_redirection_sequence(input, i))
-		{
-			printf("minishell: syntax error near unexpected token `%.3s'\n",
-				input + i);
-			return (free_tokens(head), NULL);
-		}
-		if (!extract_token(input, &i, &head, &current))
+		// if (ft_isspace(input[i]))
+		// {
+		// 	i++;
+		// 	continue ;
+		// }
+		// if (is_invalid_redirection_sequence(input, i))
+		// {
+		// 	printf("minishell: syntax error near unexpected token `%.3s'\n",
+		// 		input + i);
+		// 	return (free_tokens(head), NULL);
+		// }
+		// if (!extract_token(input, &i, &head, &current))
+		// 	return (NULL);
+		if (!token_loop(input, &i, &head, &current))
 			return (NULL);
 	}
 	return (head);

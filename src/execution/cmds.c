@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/31 14:46:44 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 15:37:20 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,13 +104,11 @@ char	*search_in_path(char **dirs, char *cmd, t_minishell *shell)
 		{
 			if (access(full_path, X_OK) == 0)
 				return (free_split(dirs), full_path);
-			free(full_path);
-			permission_denied(cmd);
+			(free(full_path), permission_denied(cmd));
 			shell->last_exit_code = 126;
 			return (free_split(dirs), NULL);
 		}
-		free(full_path);
-		i++;
+		(free(full_path), i++);
 	}
 	cmd_not_found(cmd);
 	shell->last_exit_code = 127;

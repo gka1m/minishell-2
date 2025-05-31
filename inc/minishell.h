@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:34:33 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/31 15:30:03 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 18:15:50 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,7 +155,7 @@ int								ft_isspace(int c);
 bool							is_redirection(t_token *token);
 bool							is_invalid_redirection_sequence(char *input,
 									int i);
-char							*remove_quotes(char *str);
+// char							*remove_quotes(char *str);
 void							expand_variables(t_token *token,
 									t_minishell *shell);
 t_token							*handle_redirection_expansion(t_token *token,
@@ -164,7 +164,7 @@ t_token							*expand_all_tokens(t_token *tokens,
 									t_minishell *shell);
 t_token							*concatenate_adjacent_strings(t_token *tokens);
 
-char							*remove_outer_quotes(char *str);
+// char							*remove_outer_quotes(char *str);
 char							*expand_variables_with_quotes(char *str,
 									t_minishell *shell);
 int								is_valid_pipe_side(t_token *token,
@@ -188,12 +188,16 @@ void							handle_variable_expansion(char *str, int *i,
 char							*extract_variable_name(char *str, int *i);
 char							*get_variable_value(t_minishell *shell,
 									char *var_name);
+int								handle_token(t_token **temp, t_ast **cmd_node,
+									t_ast **result, t_minishell *shell);
+int								token_loop(char *input, int *i, t_token **head,
+									t_token **current);
 // void	append_char_to_result(char **result, char c);
 // void	handle_exit_status(char **result, t_minishell *shell);
 // void	handle_variable_name(char *str, size_t *i, char **result,
-		// t_minishell *shell);
+// t_minishell *shell);
 // void	handle_variable_expansion_in_str(char *str, size_t *i, char **result,
-		// t_minishell *shell);
+// t_minishell *shell);
 
 t_token							*extract_token(char *input, int *i,
 									t_token **head, t_token **current);
@@ -229,6 +233,9 @@ void							expand_heredoc_line(t_token *token,
 									t_minishell *shell);
 char							*remove_delim_q(const char *str);
 bool							is_quoted_string(const char *str);
+void							write_unquoted_heredoc(t_heredoc *hd,
+									t_minishell *shell, char *line);
+void							write_quoted_heredoc(t_heredoc *hd, char *line);
 
 // env functions
 t_minishell						*init_minishell(char **envp);
@@ -335,6 +342,8 @@ pid_t							exec_right(t_ast *node, t_minishell *shell,
 									int pipe_fd[2]);
 void							go_to_sleep(pid_t last_pid, t_minishell *shell);
 int								count_env(t_env *env_list);
+void							exec_simi(t_ast *node, t_minishell *shell,
+									char **args);
 
 // main functions
 char							*pre_token(int *exit_status,

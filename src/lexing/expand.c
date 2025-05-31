@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 10:57:25 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/31 15:31:36 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 18:19:07 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,44 +30,44 @@ int	process_char(char c, int *in_squote, int *in_dquote, char **result)
 	return (1);
 }
 
-char	*remove_quotes(char *str)
-{
-	char	*result;
-	int		in_squote;
-	int		in_dquote;
-	size_t	i;
+// char	*remove_quotes(char *str)
+// {
+// 	char	*result;
+// 	int		in_squote;
+// 	int		in_dquote;
+// 	size_t	i;
 
-	result = ft_strdup("");
-	in_squote = 0;
-	in_dquote = 0;
-	i = 0;
-	if (!str)
-		return (NULL);
-	while (str[i])
-	{
-		process_char(str[i], &in_squote, &in_dquote, &result);
-		i++;
-	}
-	return (result);
-}
+// 	result = ft_strdup("");
+// 	in_squote = 0;
+// 	in_dquote = 0;
+// 	i = 0;
+// 	if (!str)
+// 		return (NULL);
+// 	while (str[i])
+// 	{
+// 		process_char(str[i], &in_squote, &in_dquote, &result);
+// 		i++;
+// 	}
+// 	return (result);
+// }
 
-char	*remove_outer_quotes(char *str)
-{
-	size_t	len;
-	char	*result;
+// char	*remove_outer_quotes(char *str)
+// {
+// 	size_t	len;
+// 	char	*result;
 
-	if (!str)
-		return (NULL);
-	len = ft_strlen(str);
-	if (len >= 2 && ((str[0] == '\'' && str[len - 1] == '\'') || (str[0] == '"'
-				&& str[len - 1] == '"')))
-		result = ft_substr(str, 1, len - 2);
-	else
-		result = ft_strdup(str);
-	if (!result)
-		result = ft_strdup("");
-	return (result);
-}
+// 	if (!str)
+// 		return (NULL);
+// 	len = ft_strlen(str);
+// 	if (len >= 2 && ((str[0] == '\'' && str[len - 1] == '\'') || (str[0] == '"'
+// 				&& str[len - 1] == '"')))
+// 		result = ft_substr(str, 1, len - 2);
+// 	else
+// 		result = ft_strdup(str);
+// 	if (!result)
+// 		result = ft_strdup("");
+// 	return (result);
+// }
 
 void	process_str(t_token *token, t_minishell *shell)
 {

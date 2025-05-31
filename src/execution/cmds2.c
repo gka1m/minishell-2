@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 12:35:26 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/31 15:00:28 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 18:14:17 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,21 @@
 // 	sig_interactive();
 // }
 
+void	exec_simi(t_ast *node, t_minishell *shell, char **args)
+{
+	if (is_builtin(args[0]))
+	{
+		if (setup_redirections(node, shell) == -1)
+		{
+			shell->last_exit_code = 1;
+			return ;
+		}
+		shell->last_exit_code = execute_builtin(shell, args, 1);
+	}
+	else
+		not_bi(node, shell);
+}
+
 void	execute_command(t_ast *node, t_minishell *shell)
 {
 	int		i;
@@ -76,14 +91,15 @@ void	execute_command(t_ast *node, t_minishell *shell)
 	}
 	args = &node->args[i];
 	sig_reset(false);
-	if (is_builtin(args[0]))
-	{
-		if (setup_redirections(node, shell) == -1)
-			shell->last_exit_code = 1;
-		shell->last_exit_code = execute_builtin(shell, args, 1);
-	}
-	else
-		not_bi(node, shell);
+	// if (is_builtin(args[0]))
+	// {
+	// 	if (setup_redirections(node, shell) == -1)
+	// 		shell->last_exit_code = 1;
+	// 	shell->last_exit_code = execute_builtin(shell, args, 1);
+	// }
+	// else
+	// 	not_bi(node, shell);
+	exec_simi(node, shell, args);
 	sig_interactive();
 }
 

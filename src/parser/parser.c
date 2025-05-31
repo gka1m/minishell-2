@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:47:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/31 15:19:33 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 16:35:30 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ t_ast	*parse_command(t_token **tokens, t_minishell *shell)
 {
 	t_ast	*cmd_node;
 	t_ast	*result;
-	t_ast	*redir_node;
 	t_token	*temp;
 
 	cmd_node = create_ast_node(AST_CMD, shell);
@@ -52,23 +51,8 @@ t_ast	*parse_command(t_token **tokens, t_minishell *shell)
 	cmd_node->args = NULL;
 	while (temp && temp->type != T_PIPE)
 	{
-		if (temp->type == T_STRING)
-		{
-			cmd_node->args = append_arg(cmd_node->args, temp->value);
-			temp = temp->next;
-		}
-		else if (is_redirection(temp) || temp->type == T_HEREDOC)
-		{
-			if (temp->type == T_HEREDOC)
-				redir_node = parse_heredoc(&temp, result, shell);
-			else
-				redir_node = parse_redirection(&temp, result, shell);
-			if (!redir_node)
-				return (free_ast(cmd_node), NULL);
-			result = redir_node;
-		}
-		else
-			temp = temp->next;
+		if (!handle_token(&temp, &cmd_node, &result, shell))
+			return (free_ast(cmd_node), NULL);
 	}
 	*tokens = temp;
 	return (result);

@@ -20,7 +20,7 @@ SIG = src/signals/
 # Source files
 SRC = $(LEXER)lex_utils.c $(LEXER)lexer.c $(LEXER)grammar_check.c \
       $(LEXER)expand.c $(LEXER)lex_utils2.c $(LEXER)grammar_check2.c \
-	  $(LEXER)expand2.c $(LEXER)lexer2.c \
+	  $(LEXER)expand2.c $(LEXER)lexer2.c $(LEXER)expand3.c $(LEXER)expand_utils.c \
       $(ENV)env.c $(ENV)setup.c $(ENV)freeing.c $(ENV)add.c \
       $(ENV)delete.c $(ENV)print.c $(ENV)search.c $(ENV)update.c \
       $(ENV)print_export.c $(ENV)print_export2.c \
@@ -32,7 +32,7 @@ SRC = $(LEXER)lex_utils.c $(LEXER)lexer.c $(LEXER)grammar_check.c \
       $(BUILTIN)b_exit.c $(BUILTIN)b_export.c $(BUILTIN)b_pwd.c \
       $(BUILTIN)b_unset.c $(BUILTIN)b_export_utils.c \
       $(PARSE)parser.c $(PARSE)parse_utils.c $(PARSE)heredoc.c \
-	  $(PARSE)heredoc_utils.c $(PARSE)parse_utils2.c \
+	  $(PARSE)heredoc_utils.c $(PARSE)parse_utils2.c $(PARSE)heredoc_utils2.c \
 
 # Object files
 OBJ = $(SRC:.c=.o)

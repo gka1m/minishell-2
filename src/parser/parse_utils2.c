@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/31 15:18:53 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/31 15:21:19 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 16:35:57 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,4 +55,29 @@ char	**append_arg(char **args, char *new_arg)
 	if (args)
 		free_split(args);
 	return (new_args);
+}
+
+int	handle_token(t_token **temp, t_ast **cmd_node, t_ast **result,
+		t_minishell *shell)
+{
+	t_ast	*redir_node;
+
+	if ((*temp)->type == T_STRING)
+	{
+		(*cmd_node)->args = append_arg((*cmd_node)->args, (*temp)->value);
+		*temp = (*temp)->next;
+	}
+	else if (is_redirection(*temp) || (*temp)->type == T_HEREDOC)
+	{
+		if ((*temp)->type == T_HEREDOC)
+			redir_node = parse_heredoc(temp, *result, shell);
+		else
+			redir_node = parse_redirection(temp, *result, shell);
+		if (!redir_node)
+			return (0);
+		*result = redir_node;
+	}
+	else
+		*temp = (*temp)->next;
+	return (1);
 }

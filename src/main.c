@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/31 15:26:12 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 18:43:23 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,6 @@ int	lex_and_expand(t_minishell *shell, char *input)
 		return (0);
 	}
 	expand_all_tokens(shell->tokens, shell);
-	// print_tokens(shell->tokens);
 	return (1);
 }
 
@@ -81,7 +80,6 @@ int	parse_and_exec(t_minishell *shell, int *exit_status)
 		free_tokens(shell->tokens);
 		return (0);
 	}
-	// print_ast(shell->ast, 0);
 	*exit_status = execution_logic(shell->ast, shell);
 	free_tokens(shell->tokens);
 	free_ast(shell->ast);
