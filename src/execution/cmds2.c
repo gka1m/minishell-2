@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 12:35:26 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/31 12:27:24 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 15:00:28 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,11 +79,7 @@ void	execute_command(t_ast *node, t_minishell *shell)
 	if (is_builtin(args[0]))
 	{
 		if (setup_redirections(node, shell) == -1)
-		{
 			shell->last_exit_code = 1;
-			// restore_standard_fds(shell);
-			// return ;
-		}
 		shell->last_exit_code = execute_builtin(shell, args, 1);
 	}
 	else
@@ -94,7 +90,6 @@ void	execute_command(t_ast *node, t_minishell *shell)
 void	not_bi(t_ast *node, t_minishell *shell)
 {
 	pid_t	pid;
-	// int		status;
 
 	pid = fork();
 	if (pid == 0)
@@ -102,7 +97,6 @@ void	not_bi(t_ast *node, t_minishell *shell)
 		sig_reset(true);
 		if (setup_redirections(node, shell) == -1)
 			cleanup_and_exit(shell, 1);
-		// status = execute_external(node, shell);
 		shell->last_exit_code = execute_external(node, shell);
 		cleanup_and_exit(shell, shell->last_exit_code);
 	}
@@ -122,9 +116,10 @@ int	is_builtin(char *cmd)
 {
 	if (!cmd)
 		return (0);
-	return (ft_strcmp(cmd, "cd") == 0 || ft_strcmp(cmd, "echo") == 0 || ft_strcmp(cmd,
-			"env") == 0 || ft_strcmp(cmd, "exit") == 0 || ft_strcmp(cmd, "pwd") == 0
-		|| ft_strcmp(cmd, "export") == 0 || ft_strcmp(cmd, "unset") == 0);
+	return (ft_strcmp(cmd, "cd") == 0 || ft_strcmp(cmd, "echo") == 0
+		|| ft_strcmp(cmd, "env") == 0 || ft_strcmp(cmd, "exit") == 0
+		|| ft_strcmp(cmd, "pwd") == 0 || ft_strcmp(cmd, "export") == 0
+		|| ft_strcmp(cmd, "unset") == 0);
 }
 
 void	handle_parent_process(pid_t pid, t_minishell *shell)

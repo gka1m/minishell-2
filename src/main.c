@@ -6,62 +6,11 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/31 14:10:40 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 15:26:12 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minishell.h"
-
-void	print_ast(t_ast *node, int level)
-{
-	if (!node)
-		return ;
-	// Print indentation based on the level
-	for (int i = 0; i < level; i++)
-		printf(" ");
-	// Print the node type
-	switch (node->type)
-	{
-	case AST_CMD:
-		printf("CMD: ");
-		for (int i = 0; node->args && node->args[i]; i++)
-			printf("%s ", node->args[i]);
-		printf("\n");
-		break ;
-	case AST_PIPE:
-		printf("PIPE:\n");
-		break ;
-	case AST_REDIR_IN:
-		printf("REDIR_IN: %s\n", node->file);
-		break ;
-	case AST_REDIR_OUT:
-		printf("REDIR_OUT: %s\n", node->file);
-		break ;
-	case AST_APPEND:
-		printf("APPEND: %s\n", node->file);
-		break ;
-	case AST_HEREDOC:
-		printf("HEREDOC: %s\n", node->file);
-		break ;
-	default:
-		printf("UNKNOWN NODE TYPE\n");
-	}
-	// Recursively print left and right children
-	print_ast(node->left, level + 1);
-	print_ast(node->right, level + 1);
-}
-
-void	print_tokens(t_token *tokens)
-{
-	t_token	*temp;
-
-	temp = tokens;
-	while (temp)
-	{
-		printf("Token: %s, Type: %d\n", temp->value, temp->type);
-		temp = temp->next;
-	}
-}
 
 int	ft_strcmp(const char *s1, const char *s2)
 {
@@ -77,13 +26,11 @@ char	*pre_token(int *exit_status, t_minishell *shell)
 {
 	char	*input;
 
-	// g_signal_flag = 0;
 	sig_interactive();
 	input = readline("minishell> ");
 	if (g_signal_flag == 1)
 	{
 		shell->last_exit_code = 130;
-		// free(input);
 		*exit_status = 130;
 		g_signal_flag = 0;
 		if (input)
@@ -154,15 +101,12 @@ int	main(int argc, char **argv, char **envp)
 	shell = init_minishell(envp);
 	g_signal_flag = 0;
 	if (!shell)
-	{
-		ft_putstr_fd("minishell: initialization failed\n", STDERR_FILENO);
-		return (free(shell), 1);
-	}
+		return (ft_putstr_fd("minishell: init failed\n", 2), free(shell), 1);
 	while (1)
 	{
 		input = pre_token(&exit_status, shell);
 		if (!input)
-			break;
+			break ;
 		if (!lex_and_expand(shell, input))
 			continue ;
 		if (!parse_and_exec(shell, &exit_status))
@@ -170,6 +114,57 @@ int	main(int argc, char **argv, char **envp)
 	}
 	return (rl_clear_history(), free_minishell(shell), exit_status);
 }
+
+// void	print_ast(t_ast *node, int level)
+// {
+// 	if (!node)
+// 		return ;
+// 	// Print indentation based on the level
+// 	for (int i = 0; i < level; i++)
+// 		printf(" ");
+// 	// Print the node type
+// 	switch (node->type)
+// 	{
+// 	case AST_CMD:
+// 		printf("CMD: ");
+// 		for (int i = 0; node->args && node->args[i]; i++)
+// 			printf("%s ", node->args[i]);
+// 		printf("\n");
+// 		break ;
+// 	case AST_PIPE:
+// 		printf("PIPE:\n");
+// 		break ;
+// 	case AST_REDIR_IN:
+// 		printf("REDIR_IN: %s\n", node->file);
+// 		break ;
+// 	case AST_REDIR_OUT:
+// 		printf("REDIR_OUT: %s\n", node->file);
+// 		break ;
+// 	case AST_APPEND:
+// 		printf("APPEND: %s\n", node->file);
+// 		break ;
+// 	case AST_HEREDOC:
+// 		printf("HEREDOC: %s\n", node->file);
+// 		break ;
+// 	default:
+// 		printf("UNKNOWN NODE TYPE\n");
+// 	}
+// 	// Recursively print left and right children
+// 	print_ast(node->left, level + 1);
+// 	print_ast(node->right, level + 1);
+// }
+
+// void	print_tokens(t_token *tokens)
+// {
+// 	t_token	*temp;
+
+// 	temp = tokens;
+// 	while (temp)
+// 	{
+// 		printf("Token: %s, Type: %d\n", temp->value, temp->type);
+// 		temp = temp->next;
+// 	}
+// }
 
 // int main(int argc, char **argv, char **envp)
 // {
@@ -254,7 +249,6 @@ int	main(int argc, char **argv, char **envp)
 //         }
 //         // Execution
 //         print_ast(shell->ast, 0);
-        
 //         exit_status = execution_logic(shell->ast, shell);
 //         // Cleanup after each command
 // 		// close(shell->ast->heredoc_fd);

@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:48:32 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/29 10:11:41 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 15:02:29 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ t_ast	*create_ast_node(t_ast_type type, t_minishell *shell)
 	node->right = NULL;
 	node->shell = shell;
 	node->heredoc_fd = -1;
-	// node->hd_quoted = false;hd_quoted
 	return (node);
 }
 

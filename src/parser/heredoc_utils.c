@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/21 14:38:28 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/21 14:38:54 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 15:22:24 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,4 +54,17 @@ void	ft_strcat(char *dst, const char *src)
 	while (*src)
 		*dst++ = *src++;
 	*dst = '\0';
+}
+
+void	close_unused_heredocs(t_ast *root, t_ast *current_node)
+{
+	if (!root)
+		return ;
+	if (root != current_node && root->heredoc_fd != -1)
+	{
+		close(root->heredoc_fd);
+		root->heredoc_fd = -1;
+	}
+	close_unused_heredocs(root->left, current_node);
+	close_unused_heredocs(root->right, current_node);
 }

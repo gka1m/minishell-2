@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 15:34:55 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/29 10:00:24 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 14:44:43 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,6 @@ char	**convert_env_to_array(t_env *env_list)
 
 	count = count_env(env_list);
 	current = env_list;
-	// while (current)
-	// {
-	// 	count++;
-	// 	current = current->next;
-	// }
 	env_array = malloc(sizeof(char *) * (count + 1));
 	if (!env_array)
 		return (NULL);

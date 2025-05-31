@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 11:08:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/27 17:04:38 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 14:56:19 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,27 +145,20 @@ pid_t	exec_right(t_ast *node, t_minishell *shell, int pipe_fd[2])
 	return (r_pid);
 }
 
-// void	go_to_sleep(pid_t l_pid, pid_t r_pid, t_minishell *shell)
+// void	go_to_sleep(pid_t last_pid, t_minishell *shell)
 // {
-// 	int	status;
+// 	int		status;
+// 	pid_t	pid;
 
-// 	waitpid(l_pid, &status, 0);
-// 	if (WIFEXITED(status))
-// 		shell->last_exit_code = WEXITSTATUS(status);
-// 	else if (WIFSIGNALED(status))
+// 	while ((pid = wait(&status)) > 0)
 // 	{
-// 		shell->last_exit_code = 128 + WTERMSIG(status);
-// 		if (WTERMSIG(status) == SIGINT)
-// 			ft_putstr_fd("\n", STDERR_FILENO);
-// 	}
-// 	waitpid(r_pid, &status, 0);
-// 	if (WIFEXITED(status))
-// 		shell->last_exit_code = WEXITSTATUS(status);
-// 	else if (WIFSIGNALED(status))
-// 	{
-// 		shell->last_exit_code = 128 + WTERMSIG(status);
-// 		if (WTERMSIG(status) == SIGINT)
-// 			ft_putstr_fd("\n", STDERR_FILENO);
+// 		if (pid == last_pid)
+// 		{
+// 			if (WIFEXITED(status))
+// 				shell->last_exit_code = WEXITSTATUS(status);
+// 			else if (WIFSIGNALED(status))
+// 				shell->last_exit_code = 128 + WTERMSIG(status);
+// 		}
 // 	}
 // }
 
@@ -174,22 +167,19 @@ void	go_to_sleep(pid_t last_pid, t_minishell *shell)
 	int		status;
 	pid_t	pid;
 
-	while ((pid = wait(&status)) > 0)
+	pid = wait(&status);
+	while (pid > 0)
 	{
 		if (pid == last_pid)
 		{
 			if (WIFEXITED(status))
 				shell->last_exit_code = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
-			{
 				shell->last_exit_code = 128 + WTERMSIG(status);
-				// if (WTERMSIG(status) == SIGINT)
-				// 	ft_putstr_fd("\n", STDERR_FILENO);
-			}
 		}
+		pid = wait(&status);
 	}
 }
-
 
 void	execute_pipeline(t_ast *node, t_minishell *shell, int input_fd)
 {

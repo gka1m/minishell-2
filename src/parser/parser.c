@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:47:58 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/29 10:28:43 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 15:19:33 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,32 +37,16 @@ t_ast	*parse_pipeline(t_token **tokens, t_minishell *shell)
 	return (left);
 }
 
-char	**append_arg(char **args, char *new_arg)
-{
-	size_t	len = 0;
-	char	**new_args;
-
-	while (args && args[len])
-		len++;
-	new_args = malloc(sizeof(char *) * (len + 2));
-	if (!new_args)
-		return (NULL);
-	for (size_t i = 0; i < len; i++)
-		new_args[i] = ft_strdup(args[i]);
-	new_args[len] = ft_strdup(new_arg);
-	new_args[len + 1] = NULL;
-	if (args)
-		free_split(args); // Free old array but not individual strings (we reused)
-	return (new_args);
-}
-
 t_ast	*parse_command(t_token **tokens, t_minishell *shell)
 {
-	t_ast	*cmd_node = create_ast_node(AST_CMD, shell);
-	t_ast	*result = cmd_node;
+	t_ast	*cmd_node;
+	t_ast	*result;
 	t_ast	*redir_node;
-	t_token	*temp = *tokens;
+	t_token	*temp;
 
+	cmd_node = create_ast_node(AST_CMD, shell);
+	result = cmd_node;
+	temp = *tokens;
 	if (!cmd_node)
 		return (NULL);
 	cmd_node->args = NULL;
@@ -88,7 +72,6 @@ t_ast	*parse_command(t_token **tokens, t_minishell *shell)
 	}
 	*tokens = temp;
 	return (result);
-
 }
 
 // t_ast	*parse_command(t_token **tokens, t_minishell *shell)
@@ -102,7 +85,7 @@ t_ast	*parse_command(t_token **tokens, t_minishell *shell)
 // 	temp = *tokens;
 // 	while (temp && temp->type != T_PIPE)
 // 	{
-		
+
 // 		if (temp && temp->type == T_STRING)
 // 		{
 // 			cmd_node = create_ast_node(AST_CMD, shell);
@@ -181,22 +164,6 @@ t_ast	*parse_redirection(t_token **tokens, t_ast *left, t_minishell *shell)
 	return (redir_node);
 }
 
-bool	is_quoted_string(const char *str)
-{
-	size_t len = ft_strlen(str);
-	return (len >= 2 && ((str[0] == '\'' && str[len - 1] == '\'') || 
-	                     (str[0] == '"' && str[len - 1] == '"')));
-}
-
-char	*remove_delim_q(const char *str)
-{
-	size_t len = ft_strlen(str);
-	if (is_quoted_string(str))
-		return (ft_substr(str, 1, len - 2));
-	else
-		return (ft_strdup(str));
-}
-
 t_ast	*parse_heredoc(t_token **tokens, t_ast *left, t_minishell *shell)
 {
 	t_token	*temp;
@@ -218,7 +185,6 @@ t_ast	*parse_heredoc(t_token **tokens, t_ast *left, t_minishell *shell)
 	heredoc_node->file = remove_delim_q(temp->value);
 	if (!heredoc_node->file)
 		return (free_ast(heredoc_node), free_ast(left), NULL);
-	// heredoc_node->hd_quoted = (temp->value[0] == '\'' || temp->value[0] == '"');
 	heredoc_node->left = left;
 	*tokens = temp->next;
 	return (heredoc_node);

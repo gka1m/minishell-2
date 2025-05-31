@@ -24,7 +24,7 @@ SRC = $(LEXER)lex_utils.c $(LEXER)lexer.c $(LEXER)grammar_check.c \
       $(ENV)env.c $(ENV)setup.c $(ENV)freeing.c $(ENV)add.c \
       $(ENV)delete.c $(ENV)print.c $(ENV)search.c $(ENV)update.c \
       $(ENV)print_export.c $(ENV)print_export2.c \
-      $(SIG)signal.c \
+      $(SIG)signal.c $(SIG)signal2.c \
       $(SRC_DIR)main.c \
       $(EXEC)utils.c $(EXEC)exec.c $(EXEC)cmds.c $(EXEC)error.c \
       $(EXEC)pipe.c $(EXEC)redir.c $(EXEC)cmds2.c \
@@ -32,7 +32,7 @@ SRC = $(LEXER)lex_utils.c $(LEXER)lexer.c $(LEXER)grammar_check.c \
       $(BUILTIN)b_exit.c $(BUILTIN)b_export.c $(BUILTIN)b_pwd.c \
       $(BUILTIN)b_unset.c $(BUILTIN)b_export_utils.c \
       $(PARSE)parser.c $(PARSE)parse_utils.c $(PARSE)heredoc.c \
-	  $(PARSE)heredoc_utils.c \
+	  $(PARSE)heredoc_utils.c $(PARSE)parse_utils2.c \
 
 # Object files
 OBJ = $(SRC:.c=.o)

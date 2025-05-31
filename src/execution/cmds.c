@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:21:45 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/30 15:45:56 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 14:46:44 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,46 +33,6 @@ int	execute_builtin(t_minishell *shell, char **args, int fd_out)
 	return (0);
 }
 
-// void	execute_external(t_ast *node, t_minishell *shell)
-// {
-// 	pid_t	pid;
-// 	char	**env_array;
-// 	char	*full_path;
-
-// 	if (!node || !node->args || !node->args[0])
-// 		return ;
-// 	pid = fork();
-// 	if (pid == -1)
-// 	{
-// 		perror("minishell: fork");
-// 		shell->last_exit_code = 1;
-// 		return ;
-// 	}
-// 	if (pid == 0)
-// 	{ // Child process
-// 		sig_reset(true);
-// 		if (setup_redirections(node, shell) == -1)
-// 			exit(1);
-// 		env_array = convert_env_to_array(shell->env_list);
-// 		if (!env_array)
-// 			exit(1);
-// 		full_path = find_command_path(node->args[0], shell); // Pass shell now
-// 		if (!full_path)
-// 		{
-// 			free_split(env_array);
-// 			exit(127);
-// 		}
-// 		execve(full_path, node->args, env_array);
-// 		// If execve fails
-// 		perror("minishell: execve");
-// 		free(full_path);
-// 		free_split(env_array);
-// 		exit(126);
-// 	}
-// 	else // Parent process
-// 		handle_parent_process(pid, shell);
-// }
-
 int	execute_external(t_ast *node, t_minishell *shell)
 {
 	char	**env_array;
@@ -94,29 +54,10 @@ int	execute_external(t_ast *node, t_minishell *shell)
 	if (shell->stdio_backup[0] != -1)
 		close(shell->stdio_backup[0]);
 	execve(full_path, node->args, env_array);
-	// perror("minishell: execve");
 	free(full_path);
 	free_split(env_array);
 	return (0);
 }
-
-// char	*check_direct_path(char *cmd)
-// {
-// 	struct stat	sb;
-
-// 	if (stat(cmd, &sb) == 0 && S_ISDIR(sb.st_mode))
-// 	{
-// 		ft_putstr_fd("minishell: ", 2);
-// 		ft_putstr_fd(cmd, 2);
-// 		ft_putstr_fd(": Is a directory\n", 2);
-// 		return (NULL); // exit code 126 (command found but not executable)
-// 	}
-// 	if (access(cmd, F_OK) != 0)
-// 		return (no_file(cmd), NULL);
-// 	if (access(cmd, X_OK) != 0)
-// 		return (cmd_not_found(cmd), NULL);
-// 	return (ft_strdup(cmd));
-// }
 
 char	*check_direct_path(char *cmd, t_minishell *shell)
 {
@@ -176,56 +117,15 @@ char	*search_in_path(char **dirs, char *cmd, t_minishell *shell)
 	return (free_split(dirs), NULL);
 }
 
-// char	*search_in_path(char **dirs, char *cmd)
-// {
-// 	char	*full_path;
-// 	int		i;
-
-// 	i = 0;
-// 	while (dirs[i])
-// 	{
-// 		full_path = join_str(dirs[i], "/", cmd);
-// 		if (!full_path)
-// 		{
-// 			i++;
-// 			continue ;
-// 		}
-// 		if (access(full_path, F_OK) == 0)
-// 		{
-// 			if (access(full_path, X_OK) == 0)
-// 				return (free_split(dirs), full_path);
-// 			free(full_path);
-// 			permission_denied(cmd);
-// 			// break ;
-// 		}
-// 		free(full_path);
-// 		i++;
-// 	}
-// 	return (free_split(dirs), cmd_not_found(cmd), NULL);
-// }
-
 char	*find_command_path(char *cmd, t_minishell *shell)
 {
 	t_env	*path_node;
 	char	**dirs;
 
-	// char *full_path;
-	// int	i;
 	if (!cmd || !shell || !shell->env_list)
 		return (NULL);
 	if (ft_strchr(cmd, '/'))
-	{
-		// if (access(cmd, F_OK) == 0)
-		// {
-		// 	if (access(cmd, X_OK) == 0)
-		// 		return (ft_strdup(cmd));
-		// 	cmd_not_found(cmd);
-		// }
-		// else
-		// 	no_file(cmd);
-		// return (NULL);
 		return (check_direct_path(cmd, shell));
-	}
 	path_node = find_env_var(shell->env_list, "PATH");
 	if (!path_node || !path_node->value)
 	{
@@ -235,25 +135,6 @@ char	*find_command_path(char *cmd, t_minishell *shell)
 	dirs = ft_split(path_node->value, ':');
 	if (!dirs)
 		return (NULL);
-	// full_path = NULL;
-	// i = 0;
-	// while(dirs[i])
-	// {
-	// 	full_path = join_str(dirs[i], "/", cmd);
-	// 	if (!full_path)
-	// 		continue ;
-	// 	if (access(full_path, F_OK) == 0)
-	// 	{
-	// 		if (access(full_path, X_OK) == 0)
-	// 			return (free_split(dirs), full_path);
-	// 		free(full_path);
-	// 		permission_denied(cmd);
-	// 		break ;
-	// 	}
-	// 	free(full_path);
-	// 	i++;
-	// }
-	// return (cmd_not_found(cmd), free_split(dirs), NULL);
 	return (search_in_path(dirs, cmd, shell));
 }
 

@@ -1,39 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   delete.c                                           :+:      :+:    :+:   */
+/*   signal2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/01 12:30:39 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/31 14:35:35 by kagoh            ###   ########.fr       */
+/*   Created: 2025/05/31 15:13:14 by kagoh             #+#    #+#             */
+/*   Updated: 2025/05/31 15:13:41 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-// Delete an environment variable
-void	delete_env_var(t_env **env, const char *key)
+void	setup_heredoc_signals(void)
 {
-	t_env	*temp;
-	t_env	*prev;
+	struct sigaction	sa;
 
-	temp = *env;
-	prev = NULL;
-	if (temp && ft_strncmp(temp->key, key, ft_strlen(key) + 1) == 0)
+	sa.sa_handler = handle_heredoc_sigint;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGINT, &sa, NULL);
+	sa.sa_handler = SIG_IGN;
+	sigaction(SIGQUIT, &sa, NULL);
+}
+
+void	handle_heredoc_sigint(int sig)
+{
+	(void)sig;
+	g_signal_flag = 1;
+	rl_done = 1;
+}
+
+int	rl_heredoc(void)
+{
+	if (g_signal_flag)
 	{
-		*env = temp->next;
-		return ;
+		rl_replace_line("", 0);
+		rl_redisplay();
 	}
-	while (temp && ft_strncmp(temp->key, key, ft_strlen(key) + 1) != 0)
-	{
-		prev = temp;
-		temp = temp->next;
-	}
-	if (!temp)
-		return ;
-	prev->next = temp->next;
-	free(temp->key);
-	free(temp->value);
-	free(temp);
+	return (0);
 }

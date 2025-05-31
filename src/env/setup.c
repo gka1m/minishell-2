@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 17:08:13 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/29 11:20:14 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 14:36:45 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,8 @@ t_env	*init_env(char **envp)
 	if (!envp || !*envp)
 		return (init_minimal_env());
 	env = NULL;
-	i = 0;
-	while (envp[i])
+	i = -1;
+	while (envp[++i])
 	{
 		sep = ft_strchr(envp[i], '=');
 		if (sep)
@@ -36,10 +36,8 @@ t_env	*init_env(char **envp)
 			ft_strlcpy(key, envp[i], sep - envp[i] + 1);
 			value = ft_strdup(sep + 1);
 			add_env_var(&env, key, value);
-			free(key);
-			free(value);
+			(free(key), free(value));
 		}
-		i++;
 	}
 	return (env);
 }
@@ -86,7 +84,6 @@ t_env	*init_minimal_env(void)
 	add_env_var(&env, "PATH", "/usr/local/bin:/usr/bin:/bin");
 	return (env);
 }
-
 
 // // Update an existing environment variable
 // void	update_env_var(t_env *env, const char *key, const char *new_value)

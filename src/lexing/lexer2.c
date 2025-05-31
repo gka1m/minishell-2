@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:22:17 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/29 11:12:53 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 15:01:48 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,12 +52,6 @@ t_token	*tokenize(char *input)
 				input + i);
 			return (free_tokens(head), NULL);
 		}
-		// if (precheck(input, &i, &head))
-		// 	return (NULL);
-		// new_token = classify_token(input, &i);
-		// if (!new_token)
-		// 	return (free_tokens(head), NULL);
-		// link_tokens(&head, &current, new_token);
 		if (!extract_token(input, &i, &head, &current))
 			return (NULL);
 	}
