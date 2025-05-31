@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 14:36:31 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/30 15:57:51 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 14:10:40 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,16 +77,18 @@ char	*pre_token(int *exit_status, t_minishell *shell)
 {
 	char	*input;
 
-	g_signal_flag = 0;
+	// g_signal_flag = 0;
 	sig_interactive();
 	input = readline("minishell> ");
 	if (g_signal_flag == 1)
 	{
 		shell->last_exit_code = 130;
-		free(input);
+		// free(input);
 		*exit_status = 130;
-		// g_signal_flag = 0;
-		return (ft_strdup(""));
+		g_signal_flag = 0;
+		if (input)
+			return (input);
+		return (NULL);
 	}
 	if (!input)
 	{
@@ -150,6 +152,7 @@ int	main(int argc, char **argv, char **envp)
 	(void)argv;
 	exit_status = 0;
 	shell = init_minishell(envp);
+	g_signal_flag = 0;
 	if (!shell)
 	{
 		ft_putstr_fd("minishell: initialization failed\n", STDERR_FILENO);
@@ -159,7 +162,7 @@ int	main(int argc, char **argv, char **envp)
 	{
 		input = pre_token(&exit_status, shell);
 		if (!input)
-			break ;
+			break;
 		if (!lex_and_expand(shell, input))
 			continue ;
 		if (!parse_and_exec(shell, &exit_status))
@@ -186,9 +189,9 @@ int	main(int argc, char **argv, char **envp)
 //     }
 //     // rl_catch_signals = 0;
 
+// 	g_signal_flag = 0;
 //     while (1)
 //     {
-// 		g_signal_flag = 0;
 // 		sig_interactive();
 //         input = readline("minishell> ");
 // 		if (g_signal_flag == 1)
@@ -263,4 +266,4 @@ int	main(int argc, char **argv, char **envp)
 //     rl_clear_history();
 //     free_minishell(shell);
 //     return (exit_status);
-// }
+// }	

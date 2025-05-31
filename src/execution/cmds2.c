@@ -6,7 +6,7 @@
 /*   By: kagoh <kagoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 12:35:26 by kagoh             #+#    #+#             */
-/*   Updated: 2025/05/30 15:54:29 by kagoh            ###   ########.fr       */
+/*   Updated: 2025/05/31 12:27:24 by kagoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,10 @@ void	execute_command(t_ast *node, t_minishell *shell)
 	while (node->args[i] && node->args[i][0] == '\0')
 		i++;
 	if (!node->args[i])
+	{
+		shell->last_exit_code = 0;
 		return ;
+	}
 	args = &node->args[i];
 	sig_reset(false);
 	if (is_builtin(args[0]))
@@ -91,7 +94,7 @@ void	execute_command(t_ast *node, t_minishell *shell)
 void	not_bi(t_ast *node, t_minishell *shell)
 {
 	pid_t	pid;
-	int		status;
+	// int		status;
 
 	pid = fork();
 	if (pid == 0)
@@ -99,9 +102,9 @@ void	not_bi(t_ast *node, t_minishell *shell)
 		sig_reset(true);
 		if (setup_redirections(node, shell) == -1)
 			cleanup_and_exit(shell, 1);
-		status = execute_external(node, shell);
-		// shell->last_exit_code = execute_external(node, shell);
-		cleanup_and_exit(shell, status);
+		// status = execute_external(node, shell);
+		shell->last_exit_code = execute_external(node, shell);
+		cleanup_and_exit(shell, shell->last_exit_code);
 	}
 	else if (pid > 0)
 	{
